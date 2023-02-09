@@ -1,0 +1,54 @@
+---
+title: ''
+output: pdf_document
+indent: true
+---
+
+\addcontentsline{toc}{section}{Acknowledgements}
+
+\section*{Acknowledgements}
+
+<!-- Thank you to: -->
+
+<!-- Stéphane Verguet -->
+<!-- Margaret McConnell -->
+<!-- Jessica Cohen -->
+
+<!-- Feedback from: -->
+
+<!-- <!-- Sebastian Bauhoff (early ideas) -->
+<!-- <!-- Kevin Croke (early ideas) --> 
+<!-- <!-- Harvard Center for Population and Development Studies  --> 
+<!-- <!-- David Canning (teaching and econometrics) --> 
+
+<!-- Support from: -->
+
+<!-- Jarvis Chen -->
+<!-- Bruce Villineau -->
+<!-- Matthew Boccuzzi -->
+<!-- Claudette Agustin -->
+
+<!-- Allison Conary -->
+<!-- Barbara Heil -->
+
+<!-- Friends at HSPH: -->
+<!-- ... -->
+<!-- Family: -->
+<!-- Partner: -->
+
+
+\newpage
+
+\hspace{0pt}
+
+\vfill
+
+\begin{raggedright}
+
+\emph{Dedicated to ....}
+
+\end{raggedright}
+
+\vfill
+
+\hspace{0pt}

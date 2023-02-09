@@ -1,0 +1,15 @@
+---
+title: ''
+output: pdf_document
+
+---
+
+\addcontentsline{toc}{section}{Conclusion}
+\section*{Conclusion}
+
+Thank you for following this tutorial! 
+
+I hope you'll find it useful to write a very professional dissertation. 
+
+\cite{ngTracingPathChikungunya2010}
+

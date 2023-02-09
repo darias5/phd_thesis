@@ -1,0 +1,152 @@
+---
+title: ''
+output: pdf_document
+header-includes:
+  - \usepackage{float}
+
+---
+
+# Chapter 1: Quantifying the global burden of mental disorders and their economic value
+
+\begin{raggedright}
+
+{\bf Background:} Epidemiological and economic estimates suggest that the global burden of mental disorders is considerable, both in its impacts on human health and losses to societal welfare. The availability of additional data and the emergence of new approaches present an opportunity to examine these estimates, which form a critical part in making the investment case for global mental health.
+
+{\bf Methods:} This study reviews, develops, and incorporates new estimates and methods in quantifying the global burden of mental illness. Using a composite estimation approach that accounts for premature mortality due to mental disorders and additional sources of morbidity and applying a value of a statistical life approach to economic valuation, we determine global and regional estimates of the economic cost that can be associated with mental disorders, building on data from the 2019 Global Burden of Disease study. 
+
+{\bf Findings:} We estimate that 418 million disability-adjusted life years (DALYs) could be attributable to mental disorders in 2019 (16\% of global DALYs)—a more than three-fold increase compared to conventional estimates. The economic value associated with this burden is estimated at about USD 5 trillion. At a regional level, the losses could account for between 4\% of gross domestic product in Eastern sub-Saharan Africa and 8\% in High-income North America.
+
+{\bf Interpretation:} The burden of mental illness in terms of both health and economic losses may be much higher than previously assessed.
+
+{\bf Funding:} None.
+
+\vspace{24pt}
+
+\emph{Keywords: mental health, disease burden, premature mortality, economic burden.}
+
+\end{raggedright}
+
+\newpage
+
+
+## Introduction
+
+
+Mental health is an essential part of human flourishing. As defined by the World Health Organization (WHO), it encompasses “a state of well-being in which every individual realizes [their] own potential, can cope with the normal stresses of life, can work productively and fruitfully, and is able to make a contribution to [their] community.[@worldhealthorganizationComprehensiveMentalHealth2013]” For much of the global population, however, attaining this state of mental health is an enduring challenge, with over one billion people worldwide living with a mental or addictive disorder.[@rehmGlobalBurdenDisease2019] Mental disorders are both leading causes of disability and significant risk factors for premature mortality.[@charlsonExcessMortalityMental2015; @rehmGlobalBurdenDisease2019] At all levels of sociodemographic development, this burden of morbidity and mortality is rising.[@patelLancetCommissionGlobal2018] Furthermore, as the COVID-19 pandemic continues, there is growing and alarming evidence of its detrimental psychological and psychiatric effects—for patients, health care workers, and the public overall.[@vindegaardCOVID19PandemicMental2020] 
+
+The magnitude of disability caused by mental disorders has galvanized a global movement and a call to action for greater investment and prioritization for mental health.[@patelRenewedAgendaGlobal2011] This movement has emphasized the importance of investing in mental health as a means of promoting sustainable development, human rights, and social inclusion.[@patelLancetCommissionGlobal2018]
+
+A critical link between mental health and development arises from the economic consequences of mental disorders. A growing body of literature suggests that mental disorders are costly, both in the direct medical costs of care, outpatient visits, and hospitalizations, and in indirect costs, such as losses in income and productivity due to disability, which may cause absenteeism and presenteeism.[@trautmannEconomicCostsMental2016] These costs further worsen conditions of poverty[@patelPovertyCommonMental2003]—a vulnerability that, in turn, worsens mental health, feeding a vicious cycle of poverty and illness.[@lundPovertyCommonMental2010] At the national level, mental disorders deplete the supply of labor and capital, resulting in poorer economic output.[@canavanPsychologicalDistressGhana2013] Among households and nations alike, the burden of mental illness thus has considerable economic consequences and poses a challenge to both health and wealth.
+
+Evaluating the economic burden of mental illness is a critical part in making the investment case for global mental health, informing public health decision-making, and guiding priority-setting and the scale up of much-needed interventions.[@chisholmScalingupTreatmentDepression2016] At the global level, however, the most recent estimate of the economic impact of mental disorders was published in 2011, using burden of disease estimates from 2004.[@bloomGlobalEconomicBurden2011] This study used three distinct approaches to quantify the economic burden of non-communicable diseases (NCDs), including mental illnesses.[@bloomGlobalEconomicBurden2011] The first is a cost-of-illness (COI) analysis, which includes the direct costs of illness as well as the indirect costs (e.g., lost productivity). The second is a value of lost output approach, which estimates the effects of illness on gross domestic product (GDP) due to the depletion of labor and capital. The third builds from value of a statistical life (VSL) approaches and attempts to capture a population’s willingness to pay to reduce morbidity and mortality associated with illness. This expands on the COI and value of lost output approaches, as it puts an economic value on the loss of health itself. 
+
+With a third of disability-adjusted life years (DALYs) due to NCDs arising from mental disorders, this landmark paper estimated that the value of losses due to mental disorders was roughly 1·3 trillion USD in 2010 (1·6 trillion USD in 2019) when DALYs were valued at one times GDP per capita.[@bloomGlobalEconomicBurden2011] The authors further projected that these losses would grow to nearly 2·5 trillion USD 2010 (or approximately 3·0 trillion USD in 2019) by 2030. (See Supplementary appendix Tables S1 and S2 for estimates from the other two approaches.) These estimates have been widely cited in calls to action concerning global mental health.[@patelLancetCommissionGlobal2018; @thelancetglobalhealthMentalHealthMatters2020]
+
+While the estimates presented from this paper remain staggering and salient, new studies estimating the morbidity and mortality associated with mental illness have since become available.[@gbd2019mentaldisorderscollaboratorsGlobalRegionalNational2022; @vigoEstimatingTrueGlobal2016; @walkerMortalityMentalDisorders2015] These studies suggest that previous (and current) estimates of the global burden of mental disorders may be considerably underestimated, which, in turn, has implications for estimating the true economic burden of mental illness. 
+
+The most recent estimates of morbidity and mortality due to mental disorders come from the Global Burden of Disease (GBD) 2019 study.[@vosGlobalBurden3692020a] The GBD study provides disease burden estimates using DALYs, years of life lost (YLLs), and years lived with disability (YLDs), which are then aggregated within a hierarchical grouping scheme that classifies causes of disability and death at different levels of mutually exclusive and completely exhaustive categories. (Mental disorders are a Level 2 condition, nested under NCDs; see Table S3.) 
+
+While GBD remains the gold standard for global epidemiologic estimation, the nature of the GBD scheme—in particular, the rationale for grouping certain conditions under mental disorders or not—has been the subject of debate in the literature.[@atunChallengesEstimatingTrue2016; @vigoEstimatingTrueGlobal2016; @whitefordChallengesEstimatingTrue2016] In particular, work by Vigo et al. (2016) published in The Lancet Psychiatry argues for an expanded classification of mental disorders under the GBD classification scheme to account for underestimation of the burden of mental disorders.[@vigoEstimatingTrueGlobal2016] The authors attribute this underestimation to five main causes: 1) the distinction drawn between mental and neurological diseases; 2) the categorization of self-harm and suicide under injuries; 3) the classification of all chronic pain and somatoform disorders under musculoskeletal disorders; 4) the exclusion of personality disorders; and 5) the exclusion of premature mortality due to mental disorders. Using data from the 2013 GBD study, Vigo and colleagues re-allocated the entire burden of dementias, epilepsy, migraine, tension-type headache, and self-harm to mental disorders. In addition, a third of the burden of musculoskeletal disorders without anatomical correlate (i.e., somatoform disorders with prominent pain) was attributed to mental disorders.[@vigoEstimatingTrueGlobal2016] This reallocation attributed 13% of DALYs to mental disorders, a 6 percentage point increase from the GBD estimate of 7%.
+
+In this paper, we attempt to revisit the estimation of the global burden of mental disorders and of its associated economic value. Our aim is to characterize potential underestimation of the burden of mental disorders and to quantify the economic value of this burden under different estimation approaches. Specifically, we expand on Vigo et al.[@vigoEstimatingTrueGlobal2016] by capturing premature mortality due to mental disorders using pooled risk ratios of mortality from a systematic review of mental disorders[@walkerMortalityMentalDisorders2015] to determine the population attributable fraction (PAF) of premature mortality. Inclusion of premature mortality through the PAF presents a novel composite approach that can more broadly capture attributable morbidity and mortality. Using this approach on GBD 2019 estimates, we then apply monetary values to DALYs to reach estimates of the global economic value of the mental burden of disease using a VSL approach. The VSL approach—in contrast to COI and VLO approaches—includes an economic valuation of mortality risk reductions in monetary terms, and thus enables comparison across sectors (beyond the sole health sector) which can motivate decision-making toward ameliorating welfare and societal mental health. Our findings suggest that both the epidemiological and economic burden of mental disorders could be larger than previously estimated, and that underestimation would be larger among regions where premature mortality due to mental disorders is greater.
+
+## Methods
+
+To estimate the economic burden of mental disorders, we first estimate the attributable mental burden of DALYs under various estimation approaches using data from the 2019 GBD study (available from the Global Health Data Exchange at https://ghdx.healthdata.org/gbd-2019). Second, we apply a monetary value to a DALY to yield an economic assessment associated with these burden estimates. 
+
+### Burden of mental disorders 
+
+In our analysis, we replicate the approach of Vigo et al. (2016) using GBD 2019 estimates, applying a similar re-allocation formula to YLLs, YLDs, DALYs, and deaths. Our approach, however, differs in some key respects.
+
+First, we agree with Whiteford and colleagues in viewing the assigning of the entire burden of suicide and self-harm to mental disorders as an overestimate, and consequently do not reallocate all DALYs due to suicide towards the mental health burden.[@whitefordChallengesEstimatingTrue2016] While it is empirically clear that mental disorders elevate the risk of death by suicide and that the majority of suicides appear to be due to mental disorders,[@bertoloteSuicidePsychiatricDiagnosis2002] we view assigning the entirety of this burden to mental disorders as overinclusive, which we avoid to favor a conservative estimation strategy.
+
+Second, we attempt to capture premature mortality attributable to mental disorders, recognizing that persons with mental disorders are at elevated risk of all-cause mortality,[@walkerMortalityMentalDisorders2015] unnatural death,[@crumpMentalDisordersRisk2013] and deaths due to natural causes.[@coltonCongruenciesIncreasedMortality2006] Not capturing this share of mortality is likely to be a prominent cause of underestimating the burden of mental illness, particularly in countries where the dominant share of the DALY burden is mortality (rather than morbidity).
+
+Following Vigo and colleagues, we replicate reallocations in neurological and musculoskeletal conditions, and further include alcohol and mental use disorders, as these were previously classified under mental disorders within the GBD classification. 
+
+This provides estimates of YLDs due to mental disorders. We then estimate the PAF of mortality due to mental disorders, using GBD prevalence estimates and relative risk estimates for natural-cause and unnatural-cause mortality generated from a systematic review and meta-analysis by Walker et al.[@walkerMortalityMentalDisorders2015] A comparison of our allocation approach with those of Vigo et al. and the original GBD hierarchical allocation is shown in Table 1.
+
+Our approach to capturing premature mortality relies on a pooled relative risk estimate for mortality by natural and unnatural causes, drawn from 148 studies identified by Walker et al.[@walkerMortalityMentalDisorders2015] These studies collectively reflect over 338,000 deaths across 29 countries and 6 continents. The majority of deaths (67%) recorded in studies with disaggregated data arose from acute and chronic illnesses, while unnatural causes such as injury and suicide represented 18% of deaths (the rest being unallocated). Overall, the pooled risk of all-cause mortality was 2·2 times higher (95% confidence interval (CI): 2·1-2·3) among people with mental disorders compared to those without. Using this relative risk estimate, Walker and colleagues calculated a PAF to estimate that 8 million deaths were due to mental disorders in 2012. 
+
+While Walker and colleagues used a global estimate of the worldwide prevalence of mental disorders in their study to calculate the PAF, we use GBD estimates of prevalence to derive both global- and country-level results. The PAF for a given disorder d and country c is given by:
+\[ PAF_{(d,c)}= \frac{p_{(d,c)}\ (RR_d-1)}{1+p_{(d,c)}\ (RR_d-1)}\ \ \ ,\ \ \ \ \ \ \ \ \ \ \ \ (1)\]
+
+where $p_{d,c}$ is the prevalence of a given disorder in a country and $RR_d$ is the relative risk of mortality estimated by Walker et al.[@walkerMortalityMentalDisorders2015] 
+
+We separately estimate the PAF for natural and unnatural causes of mortality. Using the calculated PAF estimates, we estimate YLLs attributable to mental disorders by multiplying the PAF by the national burden of mortality. For natural causes of death, we conservatively apply the PAF against YLLs attributable to NCDs. For unnatural causes of death, we apply the PAF against YLLs due to self-harm and injuries. These YLLs are then combined with the YLDs calculated previously to provide DALYs. 
+
+### Economic burden of disease
+
+To estimate the economic cost associated with premature mortality and morbidity tied to mental illnesses, we assigned a monetary value to attributable DALYs. VSL approaches assign a monetary value to small reductions in mortality risks.[@robinsonValuingMortalityRisk2019] Drawing from these approaches, Jamison and colleagues have estimated monetary values of statistical life years,[@jamisonGlobalHealth20352013] which Khadka and colleagues recently adapted to quantify the economic value of changing mortality risk by cause of death in low- and middle-income countries (LMICs).[@khadkaEconomicValueChanging2021] While VSL approaches are not meant to assign monetary values to full life years or years lived with illness or disability,[@robinsonValuingMortalityRisk2019] the Copenhagen Consensus has previously implemented the use of GDP per capita as a proxy for the monetary value of a DALY as a standard estimate.[@copenhagenconsensuscenterMethodology] Values of one and three times GDP per capita have been suggested as proxies for the value of a DALY.[@bertramCostEffectivenessThresholds2016; @commissiononmacroeconomicsandhealthMacroeconomicsHealthInvesting2001] Estimates of $1,000 and $5,000 per DALY have been used, with the justification that these would be reasonable and convenient lower and upper values, particularly for low-income and lower-middle income countries.[@jamisonInfectiousDiseaseInjury2013; @jhaBenefitsCostsHealth2018] 
+
+Consistent with previous approaches, we use GDP per capita (USD 2019) for our base-case value of a DALY. GDP inputs are reported in 2019 USD and obtained from the World Bank’s World Development Indicators; for consistency with our epidemiological inputs, we convert to per capita values using GBD population estimates.
+
+### Sensitivity analyses
+
+The primary focus of this paper concerns structural uncertainty in determining the burden of mental illness, resulting in the evaluation of three different estimation approaches. To address parameter uncertainty within each approach, we apply a three-way sensitivity analysis. First, following a simple intuitive approach, we incorporate the upper and lower uncertainty intervals (UIs) provided by GBD 2019 for YLLs, YLDs, and DALYs to account for parameter uncertainty. Second, we use the upper and lower values of prevalence estimates and of the 95% confidence intervals (CIs) of the pooled relative risk of all-cause mortality from Walker and colleagues in our composite approach.[@walkerMortalityMentalDisorders2015] Third, our lower bound estimates are set to reallocate one sixth of the burden of musculoskeletal disorders proposed by Vigo and colleagues,[@vigoEstimatingTrueGlobal2016] while our upper bound estimates are set to reallocate one half of this burden. 
+
+In addition to our base-case economic valuation, we further report our VSL estimates using three times GDP per capita as the value of a DALY. (Alternative valuations using values of $1,000 and $5,000, as well as purchasing power parity (PPP)-adjusted GDP per capita, are reported in Tables S5 and S6 of the Supplementary appendix.) 
+
+### Statistical analysis
+
+All computations were conducted using R software (version 3·6·2). 
+
+### Ethics statement
+
+The research draws exclusively on secondary country-level data reported at the national or subnational level. As such, it does not involve data collection, experimentation, or investigation concerning human subjects. The Institutional Review Board (IRB) of the Harvard T.H. Chan School of Public Health has determined that the study was not human subjects research, and that additional review was not required (protocol # IRB20-1946, determined on November 13, 2020).
+
+### Role of funding source
+
+This study received no funding. All authors (DA, SV, and SS) had access to the data and shared in the decision to submit this article for publication.
+
+## Results
+
+Under GBD 2019, over 125 million DALYs were attributed to mental disorders, or roughly 5% of the global burden. After including alcohol and drug use, neurological disorders, chronic pain, suicide, and self-harm, the share due to mental disorders rose to 12% of global DALYs (approximately 321 million DALYs). Under the composite approach, an additional 97 million DALYs were attributed to mental disorders, encompassing, in total, over 16% of global DALYs. Under all three methods, the burden of mental disorders (in DALYs) exhibited a country-income gradient, with mental disorders comprising over twice the burden of disease in high-income countries compared to low-income countries.
+
+Rates of DALYs and deaths attributable to mental disorders under the different estimation approaches are presented by GBD region (Figure 1). Geographically, the composite approach allocated a large portion of DALYs (to mental disorders) in Eastern Europe, North and Latin America, and sub-Saharan Africa. This is largely driven by the inclusion of premature mortality in the composite approach. Estimates of DALYs by country income group and GBD region are reported in Table 2. (Estimates of deaths are reported in Table S4-6.)
+
+Under the three approaches, we calculated the economic value of mental disorder losses (Table 3). Using GDP per capita as a proxy for the value per DALY, economic losses due to mental disorders were estimated at 4·7 trillion USD using our composite approach. This estimate is 1·1 trillion USD larger than that reached using the 2016 reallocation approach and over 3·3 trillion USD larger than that reached from the unadjusted GBD 2019 estimates. Further adjusting for purchasing power parity, the global value of mental illness losses would exceed 7·2 trillion international dollars in 2019 (Table S7).
+
+Although economic losses do not represent an actual loss to GDP, a sense of the scale can be gained by expressing the economic consequences with respect to GDP. Figure 2 displays the economic burden of disease due to mental disorders under the three estimation approaches by GBD region, as a percent of regional GDP. (Estimates by absolute values per DALY are provided in the Supplementary appendix, along with mapped data visualizing estimates across all values per DALY.) Across approaches, the greatest change in estimated burden occurs in Eastern Europe, Latin America, North America, and Southern sub-Saharan Africa. Under the relative GDP-per-capita values the economic burden would account for between 4% of GDP in Eastern Sub-Saharan Africa and 8% in High-income North America under our composite approach. 
+
+## Discussion
+
+This study explores possible alternative approaches to estimating the global burden of mental illness and the economic losses thereof. In particular, we propose a composite approach to address contention in the classification of mental disorders. This approach suggests that the global DALYs attributable to mental disorders could exceed 400 million per year, or 16% of the total burden. 
+
+When applied against an economic value per DALY of one times GDP per capita, this approach further suggests that the per year losses associated with this burden could exceed 4·7 trillion USD in 2019. When adjusting for the uncertainty in estimates of the attributable burden of disease, the losses could range from 3·1 trillion to more than 6·9 trillion USD. Adjusting for purchasing power parity would increase the magnitude of these estimates, with ranges from 4·8 to 10·6 trillion international dollars at the global scale.
+
+Put in context of the existing literature, our epidemiological and economic estimates provide two important contributions. First, our findings echo in magnitude those of Vigo and colleagues,[@vigoEstimatingTrueGlobal2016] which have highlighted that suicide and premature mortality due to mental disorders are potentially large sources of underestimation in the current GBD classification. Second, when including these sources of attributable mortality, the economic findings suggest staggering loses. We estimate that in 2019, the losses would already be over 1·8 trillion USD greater than Bloom and colleagues’ global losses projections for 2030 (2·9 trillion 2019 USD, using the same value per DALY approach).[@bloomGlobalEconomicBurden2011]
+
+Our findings add to a growing literature concerning the classification of mental disorders, in particular related to underscoring the importance of including premature mortality attributable to mental disorders in burden conceptualizations.[@vigoBurdenMentalNeurological2020; @vigoEstimatingTrueGlobal2016; @vigoTrueGlobalDisease2022; @whitefordChallengesEstimatingTrue2016] These calls have most recently been emphasized by GBD collaborators who have urged that “the differential mortality gap for individuals with mental disorders needs to be reflected within the GBD framework.”[@gbd2019mentaldisorderscollaboratorsGlobalRegionalNational2022] Our composite approach to assigning attributable mortality presents one potential attempt for acknowledging this differential mortality gap. Our economic analysis further provides updated monetary estimates of the burden of mental illness; to our knowledge, this is the first such analysis of the global economic burden of mental disorders in over a decade.
+
+Our results should, however, be interpreted with several limitations in mind. First, our estimation approaches themselves all draw upon modeled data (i.e., GBD estimates). While GBD generates descriptions of morbidity and mortality at fine demographic and geographic levels, it is important to emphasize that the sophisticated modeling approaches implemented often draw on (potentially little) available underlying empirical data.[@tichenorMetricPartnershipsGlobal2020] These inputs can be extremely limited for particular diseases and geographical locations, especially so for mental disorders. By way of example, the GBD 2019 Data Input Sources Tool retrieves 3,084 separate data sources for mental disorders. Of these, only 60 pertain to sub-Saharan Africa (1·9%) and 58 to South Asia (1·8%).[@instituteforhealthmetricsandevaluationihmeGlobalBurdenDisease] By comparison, of the 6,064 records pertaining to maternal and neonatal disorders, 631 are for sub-Saharan Africa (10·4%) and 270 for South Asia (4·5%). These severely limited inputs reflect a dearth of global mental health data; as of 2017, the World Mental Health survey initiative had conducted interviews in just 26 countries, only 13 of which were classified as low- or middle-income.[@steinCrossnationalEpidemiologySocial2017]
+
+Relatedly, our composite approach relies on pooled estimates of the relative risk of mortality from a systematic review and meta-analysis that itself is limited by the available data it draws upon[@walkerMortalityMentalDisorders2015]. The review identified 203 studies for inclusion, of which only two were located in Africa, 16 in Asia, and one in South America. While the authors found that the estimates of mortality risk did not vary by region, the limited representation of studies from the world’s most populous and epidemiologically diverse continents is a considerable shortcoming. It is possible, for instance, that the relative risk of all-cause mortality associated with mental disorders is lower where the burden of mortality is more heavily concentrated among child, maternal, and infectious diseases, and is higher where the burden is dominated by NCDs. Therefore, to reach a conservative estimate of attributable mortality, we separately estimated population attributable fractions for natural and unnatural causes of death and restricted our allocation of YLLs from natural causes to NCDs—meaning no deaths from maternal or infectious diseases were attributed to mental disorders under the composite approach.
+
+Furthermore, our composite approach allocates mortality due to mental disorders by calculating population attributable fractions using the conventional formula, which may be biased in the presence of confounding or effect heterogeneity.[@darrowConfoundingBiasAttributable2011] In particular, the use of adjusted risk ratios (as in the current analysis) may result in anticonservative bias if the crude risk ratios are lower than the adjusted ones. To mitigate the potential for bias, our sensitivity analysis presents results under conservative assumptions for risk ratios and estimates of prevalence and mortality. 
+
+Despite these limitations, our findings underscore both that the true burden of mental disorders may only partially be captured by current estimation approaches, and that, consequently, the associated economic losses may be much higher than previously estimated. We note that our findings may themselves be an underestimate, as our composite approach excludes deaths due to neonatal, maternal, and infectious diseases attributable to mental disorders. However, we observe that conventional estimation approaches may fail to capture large shares of premature mortality attributable to mental health causes, both from self-inflicted and unnatural causes of death and mortality from NCDs. Capturing this share of the burden emphasizes that mental health is a critical risk factor for premature mortality, as well as a direct source of morbidity. 
+
+The magnitude of economic costs associated with mental disorders raises the need for health economics research, particularly on returns on investment and costing for effective prevention and treatment strategies.[@patelAddressingBurdenMental2016] Further work is also needed to strengthen the measurement of the global burden of mental illness, not only for more fully capturing the morbidity and mortality of mental disorders, but also for incorporating the impacts of new and evolving threats—such as pandemics, conflicts and climate change—to population mental health. 
+
+Our study highlights that mental health—far from being an issue solely concentrated in high-income regions alone— is a major global issue, one that imposes a significant toll to health and welfare. The large magnitude of these twin burdens highlights the urgency for global action to support mental health financing and to bolster its prioritization.
+
+## Acknowledgements 
+
+We thank David Bloom, Goodarz Danaei, and Daniel Vicente Vigo for their feedback on an earlier version of the paper, as well as five anonymous reviewers for their valuable and constructive comments on our manuscript. This study received no funding.
+
+### Author conntributors
+
+All authors contributed to study conception, methodology, and interpretation. DA oversaw data acquisition, programming, formal analysis, visualization, the first draft of the manuscript. All authors contributed to critical revision of the manuscript, with responses to reviewers and subsequent revisions led by DA. All authors had access to and verified all the data and accept responsibility for the decision to submit for publication.
+
+### Declaration of interests
+
+We declare no competing interests.
+
+### Data sharing statement
+
+GBD estimates are available for download from the Global Health Data Exchange and are available freely for non-commercial users under the Open Data Commons Attribution License (https://ghdx.healthdata.org/gbd-2019). All codes used for the analysis in this article are available on GitHub (https://github.com/darias5/gmh_econ).
+
+
+
+

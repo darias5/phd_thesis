@@ -171,7 +171,7 @@ We use a controlled interrupted time series (CITS) approach.
 
 Model equation for Google search density (measured as the ratio between the normalized search volume for a given symptom during a given week and the median search volume for that symptom between 2018 and 2020):
 
-\[ Y_{d,it} = \lambda_0 + \lambda_1 time_t + \lambda_2 Post_i + \lambda_3 time_t*Post_i + 
+\[ Y_{d,it} = \lambda_0 + \lambda_1 time_t + \lambda_2 Post_i + \lambda_3 time_t*Post_i + \\
  \alpha_d treated_{di} + \beta_d time_t*treated_{di} + \delta_{d} Post_i*treated_{di} + \gamma_d time_t*Post_i*treated_{di} + \epsilon_{it}\ \ \ ,\ \ \ \ \ \ \ \ \ \ \ \ (3.1)\]
  
 where $time_t$: is a continuous variable that captures the days leading to the vaccine announcement, $Post_i$: is an indicator variable which equals 1 in the "post" period and 0 otherwise, and $treated_di$: is an indicator variable which equals 1 if the observation is for a mental health condition $d$, 0 if for headaches. 

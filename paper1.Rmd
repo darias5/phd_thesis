@@ -1091,12 +1091,16 @@ Following Vigo and colleagues, we replicate reallocations in neurological and mu
 
 This provides estimates of YLDs due to mental disorders. We then estimate the PAF of mortality due to mental disorders, using GBD prevalence estimates and relative risk estimates for natural-cause and unnatural-cause mortality generated from a systematic review and meta-analysis by Walker et al.[@walkerMortalityMentalDisorders2015] A comparison of our allocation approach with those of Vigo et al. and the original GBD hierarchical allocation is shown in Table 1.1.
 
+\begin{raggedright}
+
+\addcontentsline{lot}{table}{Table 1.1: Comparison of the composition of the global burden of mental disorders, by estimation approach.}
+
 ```{r table1_1, echo = FALSE, include = TRUE, out.width = '100%'}
 
 knitr::include_graphics("table1_1.png")
 
 ```
-\addcontentsline{lot}{table}{Table 1.1: Comparison of the composition of the global burden of mental disorders, by estimation approach.}
+\end{raggedright}
 
 Our approach to capturing premature mortality relies on a pooled relative risk estimate for mortality by natural and unnatural causes, drawn from 148 studies identified by Walker et al.[@walkerMortalityMentalDisorders2015] These studies collectively reflect over 338,000 deaths across 29 countries and 6 continents. The majority of deaths (67%) recorded in studies with disaggregated data arose from acute and chronic illnesses, while unnatural causes such as injury and suicide represented 18% of deaths (the rest being unallocated). Overall, the pooled risk of all-cause mortality was 2.2 times higher (95% confidence interval (CI): 2.1-2.3) among people with mental disorders compared to those without. Using this relative risk estimate, Walker and colleagues calculated a PAF to estimate that 8 million deaths were due to mental disorders in 2012.
 
@@ -1132,12 +1136,18 @@ The research draws exclusively on secondary country-level data reported at the n
 This study received no funding. All authors (DA, SV, and SS) had access to the data and shared in the decision to submit this article for publication.
 
 \blandscape
-```{r table1_2, echo = FALSE, include = TRUE, out.width = '100%'}
+
+\begin{raggedright}
+
+\addcontentsline{lot}{table}{Table 1.2: Disability-adjusted life years (DALYs) attributable to mental disorders as totals (millions) and percentages of overall burden, by estimation approach.}
+
+```{r table1_2, echo = FALSE, include = TRUE, out.height = '99%'}
 
 knitr::include_graphics("table1_2.png")
 
 ```
-\addcontentsline{lot}{table}{Table 1.2: Disability-adjusted life years (DALYs) attributable to mental disorders as totals (millions) and percentages of overall burden, by estimation approach.}
+
+\end{raggedright}
 
 \elandscape
 
@@ -1149,12 +1159,17 @@ Rates of DALYs and deaths attributable to mental disorders under the different e
 
 Under the three approaches, we calculated the economic value of mental disorder losses (Table 1.3). `r results_sentence2`. Further adjusting for purchasing power parity, the global value of mental illness losses would exceed 7.2 trillion international dollars in 2019 (Table S7).
 
+\begin{raggedright}
+
 ```{r table1_3, echo = FALSE, include = TRUE, out.width = '100%'}
 
 knitr::include_graphics("table1_3.png")
 
 ```
 \addcontentsline{lot}{table}{Table 1.3: Global economic value associated with premature mortality and morbidity from mental disorders, by estimation approach and value per DALY.}
+
+\end{raggedright}
+
 
 ```{r figure_gbd_adjusted, include = TRUE, echo=FALSE, warnings = FALSE, fig.scap="DALYs, YLDs, YLLs, and deaths attributable to mental disorders in 2019, by estimation approach, per 100,000 population.", out.extra='', fig.cap=paste("\\label{figure_gbd_adjusted}DALYs, YLDs, YLLs, and deaths attributable to mental disorders in 2019, by estimation approach, per 100,000 population. Values are aggregated by GBD region. DALYs: Disability-adjusted life years; YLDs: years lived with disability; YLLs: years of life lost; GBD: Global Burden of Disease.", sep=" "), fig.width = 11, fig.height = 11, fig.align='center', out.width = '97%'}
 

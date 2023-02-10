@@ -496,6 +496,8 @@ To generate the model combinations, we first detailed seven methodological choic
 
 \vspace{12pt}
 
+\begin{raggedright}
+
 ```{r table2_1, echo = FALSE, include = TRUE, out.width = '100%'}
 
 knitr::include_graphics("table2_1.png")
@@ -503,6 +505,8 @@ knitr::include_graphics("table2_1.png")
 ```
 
 \addcontentsline{lot}{table}{Table 2.1: Alternative specifications, data processing, and modeling decisions for multiverse analysis}
+
+\end{raggedright}
 
 First, we considered the role of data cleaning in the outcome data and chose to compare our analysis using the cleaned outcome data against the raw, unadjusted values. Second, we chose to compare our findings using data from all facilities (the full sample) against a sample without district and regional hospital (CSB/FSP facilities only). Primary care facilities have smaller catchment areas than hospitals; consequently, it is more plausible that climate data for primary care facilities will closely reflect climate exposure to patients compared to referral hospitals. Third, we considered the decision to model temperature and soil moisture as an additive or interactive relationship (Model 3 vs. Model 4), with both alternatives included in our multiverse analysis. Fourth, we evaluated our decision to account for overdispersion with a NB model by using a Poisson regression framework as an alternative. Fifth, we evaluated alternative specifications of exposure to cyclone activity, using three options: our binary indicator, our count indicator, and no term for cyclone activity included. Sixth, we toggled whether time fixed effects (month and year) were included. Seventh, we similarly toggled regional fixed effects.
 

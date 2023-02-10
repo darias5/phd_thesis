@@ -1,24 +1,1045 @@
----
-title: ''
-output: pdf_document
-header-includes:
-  - \usepackage{float}
 
----
 
-# Chapter 1: Quantifying the global burden of mental disorders and their economic value
+```{r paper1code_libraries_data}
+
+# Loading libraries
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(RColorBrewer)
+library(sp)
+library(broom)
+library(sf)
+library(scales)
+library(viridis)
+library(data.table)
+library(ggpubr)
+library(lemon)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sysfonts)
+library(showtext)
+font_add_google("Source Sans Pro")
+library(gridExtra)
+showtext_auto() 
+showtext_opts(dpi = 300)  
+
+# Setting directories - change these to your local directory
+path <- "C:/Users/danie/Dropbox (Harvard University)/Important Files/3. PhD/WQE/WQE II/gmh_econ/"
+datapath <- paste(path,'data', sep = "/")
+resultspath <- paste(path,'results', sep = "/")
+
+######################
+##       DATA       ##
+######################
+
+# Loading IHME Global Burden of Disease Data
+
+# The data are available for download at http://ghdx.healthdata.org/gbd-results-tool
+# Data should be downloaded for DALYs, YLLs, YLDs, deaths, and prevalence by cause and geographies
+# Save the file as IHME-GBD_2019_DATA-2019.csv
+# If prevalence data are saved separately, save it as IHME-GBD_2019_DATA-2019-prev.csv
+
+data <- read.csv(file = file.path(datapath,"IHME-GBD_2019_DATA-2019.csv"))
+
+# Adding alpha-3 codes from ISO 3166-1 (i.e., World Bank Codes)
+ihme_crosswalk <- read_excel(path = file.path(datapath, "ihme_crosswalk.xlsx")) %>% 
+  select(-c("location_name"))
+data <- left_join(data, ihme_crosswalk, by = "location_id")
+
+# Adding World Bank income classifications
+income_level <- read_excel(path = file.path(datapath, "OGHIST.xls"), sheet = 2) %>% 
+  select(-(c(2:34))) %>% 
+  rename("income_level" = "2019")
+data <- left_join(data, income_level, by = "iso_code")
+
+# Adding population (backed out using IHME rate data for consistency)
+data <- data %>% unique() %>% gather("numeric_name", "est", "val":"lower") 
+data_number <- data %>% filter(metric_id == 1) %>% rename("number" = "est")
+data_rate <- data %>% filter(metric_id == 3) %>% select("measure_id","location_id", "sex_id", "age_id", "cause_id", "year", "numeric_name", "est") %>% rename("rate" = "est")
+data <- left_join(data_number, data_rate, by = c("measure_id","location_id", "sex_id", "age_id", "cause_id", "year", "numeric_name")) %>% 
+  select(!c("metric_id", "metric_name")) %>%
+  unique()
+data$population_100k <- data$number/data$rate
+data$population <- data$population_100k  * 100000
+
+# Removing unused columns
+data <- data %>% select(!c("rate"))  %>% 
+  select(!c("sex_id", "sex_name", "age_id", "age_name", "year")) %>%
+  filter(measure_id != 5)
+
+
+
+#######################################################
+##  ORIGINAL AND 2016 REALLOCATION APPROACH  ##
+##################################################
+
+# VIGO EL AL. 2016 WEIGHTS: ALLOCATION OF THE FOLLOWING TO MENTAL HEALTH 
+# (PERCENTS DENOTE AMOUNT REALLOCATED TO MENTAL HEALTH)
+
+# Dementia - 100%
+# Epilepsy - 100%
+# Migraine - 100%
+# Tension-type headache - 100%
+# Self-harm - 100%
+# Chronic pain syndrome currently attributed to musculoskeletal disorders - 33%
+
+
+# Naming relevant IHME cause IDs
+mental_disorder_cause_id <- 558
+dementia_cause_id1 <- 543 # Alzheimer's disease and other dementias
+dementia_cause_id2 <- 544 # Parkinson's disease
+epilepsy_cause_id <- 545 # Idiopathic epilepsy
+migraine_cause_id <- 547
+tension_type_headache_cause_id <- 548
+self_harm_cause_id <- 718
+alcohol_use_disorders_cause_id <- 560
+drug_use_disorders_cause_id <- 561
+low_back_pain_cause_id <- 630
+neck_pain_cause_id <- 631
+other_musculoskeletal_cause_id <- 639
+all_cause_id <- 294
+
+
+# Original allocation
+
+# Cause ID 558 reflects the GBD 2019 mental disorder allocation
+# These lines of code retain this allocation and save it under "original value"
+cause_id <- c(mental_disorder_cause_id)
+original_weights <- c(1)
+original_weights_df <- data.frame(cause_id, original_weights)
+data_rev <- left_join(data, original_weights_df, by = c("cause_id"))
+data_rev$original_weights[is.na(data_rev$original_weights)] <- 0
+data_rev$original_value <- data_rev$number * data_rev$original_weights  
+
+# 2016 reallocation
+
+cause_id <- c(mental_disorder_cause_id,
+              dementia_cause_id1,
+              dementia_cause_id2,
+              epilepsy_cause_id,
+              migraine_cause_id,
+              tension_type_headache_cause_id,
+              self_harm_cause_id,
+              alcohol_use_disorders_cause_id,
+              drug_use_disorders_cause_id,
+              low_back_pain_cause_id,
+              neck_pain_cause_id,
+              other_musculoskeletal_cause_id,
+              mental_disorder_cause_id,
+              dementia_cause_id1,
+              dementia_cause_id2,
+              epilepsy_cause_id,
+              migraine_cause_id,
+              tension_type_headache_cause_id,
+              self_harm_cause_id,
+              alcohol_use_disorders_cause_id,
+              drug_use_disorders_cause_id,
+              low_back_pain_cause_id,
+              neck_pain_cause_id,
+              other_musculoskeletal_cause_id,
+              mental_disorder_cause_id,
+              dementia_cause_id1,
+              dementia_cause_id2,
+              epilepsy_cause_id,
+              migraine_cause_id,
+              tension_type_headache_cause_id,
+              self_harm_cause_id,
+              alcohol_use_disorders_cause_id,
+              drug_use_disorders_cause_id,
+              low_back_pain_cause_id,
+              neck_pain_cause_id,
+              other_musculoskeletal_cause_id)
+
+numeric_name <- c("val", "val", "val", "val", "val","val", "val", "val", "val", "val", "val","val",
+                  "lower","lower","lower","lower","lower","lower","lower","lower","lower","lower","lower","lower",
+                  "upper","upper","upper","upper","upper","upper","upper","upper","upper","upper","upper","upper")
+
+
+# Allocations of low back pain, neck pain, and other musculoskeletal disorders is based on
+# the following section of Vigo et al. 2016
+
+# "Considering that a fraction of low back, neck pain,
+# and 50% of other musculoskeletal pain potentially
+# corresponds to chronic pain syndromes, and for the
+# purposes of producing a more accurate estimation and
+# stimulating debate, we assume given the limited data
+# that one third (rather than zero percent, as it is now) of
+# the disease burden of these pain syndromes is
+# potentially attributable to mental disorders and explore
+#  the effect on mental illness burden calculations..."
+
+rev_2016_weights <- c(1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      2/6, # Allocating 1/3
+                      2/6,
+                      1/2*2/6, 
+                      
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1/6, # Allocating 1/6
+                      1/6,
+                      1/2*1/6, 
+                      
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      3/6, # Allocating 1/2 
+                      3/6,
+                      1/2*3/6) 
+
+
+rev_2016_weights_df <- data.frame(cause_id,numeric_name, rev_2016_weights)
+data_rev <- left_join(data_rev, rev_2016_weights_df, by = c("cause_id", "numeric_name"))
+
+data_rev$rev_2016_weights[is.na(data_rev$rev_2016_weights)] <- 0
+data_rev$rev_2016_value <- data_rev$number * data_rev$rev_2016_weights  
+
+
+############################
+##  COMPOSITE APPROACH  ##
+############################
+
+# Due to the distributive property of the Population Attributable Fraction, a category-specific attribution fraction is estimated
+# using the formula from Rockhill et al, 1998:https://pubmed.ncbi.nlm.nih.gov/9584027/  
+
+natural_cause_id <- 409 #NCDs
+unnatural_cause_id <- 687 # Injuries
+
+
+cause_id <- c(natural_cause_id,
+              unnatural_cause_id,
+              natural_cause_id,
+              unnatural_cause_id,
+              natural_cause_id,
+              unnatural_cause_id)
+
+
+numeric_name <- c("val", "val", 
+                  "lower","lower",
+                  "upper","upper")
+
+relative_risk <- c(1.8,
+                   7.22,
+                   1.71,
+                   6.43,
+                   1.88,
+                   8.12)
+
+relative_risk_df <- data.frame(cause_id,numeric_name, relative_risk)
+
+data_rev <- left_join(data_rev, relative_risk_df, by = c("cause_id", "numeric_name"))
+
+data_prev <- read.csv(file = file.path(datapath,"IHME-GBD_2019_DATA-2019-prev.csv"))
+data_prev <- data_prev %>%
+  gather("numeric_name", "prevalence", "val":"lower")  %>% 
+  select(!c("sex_id", "sex_name", "age_id", "age_name", "year")) %>% filter(cause_id == mental_disorder_cause_id) %>% select("location_id", "numeric_name", "prevalence")
+data_rev  <- left_join(data_rev, data_prev, by = c("location_id", "numeric_name"))
+
+# Two approaches to calculating the PAF are presented here. Later, only one will be retained for the creation of graphs, tables, and charts.
+# In Walker et al., the PAF formula numbered as formula 4 in Rockhill et al. is used, in which prevalence is meant to be the
+# prevalence of mental disorders among cases (i.e., the deceased). The conventional formula, formula 2, takes prevalence as 
+# the prevalence of mental disorders in the general population, but is not internally valid in cases of confounding.
+
+data_rev$paf2 <-     (data_rev$prevalence  * ((data_rev$relative_risk - 1))) /   ((data_rev$prevalence  * ((data_rev$relative_risk - 1))+1))
+data_rev$paf4 <-     data_rev$prevalence  * ((data_rev$relative_risk - 1) /    data_rev$relative_risk)
+
+data_rev <- data_rev%>% gather("paf_formula", "paf", "paf2":"paf4") 
+data_rev$paf[is.na(data_rev$paf)] <- 0
+data_rev$rev_2015_value <- data_rev$number * data_rev$paf
+
+# Combine original and re-allocated values by location, measure, PAF formula used, and numeric value (point estimate, and upper or lower bounds)
+data_rev <- data_rev %>% 
+  group_by(location_id, measure_id, numeric_name, paf_formula) %>% 
+  mutate(rev_2016_value_agg = sum(rev_2016_value),  rev_2015_value_agg = sum(rev_2015_value),original_value_agg = sum(original_value)) %>%
+  rename("measure_total" = number) %>%
+  ungroup %>%
+  filter(cause_id == "294") %>% select(!c("original_weights":"relative_risk", "paf":"rev_2015_value"))
+
+# Clean up
+
+
+############################
+##  COMPOSITE METHOD  ##
+############################
+
+# This method pulls YLLs from Walker et al. and YLDs from Vigo et al. together to re-estimate 
+# DALYs attributable to mental disorders. 
+
+# Draw in YLDs from Vigo et al.
+data_rev$composite_ylds <-ifelse(data_rev$measure_id == 3, data_rev$rev_2016_value_agg, 0)
+
+# Draw in YLLs from Walker et al.
+data_rev$composite_ylls <-ifelse(data_rev$measure_id == 4, data_rev$rev_2015_value_agg, 0)
+
+# Combine to calculate DALYs
+data_rev_composite <- data_rev %>% select(location_id, numeric_name, paf_formula, measure_id, composite_ylds, composite_ylls) %>%
+  group_by(location_id, numeric_name, paf_formula) %>%
+  mutate(composite_dalys = sum(composite_ylds, composite_ylls))
+data_rev_composite <- data_rev_composite %>% filter(measure_id == 2) %>% ungroup() %>% unique() %>% select("location_id", "numeric_name", "paf_formula", "composite_dalys") 
+data_rev <- left_join(data_rev, data_rev_composite, by = c("location_id", "numeric_name", "paf_formula"))
+data_rev$composite_dalys[data_rev$measure_id != 2] <- 0
+data_rev$composite_ylds[data_rev$measure_id != 3] <- 0
+data_rev$composite_ylls[data_rev$measure_id != 4] <- 0
+
+# Draw in deaths from Walker et al.
+data_rev$composite_deaths <-ifelse(data_rev$measure_id == 1, data_rev$rev_2015_value_agg, 0)
+data_rev$composite_deaths[data_rev$measure_id != 1] <- 0
+
+
+# Combined columns, clean up, re-organizing, tidying, and labeling
+data_rev$composite <- data_rev$composite_ylds + data_rev$composite_ylls + data_rev$composite_dalys + data_rev$composite_deaths
+data_rev <- data_rev %>% select(!c("composite_ylds":"composite_deaths")) %>%  relocate(original_value_agg, .after = paf_formula) %>%
+  relocate(numeric_name, .after = prevalence) %>%  
+  rename("Composite method" = composite,
+         "PAF method" = rev_2015_value_agg,
+         "2016 reallocation approach" = rev_2016_value_agg,
+         "GBD 2019" = original_value_agg)
+
+data_rev$cause_name <- "Mental disorders"
+data_rev <- data_rev %>% gather("estimate", "number", "GBD 2019":"Composite method")
+
+
+data_rev$estimate_id <- ifelse(data_rev$estimate == "Composite method", 4, 
+                               ifelse(data_rev$estimate == "PAF method", 3,
+                                      ifelse(data_rev$estimate == "2016 reallocation approach", 2, 1)))
+data_rev <- data_rev %>% relocate(estimate_id, .after = estimate)
+
+# Calculate rates and percent of burden
+data_rev <- data_rev %>% relocate (population_100k, .after = population)
+data_rev$rate_per_100k <- data_rev$number/data_rev$population_100k
+data_rev$percent <- data_rev$number/data_rev$measure_total*100
+
+
+############################
+##        COSTING         ##
+############################
+
+# Import GDP
+gdp_data <- read.csv(file = file.path(datapath,# "wdi_gdp_ppp.csv"  # Using PPP
+                                      "wdi_gdp.csv"                  # Not using PPP
+)) %>%
+  select(-(c(3:62))) %>% 
+  rename("gdp" = "X2019")
+gdp <- gdp_data %>% select(c(iso_code, gdp))
+data_rev <- left_join(data_rev, gdp, by = "iso_code")
+data_rev <- data_rev %>% relocate(gdp, .after = iso_code)
+data_rev$gdp[data_rev$location_id == 1] <- gdp_data$gdp[gdp_data$iso_code == "WLD"] # GDP for the world
+
+# Calculate GDP per capita, with reference to IHME population values, for consistency
+data_rev$gdp_per_capita <- data_rev$gdp/data_rev$population
+data_rev <- data_rev %>% relocate (gdp_per_capita, .after = gdp)
+
+# Clean up
+
+# Import GDP PPP
+gdp_data <- read.csv(file = file.path(datapath, "wdi_gdp_ppp.csv"  # Using PPP
+                                      #"wdi_gdp.csv"                  # Not using PPP
+)) %>%
+  select(-(c(3:62))) %>% 
+  rename("gdp_ppp" = "X2019")
+gdp <- gdp_data %>% select(c(iso_code, gdp_ppp))
+data_rev <- left_join(data_rev, gdp, by = "iso_code")
+data_rev <- data_rev %>% relocate(gdp_ppp, .after = iso_code)
+data_rev$gdp_ppp[data_rev$location_id == 1] <- gdp_data$gdp_ppp[gdp_data$iso_code == "WLD"] # GDP for the world
+
+# Calculate GDP per capita, with reference to IHME population values, for consistency
+data_rev$gdp_ppp_per_capita <- data_rev$gdp_ppp/data_rev$population
+data_rev <- data_rev %>% relocate (gdp_ppp_per_capita, .after = gdp_ppp)
+
+# Clean up
+
+############################
+# Cost per DALY
+
+# Method 1: Copenhagen Consensus 1 - $1,000
+data_rev$cost_cc1 <- ifelse(data_rev$measure_id == 2,
+                            data_rev$number * 1000, 0)
+
+# Method 2: Copenhagen Consensus 2 - $5,000
+data_rev$cost_cc2 <- data_rev$cost_cc1 * 5
+
+# Method 3: WHO - GDP/capita
+data_rev$cost_who1 <-ifelse(data_rev$measure_id == 2,
+                            data_rev$number * data_rev$gdp_per_capita, 0)
+
+# Method 4: WHO - GDP/capita * 3
+data_rev$cost_who2 <- data_rev$cost_who1 * 3
+
+# Method 5: WHO - GDP PPP/capita
+data_rev$cost_who3 <-ifelse(data_rev$measure_id == 2,
+                            data_rev$number * data_rev$gdp_ppp_per_capita, 0)
+
+# Method 6: WHO - GDP PPP/capita * 3
+data_rev$cost_who4 <- data_rev$cost_who3 * 3
+
+##################################
+##         PAF FORMULA          ##
+##################################
+
+# Select which of the PAF formulae to use for the remainder of the analysis
+
+data_rev <- data_rev %>% filter(paf_formula == "paf2") # Conventional formula
+# data_rev <- data_rev %>% filter(paf_formula == "paf4") # Case prevalence formula
+
+
+################################
+##         MAP PREP           ##
+################################
+
+data_rev_gbd <- data_rev %>% filter(estimate_id == 1) %>% 
+  select (c(measure_id, location_id, numeric_name, paf_formula, number:cost_who4)) %>%
+  rename(
+    "number_gbd" = "number",
+    "rate_per_100k_gbd" = "rate_per_100k",
+    "percent_gbd" = "percent",
+    "cost_cc1_gbd" = "cost_cc1",
+    "cost_cc2_gbd" = "cost_cc2",
+    "cost_who1_gbd" = "cost_who1",
+    "cost_who2_gbd" = "cost_who2",
+    "cost_who3_gbd" = "cost_who3",
+    "cost_who4_gbd" = "cost_who4")
+
+data_rev <- left_join(data_rev, data_rev_gbd, by = c("location_id", "measure_id", "numeric_name", "paf_formula"))
+
+data_rev <- data_rev %>% mutate(
+  number_diff = number - number_gbd,
+  rate_per_100k_diff = rate_per_100k - rate_per_100k_gbd,
+  percent_diff = percent - percent_gbd,
+  cost_cc1_diff = cost_cc1 - cost_cc1_gbd,
+  cost_cc2_diff = cost_cc2 - cost_cc2_gbd,
+  cost_who1_diff = cost_who1 - cost_who1_gbd,
+  cost_who2_diff = cost_who2 - cost_who2_gbd,
+  cost_who3_diff = cost_who3 - cost_who3_gbd,
+  cost_who4_diff = cost_who4 - cost_who4_gbd)
+
+# Import regional data
+region <- read_excel(path = file.path(datapath, "regions.xlsx"))
+
+# Merge
+region <- region %>% select (iso_code, who_region, ihme_region)
+data_rev <- full_join(data_rev, region, by = "iso_code")
+
+# WHO region map prep
+
+data_rev <- data_rev %>% group_by(estimate_id, measure_id, numeric_name, paf_formula, who_region) %>% 
+  mutate(who_region_pop100k = sum(population_100k),
+         who_region_number = sum(number),
+         who_region_measure_total = sum(measure_total),
+         who_region_gdp = sum(gdp, na.rm=TRUE),
+         who_region_gdp_ppp = sum(gdp_ppp, na.rm=TRUE))%>%
+  mutate(who_region_rate_per_100k = who_region_number/who_region_pop100k,
+         who_region_percent = who_region_number/who_region_measure_total*100,
+         who_region_population = who_region_pop100k * 100000) %>%
+  mutate(who_region_gdp_per_capita = who_region_gdp/who_region_population,
+         who_region_gdp_ppp_per_capita = who_region_gdp_ppp/who_region_population,
+         who_region_cost_cc1 = ifelse(measure_id == 2,
+                                      who_region_number * 1000, 0),
+         who_region_cost_cc2 = who_region_cost_cc1 * 5,
+         who_region_cost_who1 = ifelse(measure_id == 2,
+                                       who_region_number * who_region_gdp_per_capita, 0),
+         who_region_cost_who2 = who_region_cost_who1 * 3,
+         who_region_cost_who3 = ifelse(measure_id == 2,
+                                       who_region_number * who_region_gdp_ppp_per_capita, 0),
+         who_region_cost_who4 = who_region_cost_who3 * 3) %>%
+  ungroup()
+
+data_rev_gbd_who_region<- data_rev %>% filter(estimate_id == 1) %>% 
+  select (c(measure_id, location_id, numeric_name, paf_formula, who_region_number:who_region_cost_who4)) %>%
+  rename(
+    "who_region_number_gbd" = "who_region_number",
+    "who_region_rate_per_100k_gbd" = "who_region_rate_per_100k",
+    "who_region_percent_gbd" = "who_region_percent",
+    "who_region_cost_cc1_gbd" = "who_region_cost_cc1",
+    "who_region_cost_cc2_gbd" = "who_region_cost_cc2",
+    "who_region_cost_who1_gbd" = "who_region_cost_who1",
+    "who_region_cost_who2_gbd" = "who_region_cost_who2",
+    "who_region_cost_who3_gbd" = "who_region_cost_who3",
+    "who_region_cost_who4_gbd" = "who_region_cost_who4"
+  )  %>%
+  select(measure_id, location_id, numeric_name, paf_formula, who_region_number_gbd, who_region_rate_per_100k_gbd, who_region_percent_gbd,
+         who_region_cost_cc1_gbd, who_region_cost_cc2_gbd, who_region_cost_who1_gbd, 
+         who_region_cost_who2_gbd, who_region_cost_who3_gbd, who_region_cost_who4_gbd)
+
+data_rev <- left_join(data_rev, data_rev_gbd_who_region, by = c("location_id", "measure_id", "numeric_name", "paf_formula"))
+
+data_rev <- data_rev %>% mutate(
+  who_region_number_diff = who_region_number - who_region_number_gbd,
+  who_region_rate_per_100k_diff = who_region_rate_per_100k - who_region_rate_per_100k_gbd,
+  who_region_percent_diff = who_region_percent - who_region_percent_gbd,
+  who_region_cost_cc1_diff = who_region_cost_cc1 - who_region_cost_cc1_gbd,
+  who_region_cost_cc2_diff = who_region_cost_cc2 - who_region_cost_cc2_gbd,
+  who_region_cost_who1_diff = who_region_cost_who1 - who_region_cost_who1_gbd,
+  who_region_cost_who2_diff = who_region_cost_who2 - who_region_cost_who2_gbd,
+  who_region_cost_who3_diff = who_region_cost_who3 - who_region_cost_who3_gbd,
+  who_region_cost_who4_diff = who_region_cost_who4 - who_region_cost_who4_gbd)
+
+
+# IHME region  map prep
+
+data_rev <- data_rev %>% group_by(estimate_id, measure_id, numeric_name, paf_formula, ihme_region) %>% 
+  mutate(ihme_region_pop100k = sum(population_100k),
+         ihme_region_number = sum(number),
+         ihme_region_measure_total = sum(measure_total),
+         ihme_region_gdp = sum(gdp, na.rm=TRUE),
+         ihme_region_gdp_ppp = sum(gdp_ppp, na.rm=TRUE))%>%
+  mutate(ihme_region_rate_per_100k = ihme_region_number/ihme_region_pop100k,
+         ihme_region_percent = ihme_region_number/ihme_region_measure_total*100,
+         ihme_region_population = ihme_region_pop100k * 100000) %>%
+  mutate(ihme_region_gdp_per_capita = ihme_region_gdp/ihme_region_population,
+         ihme_region_gdp_ppp_per_capita = ihme_region_gdp_ppp/ihme_region_population,
+         ihme_region_cost_cc1 = ifelse(measure_id == 2,
+                                       ihme_region_number * 1000, 0),
+         ihme_region_cost_cc2 = ihme_region_cost_cc1 * 5,
+         ihme_region_cost_who1 = ifelse(measure_id == 2,
+                                        ihme_region_number * ihme_region_gdp_per_capita, 0),
+         ihme_region_cost_who2 = ihme_region_cost_who1 * 3,
+         ihme_region_cost_who3 = ifelse(measure_id == 2,
+                                        ihme_region_number * ihme_region_gdp_ppp_per_capita, 0),
+         ihme_region_cost_who4 = ihme_region_cost_who3 * 3) %>%
+  ungroup()
+
+data_rev_gbd_ihme_region<- data_rev %>% filter(estimate_id == 1) %>% 
+  select (c(measure_id, location_id, numeric_name, paf_formula, ihme_region_number:ihme_region_cost_who4)) %>%
+  rename(
+    "ihme_region_number_gbd" = "ihme_region_number",
+    "ihme_region_rate_per_100k_gbd" = "ihme_region_rate_per_100k",
+    "ihme_region_percent_gbd" = "ihme_region_percent",
+    "ihme_region_cost_cc1_gbd" = "ihme_region_cost_cc1",
+    "ihme_region_cost_cc2_gbd" = "ihme_region_cost_cc2",
+    "ihme_region_cost_who1_gbd" = "ihme_region_cost_who1",
+    "ihme_region_cost_who2_gbd" = "ihme_region_cost_who2",
+    "ihme_region_cost_who3_gbd" = "ihme_region_cost_who3",
+    "ihme_region_cost_who4_gbd" = "ihme_region_cost_who4"
+  )  %>%
+  select(measure_id, location_id, numeric_name, paf_formula, ihme_region_number_gbd, ihme_region_rate_per_100k_gbd, ihme_region_percent_gbd,
+         ihme_region_cost_cc1_gbd, ihme_region_cost_cc2_gbd, ihme_region_cost_who1_gbd, 
+         ihme_region_cost_who2_gbd, ihme_region_cost_who3_gbd, ihme_region_cost_who4_gbd)
+
+data_rev <- left_join(data_rev, data_rev_gbd_ihme_region, by = c("location_id", "measure_id", "numeric_name", "paf_formula"))
+
+data_rev <- data_rev %>% mutate(
+  ihme_region_number_diff = ihme_region_number - ihme_region_number_gbd,
+  ihme_region_rate_per_100k_diff = ihme_region_rate_per_100k - ihme_region_rate_per_100k_gbd,
+  ihme_region_percent_diff = ihme_region_percent - ihme_region_percent_gbd,
+  ihme_region_cost_cc1_diff = ihme_region_cost_cc1 - ihme_region_cost_cc1_gbd,
+  ihme_region_cost_cc2_diff = ihme_region_cost_cc2 - ihme_region_cost_cc2_gbd,
+  ihme_region_cost_who1_diff = ihme_region_cost_who1 - ihme_region_cost_who1_gbd,
+  ihme_region_cost_who2_diff = ihme_region_cost_who2 - ihme_region_cost_who2_gbd,
+  ihme_region_cost_who3_diff = ihme_region_cost_who3 - ihme_region_cost_who3_gbd,
+  ihme_region_cost_who4_diff = ihme_region_cost_who4 - ihme_region_cost_who4_gbd)
+
+
+# Import map data
+world <- ne_countries(scale = "medium", returnclass = "sf")
+world$iso_code <- world$gu_a3
+world$iso_code[world$adm0_a3 == "SDS"] <- "SSD"
+
+# Re-order estimates: original, Vigo, Walker, composite
+
+data_rev <- data_rev %>% 
+  mutate(estimate_newlab = recode(estimate, 
+                                  'GBD 2019' = "Original approach",                
+                                  '2016 reallocation approach' = "Reallocation approach",
+                                  'PAF method' = "PAF method",              
+                                  'Composite method'= "Composite approach"  
+  ))
+
+data_rev$estimate_newlab <- factor(data_rev$estimate_newlab ,      # Reordering group factor levels
+                                   levels = c("Original approach",
+                                              "Reallocation approach",
+                                              "PAF method",
+                                              "Composite approach"))
+# Merging map and dataframe
+data_rev_map <- full_join(world, data_rev, by = "iso_code") %>% filter(numeric_name == "val")
+
+# Clean up
+
+
+# Standard subtitles, and captions
+subtitle_1 <- "Value per DALY: $1,000"
+subtitle_2 <- "Value per DALY: $5,000"
+subtitle_3 <- "Value per DALY: GDP/capita"
+subtitle_4 <- "Value per DALY: 3 X GDP/capita"
+#caption <- "Source: Global Burden of Disease Study. Reallocation approach from Vigo et al. 2016."
+
+```
+
+```{r paper1code_results}
+
+####################################
+##       REGIONAL CHARTS          ##
+####################################
+
+who_region_positions <- c("African Region", "Eastern Mediterranean Region", "European Region",
+                          "Region of the Americas", "South-East Asia Region", "Western Pacific Region",  "#NA")
+
+who_region_pal <-  c("#E74C3C", "#E67E22" , "#F4D03F", "#45B39D", "#5499C7", "#AF7AC5")
+
+ihme_region_positions <- c("East Asia", "Southeast Asia", "Oceania", "Central Asia", "Eastern Europe", "Central Europe",
+                           "Caribbean", "Central Latin America", "Tropical Latin America", "Andean Latin America", "North Africa and Middle East",
+                           "Southern Sub-Saharan Africa", "Western Sub-Saharan Africa", "Central Sub-Saharan Africa", "Eastern Sub-Saharan Africa",
+                           "South Asia", "Southern Latin America", "Western Europe", "High-income North America",
+                           "Australasia", "High-income Asia Pacific", "#NA")
+
+ihme_pal_new <- c("#002673", "#005CE6", "#73DFFF", "#E54800", "#E69800", "#FFD37F",
+                  "#216F00", "#33A600", "#4CE600", "#A3FF73", "#4E4E4E", 
+                  "#730000", "#FF0000", "#FF7F7F", "#FFBEBE", 
+                  "#E6E600", "#73004C", "#A80084", "#C500FF", "#E600A9", "#FFBEE8", "#7F7F7F")
+
+ihme_region_pal <- c("#8C95F1", "#D7ECFC" , "#B6CDD4", "#EAA144", "#F3DA89", "#F9EFC2", "#B1F585", "#B6F2D5",
+                     "#E3FD8C", "#E2FDD7", "#99ACA4", "#9D5F56", "#E989A9", "#F5DBD8", "#F8EEEF",
+                     "#F4FF7C", "#C42AF1", "#E986F8", "#D7C2FC", "#DD9BE9", "#FAE5FE", "#7F7F7F")
+
+############################
+##        TABLES          ##
+############################
+
+# Table 1: Burden of disease due to mental disorders
+
+data_global <- data_rev %>% filter(location_id == 1)  %>% filter(estimate_id != 3)  %>% select(location_name, measure_name, numeric_name, estimate, number, percent) %>%
+  mutate(number = round(number/1000000, 1),
+         percent = round(percent, 1))
+
+data_regional <- data_rev  %>% filter(estimate_id != 3)  %>% 
+  group_by(ihme_region,measure_name, numeric_name, estimate) %>% mutate(region_total = sum(measure_total),
+                                                                        region_number = sum(number)) %>%
+  mutate(region_percent = round(region_number / region_total * 100, 1)) %>% select(ihme_region, measure_name, numeric_name, estimate, region_number, region_percent) %>%
+  rename("number" = "region_number",
+         "percent" = "region_percent",
+         "location_name" = "ihme_region") %>%
+  ungroup() %>%
+  unique() %>% filter(!is.na(location_name)) %>%
+  mutate(number = round(number/1000000, 1)) %>% arrange((location_name))
+
+data_income <- data_rev  %>% filter(estimate_id != 3)  %>% 
+  group_by(income_level,measure_name, numeric_name, estimate) %>% mutate(region_total = sum(measure_total),
+                                                                         region_number = sum(number)) %>%
+  mutate(region_percent = round(region_number / region_total * 100, 1)) %>% select(income_level, measure_name, numeric_name, estimate, region_number, region_percent) %>%
+  rename("number" = "region_number",
+         "percent" = "region_percent",
+         "location_name" = "income_level") %>%
+  ungroup() %>%
+  unique() %>% filter(!is.na(location_name)) %>%
+  mutate(number = round(number/1000000, 1))
+
+location_name <- c("H","UM","LM","L")
+rank <- c(1,2,3,4)
+fullname <- c("High income",
+              "Upper-middle income",
+              "Lower-middle income",
+              "Low income")
+
+
+incomelevels <- data.frame(location_name,rank, fullname)
+
+data_income <- left_join(data_income, incomelevels, by = "location_name") %>% arrange(rank) %>% select(!c(location_name, rank)) %>% rename("location_name" = "fullname")
+
+data_table1 <- rbind(data_global, data_income, data_regional) %>% 
+  gather("metric","point","number":"percent" ) %>%  
+  pivot_wider(names_from = c(numeric_name, metric, estimate), values_from = point)
+
+
+col_order <- c(
+  "measure_name",
+  "location_name",                                    
+  "val_number_GBD 2019",                             
+  "lower_number_GBD 2019",                            
+  "upper_number_GBD 2019",   
+  "val_percent_GBD 2019",                            
+  "lower_percent_GBD 2019",  
+  "upper_percent_GBD 2019",                           
+  "val_number_2016 reallocation approach",   
+  "lower_number_2016 reallocation approach",  
+  "upper_number_2016 reallocation approach",  
+  "val_percent_2016 reallocation approach",  
+  "lower_percent_2016 reallocation approach", 
+  "upper_percent_2016 reallocation approach", 
+  "val_number_Composite method",           
+  "lower_number_Composite method",          
+  "upper_number_Composite method",          
+  "val_percent_Composite method",          
+  "lower_percent_Composite method",  
+  "upper_percent_Composite method")
+
+data_table1 <- data_table1[, col_order]
+
+data_table1 <- data_table1 %>% arrange(measure_name)
+
+write.csv(data_table1, file = paste0(resultspath, "/table1.csv"))
+
+# Table 2: Value of economic welfare estimates 
+
+data_global <- data_rev %>% 
+  filter(location_id == 1)  %>% 
+  filter(measure_id == 2) %>%
+  filter(estimate_id != 3)  %>% 
+  select(location_name, numeric_name, 
+         estimate, cost_cc1, cost_cc2, cost_who1, cost_who2, cost_who3, cost_who4)
+
+data_global$location_name <- "Global"
+
+
+data_regional <- data_rev  %>%   
+  filter(measure_id == 2) %>%
+  filter(estimate_id != 3)  %>% 
+  select(ihme_region,numeric_name, estimate, ihme_region_cost_cc1,
+         ihme_region_cost_cc2, ihme_region_cost_who1, ihme_region_cost_who2, ihme_region_cost_who3, ihme_region_cost_who4) %>%
+  unique() %>%
+  rename("location_name" =ihme_region,
+         "cost_cc1" = ihme_region_cost_cc1,
+         "cost_cc2" = ihme_region_cost_cc2,
+         "cost_who1" = ihme_region_cost_who1,
+         "cost_who2" = ihme_region_cost_who2,
+         "cost_who3" = ihme_region_cost_who3,
+         "cost_who4" = ihme_region_cost_who4) %>%
+  filter(!is.na(location_name)) %>% 
+  arrange((location_name))
+
+data_income <- data_rev  %>% 
+  filter(measure_id == 2) %>%
+  filter(estimate_id != 3)  %>%  
+  select(income_level, estimate, numeric_name, cost_cc1, cost_cc2, cost_who1, cost_who2,  cost_who3, cost_who4) %>%
+  pivot_longer(cols = cost_cc1:cost_who4) %>%
+  group_by(income_level,numeric_name, name, estimate) %>% 
+  mutate(cost_total = sum(value, na.rm = TRUE)) %>%
+  ungroup() %>%
+  select(income_level, numeric_name, name, cost_total, estimate) %>% unique() %>%
+  rename("location_name" = income_level)
+
+location_name <- c("H","UM","LM","L")
+rank <- c(1,2,3,4)
+fullname <- c("High income",
+              "Upper-middle income",
+              "Lower-middle income",
+              "Low income")
+
+incomelevels <- data.frame(location_name,rank, fullname)
+
+data_income <- left_join(data_income, incomelevels, by = "location_name") %>% 
+  arrange(rank) %>% select(!c(location_name, rank)) %>% rename("location_name" = "fullname")
+
+data_income <- data_income %>% 
+  pivot_wider(values_from = cost_total, names_from = name) %>%
+  filter(!is.na(location_name)) 
+
+#### Pivot wider, change column names, drop NA for income levels
+
+data_table2 <- rbind(data_global, data_income, data_regional) %>% 
+  arrange(factor(numeric_name, levels = c("val", "lower", "upper"))) %>%
+  arrange(factor(estimate, levels = c("GBD 2019", "2016 reallocation approach", "Composite method"))) %>%
+  pivot_longer(cols = cost_cc1:cost_who4) %>%
+  mutate(value = round(value/1000000000000,2)) %>%
+  pivot_wider(names_from = c(numeric_name, estimate), values_from = value) %>%
+  arrange(name) %>%
+  relocate(name, .before = "location_name")
+
+# write.csv(data_table2, file = paste0(resultspath, "/table2.csv"))
+
+# Appendix 2: Value of economic welfare estimates (CC)
+
+appendix_table <- data_rev %>% filter(location_id == 1) %>%  
+  filter(measure_id == 2) %>% filter(estimate_id != 3) %>% 
+  select(estimate, numeric_name, cost_cc1, cost_cc2, cost_who1, cost_who2, cost_who3, cost_who4)
+appendix_table$cost_cc1 <- round(appendix_table$cost_cc1/1000000000000,2)
+appendix_table$cost_cc2 <- round(appendix_table$cost_cc2/1000000000000,2)
+appendix_table$cost_who1 <- round(appendix_table$cost_who1/1000000000000,2)
+appendix_table$cost_who2 <- round(appendix_table$cost_who2/1000000000000,2)
+appendix_table$cost_who3 <- round(appendix_table$cost_who3/1000000000000,2)
+appendix_table$cost_who4 <- round(appendix_table$cost_who4/1000000000000,2)
+appendix_table <- appendix_table %>% select(!c(cost_who1, cost_who2)) %>% arrange(estimate, factor(numeric_name, levels = c("val", "lower", "upper")))
+appendix_table_t <- transpose(appendix_table)
+
+colnames(appendix_table_t) <- rownames(appendix_table)
+rownames(appendix_table_t) <- colnames(appendix_table)
+
+# write.csv(appendix_table_t, file = paste0(resultspath, "/table_appendix.csv"))
+
+```
+
+```{r paper1code_text}
+
+############################
+##        VALUES          ##
+############################
+
+# Key values and calculations for Abstract and Results
+
+# Abstract
+
+abstract1 <- data_table1 %>% 
+  filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
+  filter(location_name =="Global") %>% 
+  select("val_number_Composite method") %>% 
+  unique()
+abstract1 <- as.numeric(abstract1)
+abstract1 <- round(abstract1, 0)
+
+abstract2 <- data_table1 %>% 
+  filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
+  filter(location_name =="Global") %>% 
+  select("val_percent_Composite method") %>% 
+  unique()
+abstract2 <- as.numeric(abstract2)
+abstract2 <- floor(abstract2)
+
+abstract3 <- data_table1 %>% 
+  filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
+  filter(location_name =="Global") %>% 
+  select("val_number_GBD 2019") %>% 
+  unique()
+abstract3 <- as.numeric(abstract3)
+abstract3 <- round(abstract3, 0)
+
+
+
+
+abstract_sentence1 <- paste0("We estimate that ",
+                             abstract1,
+                             " million disability-adjusted life years (DALYs) could be attributable to mental disorders in 2019 (",
+                             abstract2,
+                             "\\% of global DALYs)",
+                             ifelse(abstract1/abstract3>3,", a more than ",", an approximate "), 
+                             "three-fold increase compared to conventional estimates. ")
+
+abstract4 <- data_table2%>% 
+  filter(name == "cost_who1") %>% 
+  filter(location_name == "Global") %>%
+  select(`val_Composite method`) %>%
+  unique()
+abstract4 <- as.numeric(abstract4)
+abstract4 <- floor(abstract4*10)/10
+
+abstract_sentence2 <- paste0("The economic value associated with this burden is estimated at about USD ",
+                             abstract4,
+                             " trillion. ")
+
+table3 <- data_rev %>% 
+  filter(numeric_name == "val") %>%
+  select(measure_id, estimate, estimate_id, ihme_region, ihme_region_cost_who1, ihme_region_gdp) %>% 
+  unique %>%
+  filter(measure_id== "2") %>% 
+  filter(estimate_id== "4") %>% mutate(
+    regional_percent = ihme_region_cost_who1 / ihme_region_gdp *100)
+
+abstract5 <- table3$ihme_region[table3$regional_percent == max(table3$regional_percent)]
+abstract6 <- round(table3$regional_percent[table3$regional_percent == max(table3$regional_percent)],1)
+
+abstract7 <- table3$ihme_region[table3$regional_percent == min(table3$regional_percent)]
+abstract8 <- round(table3$regional_percent[table3$regional_percent == min(table3$regional_percent)],1)
+
+abstract_sentence3 <- paste0("At a regional level, the losses account for between ",
+                             abstract8,
+                             "\\% of gross domestic product in ",
+                             abstract7,
+                             " and ",
+                             abstract6,
+                             "\\% in ",
+                             abstract5,
+                             ". ")
+
+# Results
+
+results1 <- data_table1 %>% 
+  filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
+  filter(location_name =="Global") %>% 
+  select("val_number_GBD 2019") %>% 
+  unique()
+results1 <- as.numeric(results1)
+results1 <- floor(results1)
+
+results2 <- data_table1 %>% 
+  filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
+  filter(location_name =="Global") %>% 
+  select("val_percent_GBD 2019") %>% 
+  unique()
+results2 <- as.numeric(results2)
+results2 <- round(results2,0)
+
+results3 <- data_table1 %>% 
+  filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
+  filter(location_name =="Global") %>% 
+  select("val_percent_2016 reallocation approach") %>% 
+  unique()
+results3 <- as.numeric(results3)
+results3 <- floor(results3)
+
+results4 <- data_table1 %>% 
+  filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
+  filter(location_name =="Global") %>% 
+  select("val_number_2016 reallocation approach") %>% 
+  unique()
+results4 <- as.numeric(results4)
+results4 <- floor(results4)
+
+results5 <- data_table1 %>% 
+  filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
+  filter(location_name =="High income") %>% 
+  select("val_number_Composite method") %>% 
+  unique()
+results5 <- as.numeric(results5)
+results5 <- round(results5, 0)
+
+results6 <- data_table1 %>% 
+  filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
+  filter(location_name =="Low income") %>% 
+  select("val_number_Composite method") %>% 
+  unique()
+results6 <- as.numeric(results6)
+results6 <- round(results6, 0)
+
+
+
+results_sentence1 <- paste0(
+  "Under GBD 2019, over ",
+  results1,
+  " million DALYs were attributed to mental disorders, or roughly ",
+  results2,
+  "\\% of the global burden. After including alcohol and drug use, neurological disorders, chronic pain, suicide, and self-harm, the share due to mental disorders rose to ",
+  results3,
+  "\\% of global DALYs (approximately ",
+  results4,
+  " million DALYs). Under the composite approach, an additional  ",
+  abstract1-results4,
+  " million DALYs were attributed to mental disorders, encompassing, in total, over ",
+  abstract2,
+  "\\% of global DALYs. Under all three methods, the burden of mental disorders (in DALYs) exhibited a country-income gradient, with mental disorders comprising ",
+  ifelse(results5/results6 > 2.4, "over twice", ifelse(results5/results6> 2, "roughly twice", "approximately twice")),
+  " the burden of disease in high-income countries compared to low-income countries.")
+
+
+results7 <- data_table2%>% 
+  filter(name == "cost_who1") %>% 
+  filter(location_name == "Global") %>%
+  select(`val_Composite method`) %>%
+  unique()
+results7 <- as.numeric(results7)
+
+results8 <- data_table2%>% 
+  filter(name == "cost_who1") %>% 
+  filter(location_name == "Global") %>%
+  select(`val_2016 reallocation approach`) %>%
+  unique()
+results8 <- as.numeric(results8)
+
+results9 <- data_table2%>% 
+  filter(name == "cost_who1") %>% 
+  filter(location_name == "Global") %>%
+  select(`val_GBD 2019`) %>%
+  unique()
+results9 <- as.numeric(results9)
+
+results_sentence2 <- paste0(
+  "Using GDP per capita as a proxy for the value per DALY, economic losses due to mental disorders were estimated at ",
+  abstract4,
+  " trillion USD using our composite approach. This estimate is ",
+  floor((results7 - results8)*10)/10,
+  " trillion USD larger than that reached using the 2016 reallocation approach and over ",
+  floor((results7 - results9)*10)/10,
+  " trillion USD larger than that reached from the unadjusted GBD 2019 estimates.")
+
+results_sentence3 <- paste0(
+  "Under the relative GDP-per-capita values the economic burden would account for between ",
+  abstract8,
+  "\\% of gross domestic product in ",
+  abstract7,
+  " and ",
+  abstract6,
+  "\\% in ",
+  abstract5,
+  " under our composite approach.")
+
+# Discussion
+
+
+
+discussion_sentence1 <- paste0(
+  "This approach suggests that the global DALYs attributable to mental disorders could exceed ",
+  abstract1,
+  " million per year, or ",
+  abstract2,
+  "\\% of the total burden.")
+
+
+discussion1 <- data_table2%>% 
+  filter(name == "cost_who1") %>% 
+  filter(location_name == "Global") %>%
+  select(`lower_Composite method`) %>%
+  unique()
+discussion1 <- as.numeric(discussion1)
+
+
+discussion2 <- data_table2%>% 
+  filter(name == "cost_who1") %>% 
+  filter(location_name == "Global") %>%
+  select(`upper_Composite method`) %>%
+  unique()
+discussion2 <- as.numeric(discussion2)
+
+discussion_sentence2 <- paste0(
+  "When applied against an economic value per DALY of one times GDP per capita, this approach further suggests that the per year losses associated with this burden could exceed ",
+  abstract4,
+  " trillion USD in 2019. When adjusting for the uncertainty in estimates of the attributable burden of disease, the losses could range from ",
+  floor((discussion1)*10)/10,
+  " trillion to more than ",
+  floor((discussion2)*10)/10,
+  " trillion USD.")
+
+discussion_sentence3 <- paste0("We estimate that in 2019, the losses would already be over ",
+                               floor((abstract4 - 2.9)*10)/10,
+                               " trillion USD greater than Bloom and colleagues’ global losses projections for 2030 (2.9 trillion 2019 USD, using the same value per DALY approach).")
+
+
+
+
+```
+
+# Quantifying the global burden of mental disorders and their economic value
+
+\begin{centering}
+
+\emph{Daniel Arias, Shekhar Saxena, Stéphane Verguet}
+
+\vspace{6pt}
+
+\noindent\rule{8cm}{0.4pt}
+
+A version of this paper was accepted for publication by \emph{eClinicalMedicine} on September 9, 2022 and was published in Volume 54, Issue 101675 in December 2022.  
+
+\noindent\rule{8cm}{0.4pt}
+
+\end{centering}
 
 \begin{raggedright}
 
-{\bf Background:} Epidemiological and economic estimates suggest that the global burden of mental disorders is considerable, both in its impacts on human health and losses to societal welfare. The availability of additional data and the emergence of new approaches present an opportunity to examine these estimates, which form a critical part in making the investment case for global mental health.
+\vspace{6pt}
+
+{\bf Background:} Epidemiological and economic estimates suggest that the global burden of mental disorders is considerable, both in its impacts on human health and losses to societal welfare. The availability of additional data and the emergence of new approaches present an opportunity to examine these estimates, which form a critical part in making the investment case for mental health.
 
 {\bf Methods:} This study reviews, develops, and incorporates new estimates and methods in quantifying the global burden of mental illness. Using a composite estimation approach that accounts for premature mortality due to mental disorders and additional sources of morbidity and applying a value of a statistical life approach to economic valuation, we determine global and regional estimates of the economic cost that can be associated with mental disorders, building on data from the 2019 Global Burden of Disease study. 
 
-{\bf Findings:} We estimate that 418 million disability-adjusted life years (DALYs) could be attributable to mental disorders in 2019 (16\% of global DALYs)—a more than three-fold increase compared to conventional estimates. The economic value associated with this burden is estimated at about USD 5 trillion. At a regional level, the losses could account for between 4\% of gross domestic product in Eastern sub-Saharan Africa and 8\% in High-income North America.
-
-{\bf Interpretation:} The burden of mental illness in terms of both health and economic losses may be much higher than previously assessed.
-
-{\bf Funding:} None.
+{\bf Findings and interpretation:} `r paste0(abstract_sentence1, abstract_sentence2, abstract_sentence3)` Taken together, our findings suggest that the burden of mental illness in terms of both health and economic losses may be much higher than previously assessed.
 
 \vspace{24pt}
 
@@ -32,19 +1053,19 @@ header-includes:
 ## Introduction
 
 
-Mental health is an essential part of human flourishing. As defined by the World Health Organization (WHO), it encompasses “a state of well-being in which every individual realizes [their] own potential, can cope with the normal stresses of life, can work productively and fruitfully, and is able to make a contribution to [their] community.[@worldhealthorganizationComprehensiveMentalHealth2013]” For much of the global population, however, attaining this state of mental health is an enduring challenge, with over one billion people worldwide living with a mental or addictive disorder.[@rehmGlobalBurdenDisease2019] Mental disorders are both leading causes of disability and significant risk factors for premature mortality.[@charlsonExcessMortalityMental2015; @rehmGlobalBurdenDisease2019] At all levels of sociodemographic development, this burden of morbidity and mortality is rising.[@patelLancetCommissionGlobal2018] Furthermore, as the COVID-19 pandemic continues, there is growing and alarming evidence of its detrimental psychological and psychiatric effects—for patients, health care workers, and the public overall.[@vindegaardCOVID19PandemicMental2020] 
+Mental health is an essential part of human flourishing. As defined by the World Health Organization (WHO), it encompasses “a state of well-being in which every individual realizes [their] own potential, can cope with the normal stresses of life, can work productively and fruitfully, and is able to make a contribution to [their] community.[@worldhealthorganizationComprehensiveMentalHealth2013]” For much of the global population, however, attaining this state of mental health is an enduring challenge, with over one billion people worldwide living with a mental or addictive disorder.[@rehmGlobalBurdenDisease2019] Mental disorders are both leading causes of disability and significant risk factors for premature mortality.[@charlsonExcessMortalityMental2015; @rehmGlobalBurdenDisease2019] At all levels of sociodemographic development, this burden of morbidity and mortality is rising.[@patelLancetCommissionGlobal2018] Furthermore, as the COVID-19 pandemic continues, there is growing and alarming evidence of its detrimental psychological and psychiatric effects—for patients, health care workers, and the public overall.[@vindegaardCOVID19PandemicMental2020]
 
 The magnitude of disability caused by mental disorders has galvanized a global movement and a call to action for greater investment and prioritization for mental health.[@patelRenewedAgendaGlobal2011] This movement has emphasized the importance of investing in mental health as a means of promoting sustainable development, human rights, and social inclusion.[@patelLancetCommissionGlobal2018]
 
 A critical link between mental health and development arises from the economic consequences of mental disorders. A growing body of literature suggests that mental disorders are costly, both in the direct medical costs of care, outpatient visits, and hospitalizations, and in indirect costs, such as losses in income and productivity due to disability, which may cause absenteeism and presenteeism.[@trautmannEconomicCostsMental2016] These costs further worsen conditions of poverty[@patelPovertyCommonMental2003]—a vulnerability that, in turn, worsens mental health, feeding a vicious cycle of poverty and illness.[@lundPovertyCommonMental2010] At the national level, mental disorders deplete the supply of labor and capital, resulting in poorer economic output.[@canavanPsychologicalDistressGhana2013] Among households and nations alike, the burden of mental illness thus has considerable economic consequences and poses a challenge to both health and wealth.
 
-Evaluating the economic burden of mental illness is a critical part in making the investment case for global mental health, informing public health decision-making, and guiding priority-setting and the scale up of much-needed interventions.[@chisholmScalingupTreatmentDepression2016] At the global level, however, the most recent estimate of the economic impact of mental disorders was published in 2011, using burden of disease estimates from 2004.[@bloomGlobalEconomicBurden2011] This study used three distinct approaches to quantify the economic burden of non-communicable diseases (NCDs), including mental illnesses.[@bloomGlobalEconomicBurden2011] The first is a cost-of-illness (COI) analysis, which includes the direct costs of illness as well as the indirect costs (e.g., lost productivity). The second is a value of lost output approach, which estimates the effects of illness on gross domestic product (GDP) due to the depletion of labor and capital. The third builds from value of a statistical life (VSL) approaches and attempts to capture a population’s willingness to pay to reduce morbidity and mortality associated with illness. This expands on the COI and value of lost output approaches, as it puts an economic value on the loss of health itself. 
+Evaluating the economic burden of mental illness is a critical part in making the investment case for global mental health, informing public health decision-making, and guiding priority-setting and the scale up of much-needed interventions.[@chisholmScalingupTreatmentDepression2016] At the global level, however, the most recent estimate of the economic impact of mental disorders was published in 2011, using burden of disease estimates from 2004.[@bloomGlobalEconomicBurden2011] This study used three distinct approaches to quantify the economic burden of non-communicable diseases (NCDs), including mental illnesses.[@bloomGlobalEconomicBurden2011] The first is a cost-of-illness (COI) analysis, which includes the direct costs of illness as well as the indirect costs (e.g., lost productivity). The second is a value of lost output approach, which estimates the effects of illness on gross domestic product (GDP) due to the depletion of labor and capital. The third builds from value of a statistical life (VSL) approaches and attempts to capture a population’s willingness to pay to reduce morbidity and mortality associated with illness. This expands on the COI and value of lost output approaches, as it puts an economic value on the loss of health itself.
 
-With a third of disability-adjusted life years (DALYs) due to NCDs arising from mental disorders, this landmark paper estimated that the value of losses due to mental disorders was roughly 1·3 trillion USD in 2010 (1·6 trillion USD in 2019) when DALYs were valued at one times GDP per capita.[@bloomGlobalEconomicBurden2011] The authors further projected that these losses would grow to nearly 2·5 trillion USD 2010 (or approximately 3·0 trillion USD in 2019) by 2030. (See Supplementary appendix Tables S1 and S2 for estimates from the other two approaches.) These estimates have been widely cited in calls to action concerning global mental health.[@patelLancetCommissionGlobal2018; @thelancetglobalhealthMentalHealthMatters2020]
+With a third of disability-adjusted life years (DALYs) due to NCDs arising from mental disorders, this landmark paper estimated that the value of losses due to mental disorders was roughly 1.3 trillion USD in 2010 (1.6 trillion USD in 2019) when DALYs were valued at one times GDP per capita.[@bloomGlobalEconomicBurden2011] The authors further projected that these losses would grow to nearly 2.5 trillion USD 2010 (or approximately 3.0 trillion USD in 2019) by 2030. (See Supplementary appendix Tables S1 and S2 for estimates from the other two approaches.) These estimates have been widely cited in calls to action concerning global mental health.[@patelLancetCommissionGlobal2018; @thelancetglobalhealthMentalHealthMatters2020]
 
-While the estimates presented from this paper remain staggering and salient, new studies estimating the morbidity and mortality associated with mental illness have since become available.[@gbd2019mentaldisorderscollaboratorsGlobalRegionalNational2022; @vigoEstimatingTrueGlobal2016; @walkerMortalityMentalDisorders2015] These studies suggest that previous (and current) estimates of the global burden of mental disorders may be considerably underestimated, which, in turn, has implications for estimating the true economic burden of mental illness. 
+While the estimates presented from this paper remain staggering and salient, new studies estimating the morbidity and mortality associated with mental illness have since become available.[@gbd2019mentaldisorderscollaboratorsGlobalRegionalNational2022; @vigoEstimatingTrueGlobal2016; @walkerMortalityMentalDisorders2015] These studies suggest that previous (and current) estimates of the global burden of mental disorders may be considerably underestimated, which, in turn, has implications for estimating the true economic burden of mental illness.
 
-The most recent estimates of morbidity and mortality due to mental disorders come from the Global Burden of Disease (GBD) 2019 study.[@vosGlobalBurden3692020a] The GBD study provides disease burden estimates using DALYs, years of life lost (YLLs), and years lived with disability (YLDs), which are then aggregated within a hierarchical grouping scheme that classifies causes of disability and death at different levels of mutually exclusive and completely exhaustive categories. (Mental disorders are a Level 2 condition, nested under NCDs; see Table S3.) 
+The most recent estimates of morbidity and mortality due to mental disorders come from the Global Burden of Disease (GBD) 2019 study.[@vosGlobalBurden3692020a] The GBD study provides disease burden estimates using DALYs, years of life lost (YLLs), and years lived with disability (YLDs), which are then aggregated within a hierarchical grouping scheme that classifies causes of disability and death at different levels of mutually exclusive and completely exhaustive categories. (Mental disorders are a Level 2 condition, nested under NCDs; see Table S3.)
 
 While GBD remains the gold standard for global epidemiologic estimation, the nature of the GBD scheme—in particular, the rationale for grouping certain conditions under mental disorders or not—has been the subject of debate in the literature.[@atunChallengesEstimatingTrue2016; @vigoEstimatingTrueGlobal2016; @whitefordChallengesEstimatingTrue2016] In particular, work by Vigo et al. (2016) published in The Lancet Psychiatry argues for an expanded classification of mental disorders under the GBD classification scheme to account for underestimation of the burden of mental disorders.[@vigoEstimatingTrueGlobal2016] The authors attribute this underestimation to five main causes: 1) the distinction drawn between mental and neurological diseases; 2) the categorization of self-harm and suicide under injuries; 3) the classification of all chronic pain and somatoform disorders under musculoskeletal disorders; 4) the exclusion of personality disorders; and 5) the exclusion of premature mortality due to mental disorders. Using data from the 2013 GBD study, Vigo and colleagues re-allocated the entire burden of dementias, epilepsy, migraine, tension-type headache, and self-harm to mental disorders. In addition, a third of the burden of musculoskeletal disorders without anatomical correlate (i.e., somatoform disorders with prominent pain) was attributed to mental disorders.[@vigoEstimatingTrueGlobal2016] This reallocation attributed 13% of DALYs to mental disorders, a 6 percentage point increase from the GBD estimate of 7%.
 
@@ -52,9 +1073,9 @@ In this paper, we attempt to revisit the estimation of the global burden of ment
 
 ## Methods
 
-To estimate the economic burden of mental disorders, we first estimate the attributable mental burden of DALYs under various estimation approaches using data from the 2019 GBD study (available from the Global Health Data Exchange at https://ghdx.healthdata.org/gbd-2019). Second, we apply a monetary value to a DALY to yield an economic assessment associated with these burden estimates. 
+To estimate the economic burden of mental disorders, we first estimate the attributable mental burden of DALYs under various estimation approaches using data from the 2019 GBD study (available from the Global Health Data Exchange at https://ghdx.healthdata.org/gbd-2019). Second, we apply a monetary value to a DALY to yield an economic assessment associated with these burden estimates.
 
-### Burden of mental disorders 
+### Burden of mental disorders
 
 In our analysis, we replicate the approach of Vigo et al. (2016) using GBD 2019 estimates, applying a similar re-allocation formula to YLLs, YLDs, DALYs, and deaths. Our approach, however, differs in some key respects.
 
@@ -62,80 +1083,390 @@ First, we agree with Whiteford and colleagues in viewing the assigning of the en
 
 Second, we attempt to capture premature mortality attributable to mental disorders, recognizing that persons with mental disorders are at elevated risk of all-cause mortality,[@walkerMortalityMentalDisorders2015] unnatural death,[@crumpMentalDisordersRisk2013] and deaths due to natural causes.[@coltonCongruenciesIncreasedMortality2006] Not capturing this share of mortality is likely to be a prominent cause of underestimating the burden of mental illness, particularly in countries where the dominant share of the DALY burden is mortality (rather than morbidity).
 
-Following Vigo and colleagues, we replicate reallocations in neurological and musculoskeletal conditions, and further include alcohol and mental use disorders, as these were previously classified under mental disorders within the GBD classification. 
+Following Vigo and colleagues, we replicate reallocations in neurological and musculoskeletal conditions, and further include alcohol and mental use disorders, as these were previously classified under mental disorders within the GBD classification.
 
 This provides estimates of YLDs due to mental disorders. We then estimate the PAF of mortality due to mental disorders, using GBD prevalence estimates and relative risk estimates for natural-cause and unnatural-cause mortality generated from a systematic review and meta-analysis by Walker et al.[@walkerMortalityMentalDisorders2015] A comparison of our allocation approach with those of Vigo et al. and the original GBD hierarchical allocation is shown in Table 1.
 
-Our approach to capturing premature mortality relies on a pooled relative risk estimate for mortality by natural and unnatural causes, drawn from 148 studies identified by Walker et al.[@walkerMortalityMentalDisorders2015] These studies collectively reflect over 338,000 deaths across 29 countries and 6 continents. The majority of deaths (67%) recorded in studies with disaggregated data arose from acute and chronic illnesses, while unnatural causes such as injury and suicide represented 18% of deaths (the rest being unallocated). Overall, the pooled risk of all-cause mortality was 2·2 times higher (95% confidence interval (CI): 2·1-2·3) among people with mental disorders compared to those without. Using this relative risk estimate, Walker and colleagues calculated a PAF to estimate that 8 million deaths were due to mental disorders in 2012. 
+```{r table1_1, echo = FALSE, include = TRUE, out.width = '100%'}
+
+knitr::include_graphics("table1_1.png")
+
+```
+\addcontentsline{lot}{table}{Table 1.1: Comparison of the composition of the global burden of mental disorders, by estimation approach.}
+
+Our approach to capturing premature mortality relies on a pooled relative risk estimate for mortality by natural and unnatural causes, drawn from 148 studies identified by Walker et al.[@walkerMortalityMentalDisorders2015] These studies collectively reflect over 338,000 deaths across 29 countries and 6 continents. The majority of deaths (67%) recorded in studies with disaggregated data arose from acute and chronic illnesses, while unnatural causes such as injury and suicide represented 18% of deaths (the rest being unallocated). Overall, the pooled risk of all-cause mortality was 2.2 times higher (95% confidence interval (CI): 2.1-2.3) among people with mental disorders compared to those without. Using this relative risk estimate, Walker and colleagues calculated a PAF to estimate that 8 million deaths were due to mental disorders in 2012.
 
 While Walker and colleagues used a global estimate of the worldwide prevalence of mental disorders in their study to calculate the PAF, we use GBD estimates of prevalence to derive both global- and country-level results. The PAF for a given disorder d and country c is given by:
 \[ PAF_{(d,c)}= \frac{p_{(d,c)}\ (RR_d-1)}{1+p_{(d,c)}\ (RR_d-1)}\ \ \ ,\ \ \ \ \ \ \ \ \ \ \ \ (1)\]
 
-where $p_{d,c}$ is the prevalence of a given disorder in a country and $RR_d$ is the relative risk of mortality estimated by Walker et al.[@walkerMortalityMentalDisorders2015] 
+where $p_{d,c}$ is the prevalence of a given disorder in a country and $RR_d$ is the relative risk of mortality estimated by Walker et al.[@walkerMortalityMentalDisorders2015]
 
-We separately estimate the PAF for natural and unnatural causes of mortality. Using the calculated PAF estimates, we estimate YLLs attributable to mental disorders by multiplying the PAF by the national burden of mortality. For natural causes of death, we conservatively apply the PAF against YLLs attributable to NCDs. For unnatural causes of death, we apply the PAF against YLLs due to self-harm and injuries. These YLLs are then combined with the YLDs calculated previously to provide DALYs. 
+We separately estimate the PAF for natural and unnatural causes of mortality. Using the calculated PAF estimates, we estimate YLLs attributable to mental disorders by multiplying the PAF by the national burden of mortality. For natural causes of death, we conservatively apply the PAF against YLLs attributable to NCDs. For unnatural causes of death, we apply the PAF against YLLs due to self-harm and injuries. These YLLs are then combined with the YLDs calculated previously to provide DALYs.
 
 ### Economic burden of disease
 
-To estimate the economic cost associated with premature mortality and morbidity tied to mental illnesses, we assigned a monetary value to attributable DALYs. VSL approaches assign a monetary value to small reductions in mortality risks.[@robinsonValuingMortalityRisk2019] Drawing from these approaches, Jamison and colleagues have estimated monetary values of statistical life years,[@jamisonGlobalHealth20352013] which Khadka and colleagues recently adapted to quantify the economic value of changing mortality risk by cause of death in low- and middle-income countries (LMICs).[@khadkaEconomicValueChanging2021] While VSL approaches are not meant to assign monetary values to full life years or years lived with illness or disability,[@robinsonValuingMortalityRisk2019] the Copenhagen Consensus has previously implemented the use of GDP per capita as a proxy for the monetary value of a DALY as a standard estimate.[@copenhagenconsensuscenterMethodology] Values of one and three times GDP per capita have been suggested as proxies for the value of a DALY.[@bertramCostEffectivenessThresholds2016; @commissiononmacroeconomicsandhealthMacroeconomicsHealthInvesting2001] Estimates of $1,000 and $5,000 per DALY have been used, with the justification that these would be reasonable and convenient lower and upper values, particularly for low-income and lower-middle income countries.[@jamisonInfectiousDiseaseInjury2013; @jhaBenefitsCostsHealth2018] 
+To estimate the economic cost associated with premature mortality and morbidity tied to mental illnesses, we assigned a monetary value to attributable DALYs. VSL approaches assign a monetary value to small reductions in mortality risks.[@robinsonValuingMortalityRisk2019] Drawing from these approaches, Jamison and colleagues have estimated monetary values of statistical life years,[@jamisonGlobalHealth20352013] which Khadka and colleagues recently adapted to quantify the economic value of changing mortality risk by cause of death in low- and middle-income countries (LMICs).[@khadkaEconomicValueChanging2021] While VSL approaches are not meant to assign monetary values to full life years or years lived with illness or disability,[@robinsonValuingMortalityRisk2019] the Copenhagen Consensus has previously implemented the use of GDP per capita as a proxy for the monetary value of a DALY as a standard estimate.[@copenhagenconsensuscenterMethodology] Values of one and three times GDP per capita have been suggested as proxies for the value of a DALY.[@bertramCostEffectivenessThresholds2016; @commissiononmacroeconomicsandhealthMacroeconomicsHealthInvesting2001] Estimates of $1,000 and $5,000 per DALY have been used, with the justification that these would be reasonable and convenient lower and upper values, particularly for low-income and lower-middle income countries.[@jamisonInfectiousDiseaseInjury2013; @jhaBenefitsCostsHealth2018]
 
 Consistent with previous approaches, we use GDP per capita (USD 2019) for our base-case value of a DALY. GDP inputs are reported in 2019 USD and obtained from the World Bank’s World Development Indicators; for consistency with our epidemiological inputs, we convert to per capita values using GBD population estimates.
 
 ### Sensitivity analyses
 
-The primary focus of this paper concerns structural uncertainty in determining the burden of mental illness, resulting in the evaluation of three different estimation approaches. To address parameter uncertainty within each approach, we apply a three-way sensitivity analysis. First, following a simple intuitive approach, we incorporate the upper and lower uncertainty intervals (UIs) provided by GBD 2019 for YLLs, YLDs, and DALYs to account for parameter uncertainty. Second, we use the upper and lower values of prevalence estimates and of the 95% confidence intervals (CIs) of the pooled relative risk of all-cause mortality from Walker and colleagues in our composite approach.[@walkerMortalityMentalDisorders2015] Third, our lower bound estimates are set to reallocate one sixth of the burden of musculoskeletal disorders proposed by Vigo and colleagues,[@vigoEstimatingTrueGlobal2016] while our upper bound estimates are set to reallocate one half of this burden. 
+The primary focus of this paper concerns structural uncertainty in determining the burden of mental illness, resulting in the evaluation of three different estimation approaches. To address parameter uncertainty within each approach, we apply a three-way sensitivity analysis. First, following a simple intuitive approach, we incorporate the upper and lower uncertainty intervals (UIs) provided by GBD 2019 for YLLs, YLDs, and DALYs to account for parameter uncertainty. Second, we use the upper and lower values of prevalence estimates and of the 95% confidence intervals (CIs) of the pooled relative risk of all-cause mortality from Walker and colleagues in our composite approach.[@walkerMortalityMentalDisorders2015] Third, our lower bound estimates are set to reallocate one sixth of the burden of musculoskeletal disorders proposed by Vigo and colleagues,[@vigoEstimatingTrueGlobal2016] while our upper bound estimates are set to reallocate one half of this burden.
 
-In addition to our base-case economic valuation, we further report our VSL estimates using three times GDP per capita as the value of a DALY. (Alternative valuations using values of $1,000 and $5,000, as well as purchasing power parity (PPP)-adjusted GDP per capita, are reported in Tables S5 and S6 of the Supplementary appendix.) 
+In addition to our base-case economic valuation, we further report our VSL estimates using three times GDP per capita as the value of a DALY. (Alternative valuations using values of $1,000 and $5,000, as well as purchasing power parity (PPP)-adjusted GDP per capita, are reported in Tables S5 and S6 of the Supplementary appendix.)
 
 ### Statistical analysis
 
-All computations were conducted using R software (version 3·6·2). 
+All analyses were completed using R (version 4.2.1).[@rcoreteamLanguageEnvironmentStatistical2022]
 
 ### Ethics statement
 
-The research draws exclusively on secondary country-level data reported at the national or subnational level. As such, it does not involve data collection, experimentation, or investigation concerning human subjects. The Institutional Review Board (IRB) of the Harvard T.H. Chan School of Public Health has determined that the study was not human subjects research, and that additional review was not required (protocol # IRB20-1946, determined on November 13, 2020).
+The research draws exclusively on secondary country-level data reported at the national or subnational level. As such, it does not involve data collection, experimentation, or investigation concerning human subjects. The Institutional Review Board (IRB) of the Harvard T.H. Chan School of Public Health has determined that the study was not human subjects research, and that additional review was not required (protocol number: IRB20-1946, determined on November 13, 2020).
 
 ### Role of funding source
 
 This study received no funding. All authors (DA, SV, and SS) had access to the data and shared in the decision to submit this article for publication.
 
+\blandscape
+
+```{r table1_2, echo = FALSE, include = TRUE, out.width = '100%'}
+
+knitr::include_graphics("table1_2.png")
+
+```
+\addcontentsline{lot}{table}{Table 1.2: Disability-adjusted life years (DALYs) attributable to mental disorders as totals (millions) and percentages of overall burden, by estimation approach.}
+
+\elandscape
+
 ## Results
 
-Under GBD 2019, over 125 million DALYs were attributed to mental disorders, or roughly 5% of the global burden. After including alcohol and drug use, neurological disorders, chronic pain, suicide, and self-harm, the share due to mental disorders rose to 12% of global DALYs (approximately 321 million DALYs). Under the composite approach, an additional 97 million DALYs were attributed to mental disorders, encompassing, in total, over 16% of global DALYs. Under all three methods, the burden of mental disorders (in DALYs) exhibited a country-income gradient, with mental disorders comprising over twice the burden of disease in high-income countries compared to low-income countries.
+`r results_sentence1`
 
-Rates of DALYs and deaths attributable to mental disorders under the different estimation approaches are presented by GBD region (Figure 1). Geographically, the composite approach allocated a large portion of DALYs (to mental disorders) in Eastern Europe, North and Latin America, and sub-Saharan Africa. This is largely driven by the inclusion of premature mortality in the composite approach. Estimates of DALYs by country income group and GBD region are reported in Table 2. (Estimates of deaths are reported in Table S4-6.)
+Rates of DALYs and deaths attributable to mental disorders under the different estimation approaches are presented by GBD region (Figure \ref{figure_gbd_adjusted}). Geographically, the composite approach allocated a large portion of DALYs (to mental disorders) in Eastern Europe, North and Latin America, and sub-Saharan Africa. This is largely driven by the inclusion of premature mortality in the composite approach. Estimates of DALYs by country income group and GBD region are reported in Table 2. (Estimates of deaths are reported in Table S4-6.)
 
-Under the three approaches, we calculated the economic value of mental disorder losses (Table 3). Using GDP per capita as a proxy for the value per DALY, economic losses due to mental disorders were estimated at 4·7 trillion USD using our composite approach. This estimate is 1·1 trillion USD larger than that reached using the 2016 reallocation approach and over 3·3 trillion USD larger than that reached from the unadjusted GBD 2019 estimates. Further adjusting for purchasing power parity, the global value of mental illness losses would exceed 7·2 trillion international dollars in 2019 (Table S7).
+Under the three approaches, we calculated the economic value of mental disorder losses (Table 3). `r results_sentence2`. Further adjusting for purchasing power parity, the global value of mental illness losses would exceed 7.2 trillion international dollars in 2019 (Table S7).
 
-Although economic losses do not represent an actual loss to GDP, a sense of the scale can be gained by expressing the economic consequences with respect to GDP. Figure 2 displays the economic burden of disease due to mental disorders under the three estimation approaches by GBD region, as a percent of regional GDP. (Estimates by absolute values per DALY are provided in the Supplementary appendix, along with mapped data visualizing estimates across all values per DALY.) Across approaches, the greatest change in estimated burden occurs in Eastern Europe, Latin America, North America, and Southern sub-Saharan Africa. Under the relative GDP-per-capita values the economic burden would account for between 4% of GDP in Eastern Sub-Saharan Africa and 8% in High-income North America under our composite approach. 
+```{r table1_3, echo = FALSE, include = TRUE, out.width = '100%'}
+
+knitr::include_graphics("table1_3.png")
+
+```
+\addcontentsline{lot}{table}{Table 1.3: Global economic value associated with premature mortality and morbidity from mental disorders, by estimation approach and value per DALY.}
+
+```{r figure_gbd_adjusted, include = TRUE, echo=FALSE, warnings = FALSE, fig.scap="DALYs, YLDs, YLLs, and deaths attributable to mental disorders in 2019, by estimation approach, per 100,000 population.", out.extra='', fig.cap=paste("\\label{figure_gbd_adjusted}DALYs, YLDs, YLLs, and deaths attributable to mental disorders in 2019, by estimation approach, per 100,000 population. Values are aggregated by GBD region. DALYs: Disability-adjusted life years; YLDs: years lived with disability; YLLs: years of life lost; GBD: Global Burden of Disease.", sep=" "), fig.width = 11, fig.height = 11, fig.align='center', out.width = '97%'}
+
+# Figure 1
+sf_use_s2(FALSE)
+
+lancet_pal <- c("#5A56A4", 
+                "#318ABF",
+                "#62C2A4",
+                "#9DD1A4",
+                "#DBE79A",
+                "#FCDA8B",
+                '#FCAA66',
+                "#F2744C",
+                "#D84858",
+                "#9A154C")
+
+j = 1
+i = "ihme_region"
+k = "rate_per_100k"
+m = "abs"
+
+temp <- data_rev_map %>% 
+  filter(measure_id == j) %>% 
+  filter(estimate_id %in%  c(1,2,4))
+
+deaths <- data_rev_map %>% 
+  filter(measure_id == j) %>% 
+  filter(estimate_id %in%  c(1,2,4)) %>% 
+  mutate(var_cut = cut(ihme_region_rate_per_100k, 
+                       breaks =c(0, 1, 20, 40, 60, 80, 100, 120, 130, 140, max(temp$ihme_region_rate_per_100k)))) %>%
+  ggplot() +
+  geom_sf(mapping = aes(fill = var_cut), color = "grey95", size = 0.001) +
+  geom_sf(data = . %>%   group_by(ihme_region) %>% 
+            st_set_precision(1e4) %>%
+            summarize(geometry = st_union(geometry)), fill = "transparent", color = 'black', size = 0.02) +
+  theme(panel.grid.major = element_blank(), 
+        panel.background = element_blank(),
+        axis.title = element_blank(), 
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        text = element_text(family = "Source Sans Pro")) + 
+  labs(subtitle = "D: Deaths",
+    fill=
+      ifelse(j == 1,ifelse(k == "rate_per_100k", "Deaths", "% of deaths"),
+             ifelse(j == 2, ifelse(k == "rate_per_100k", "DALYs", "% of DALYs"),
+                    ifelse(j == 3, ifelse(k == "rate_per_100k", "YLDs", "% of YLDs"), 
+                           ifelse(k == "rate_per_100k", "YLLs", "% of YLLs"))))) +
+  scale_fill_manual(values=setNames(lancet_pal, levels(data_rev_map$var_cut))) +
+  coord_sf(ndiscr = F) + 
+  facet_grid(~estimate_newlab) +
+  theme(legend.position = "bottom",
+        legend.title = element_text(size = 11),
+        legend.text =  element_text(size = 10),
+        plot.subtitle=element_text(size=15),
+        text = element_text(family = "Source Sans Pro"),
+        strip.background = element_rect(colour="white",
+                                        fill="white")
+        ,
+        strip.text = element_text(size=14)
+  ) +
+  guides(fill = guide_legend(override.aes =
+                               list(size = 0.5),
+                             nrow = 1, 
+                             byrow = TRUE))
+  
+  
+
+j = 2 
+
+temp <- data_rev_map %>% 
+  filter(measure_id == j) %>% 
+  filter(estimate_id %in%  c(1,2,4))
+
+dalys <- data_rev_map %>% 
+  filter(measure_id == j) %>% 
+  filter(estimate_id %in%  c(1,2,4)) %>% 
+  mutate(var_cut = cut(ihme_region_rate_per_100k/1000, 
+                       breaks =c(1, 1.5,
+                                 2, 2.5, 3, 4, 5, 6, 7, 7.5, 
+                                 max(temp$ihme_region_rate_per_100k)/1000))) %>% 
+  ggplot() +
+  geom_sf(mapping = aes(fill = var_cut), color = "grey95", size = 0.001) +
+  geom_sf(data = . %>%   group_by(ihme_region) %>% 
+            st_set_precision(1e4) %>%
+            summarize(geometry = st_union(geometry)), fill = "transparent", color = 'black', size = 0.02) +
+  theme(panel.grid.major = element_blank(), 
+        panel.background = element_blank(),
+        axis.title = element_blank(), 
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        text = element_text(family = "Source Sans Pro")) + 
+  labs(subtitle = "A: Disability-adjusted life years",
+       fill=
+         ifelse(j == 1,ifelse(k == "rate_per_100k", "Deaths", "% of deaths"),
+                ifelse(j == 2, ifelse(k == "rate_per_100k", "DALYs, thousands", "% of DALYs"),
+                       ifelse(j == 3, ifelse(k == "rate_per_100k", "YLDs, thousands", "% of YLDs"), 
+                              ifelse(k == "rate_per_100k", "YLLs, thousands", "% of YLLs"))))) +
+  scale_fill_manual(values=setNames(lancet_pal, levels(data_rev_map$var_cut))) +
+  coord_sf(ndiscr = F) + 
+  facet_grid(~estimate_newlab) +
+  theme(legend.position = "bottom",
+        legend.title = element_text(size = 11),
+        legend.text =  element_text(size = 10),
+        plot.subtitle=element_text(size=15),
+        text = element_text(family = "Source Sans Pro"),
+        strip.background = element_rect(colour="white",
+                                        fill="white")
+        ,
+        strip.text = element_text(size=14)
+  ) +
+  guides(fill = guide_legend(override.aes =
+                               list(size = 0.5),
+                             nrow = 1, 
+                             byrow = TRUE))
+
+j = 3
+
+temp <- data_rev_map %>% 
+  filter(measure_id == j) %>% 
+  filter(estimate_id %in%  c(1,2,4))
+
+ylds <- data_rev_map %>% 
+  filter(measure_id == j) %>% 
+  filter(estimate_id %in%  c(1,2,4)) %>% 
+  mutate(var_cut = cut(ihme_region_rate_per_100k/1000, 
+                       breaks =c(1, 1.25, 1.5,
+                                 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 
+                                 max(temp$ihme_region_rate_per_100k)/1000))) %>% 
+  ggplot() +
+  geom_sf(mapping = aes(fill = var_cut), color = "grey95", size = 0.001) +
+  geom_sf(data = . %>%   group_by(ihme_region) %>% 
+            st_set_precision(1e4) %>%
+            summarize(geometry = st_union(geometry)), fill = "transparent", color = 'black', size = 0.02) +
+  theme(panel.grid.major = element_blank(), 
+        panel.background = element_blank(),
+        axis.title = element_blank(), 
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        text = element_text(family = "Source Sans Pro")) + 
+  labs(subtitle = "B: Years lived with disability",
+       fill=
+         ifelse(j == 1,ifelse(k == "rate_per_100k", "Deaths", "% of deaths"),
+                ifelse(j == 2, ifelse(k == "rate_per_100k", "DALYs, thousands", "% of DALYs"),
+                       ifelse(j == 3, ifelse(k == "rate_per_100k", "YLDs, thousands", "% of YLDs"), 
+                              ifelse(k == "rate_per_100k", "YLLs, thousands", "% of YLLs"))))) +
+  scale_fill_manual(values=setNames(lancet_pal, levels(data_rev_map$var_cut))) +
+  coord_sf(ndiscr = F) + 
+  facet_grid(~estimate_newlab) +
+  theme(legend.position = "bottom",
+        legend.title = element_text(size = 11),
+        legend.text =  element_text(size = 10),
+        plot.subtitle=element_text(size=15),
+        text = element_text(family = "Source Sans Pro"),
+        strip.background = element_rect(colour="white",
+                                        fill="white")
+        ,
+        strip.text = element_text(size=14)
+  ) +
+  guides(fill = guide_legend(override.aes =
+                               list(size = 0.5),
+                             nrow = 1, 
+                             byrow = TRUE))
+
+
+j = 4
+
+temp <- data_rev_map %>% 
+  filter(measure_id == j) %>% 
+  filter(estimate_id %in%  c(1,2,4))
+
+ylls <- data_rev_map %>% 
+  filter(measure_id == j) %>% 
+  filter(estimate_id %in%  c(1,2,4)) %>% 
+  mutate(var_cut = cut(ihme_region_rate_per_100k/1000, 
+                       breaks =c(0, 0.25, 0.5, 0.75, 1, 1.5,
+                                 2, 2.5, 3, 3.5, 
+                                 max(temp$ihme_region_rate_per_100k)/1000))) %>% 
+  ggplot() +
+  geom_sf(mapping = aes(fill = var_cut), color = "grey95", size = 0.001) +
+  geom_sf(data = . %>%   group_by(ihme_region) %>% 
+            st_set_precision(1e4) %>%
+            summarize(geometry = st_union(geometry)), fill = "transparent", color = 'black', size = 0.02) +
+  theme(panel.grid.major = element_blank(), 
+        panel.background = element_blank(),
+        axis.title = element_blank(), 
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        text = element_text(family = "Source Sans Pro")) + 
+  labs(subtitle = "C: Years of life lost",
+       fill=
+         ifelse(j == 1,ifelse(k == "rate_per_100k", "Deaths", "% of deaths"),
+                ifelse(j == 2, ifelse(k == "rate_per_100k", "DALYs, thousands", "% of DALYs"),
+                       ifelse(j == 3, ifelse(k == "rate_per_100k", "YLDs, thousands", "% of YLDs"), 
+                              ifelse(k == "rate_per_100k", "YLLs, thousands", "% of YLLs"))))) +
+  scale_fill_manual(values=setNames(lancet_pal, levels(data_rev_map                 $var_cut))) +
+  coord_sf(ndiscr = F) + 
+  facet_grid(~estimate_newlab) +
+  theme(legend.position = "bottom",
+        legend.title = element_text(size = 11),
+        legend.text =  element_text(size = 10),
+        plot.subtitle=element_text(size=15),
+        text = element_text(family = "Source Sans Pro"),
+        strip.background = element_rect(colour="white",
+                                        fill="white")
+         ,
+         strip.text = element_text(size=14)
+  ) +
+  guides(fill = guide_legend(override.aes =
+                               list(size = 0.5),
+                             nrow = 1, 
+                             byrow = TRUE))
+
+
+ggarrange(dalys, ylds, ylls, deaths, 
+          ncol = 1, nrow = 4)
+
+ggsave(filename = paste0("Figure_1.png"), 
+       plot = last_plot(), 
+       path = resultspath)
+       
+       # ,
+       # width = 1689,
+       # height = 1153,
+       # units = "px",
+       # dpi = 320)
+
+
+```
+
+
+```{r figure_cost_by_region, fig.width = 8, fig.height = 6, fig.align='center', out.width = '95%',  fig.scap="Economic burden of mental disorders, as a percent of GDP.", out.extra='', fig.cap="\\label{figure_cost_by_region}Economic burden of mental disorders, as a percent of GDP. The economic value is determined by using GDP per capita (USD 2019) as the value of a DALY. Values are aggregated by GBD region. GDP: gross domestic product; USD: United States dollar; DALY: disability-adjusted life year; GBD: Global Burden of Disease.", echo = FALSE, include = TRUE}
+
+l = "cost_who1"
+m = "abs"
+i = "ihme_region"
+
+
+data_rev %>%
+  filter(numeric_name == "val") %>%
+  {if(i == "who_region") select(.,measure_id,estimate, estimate_id,estimate_newlab,  who_region, who_region_pop100k:who_region_cost_who2_diff)
+    else select(.,measure_id, estimate, estimate_id, estimate_newlab, ihme_region, ihme_region_pop100k:ihme_region_cost_who2_diff)} %>% unique %>%
+  filter(measure_id== "2") %>%
+  filter(estimate_id %in%  c(ifelse(m =="diff","",1), 2,4)) %>%
+  filter(!is.na(get(i))) %>%
+  mutate(region = factor(get(i) , levels =  get(paste0(i,"_positions")))) %>%
+  ggplot(aes(y = region, fill=region, x=get(paste0(i,"_",l,ifelse(m =="diff", "_diff","")))/ get(paste0(i,"_","gdp")) * 100)) +
+  geom_bar(stat="identity") +
+  labs(x="% of GDP") +
+  facet_wrap(~estimate_newlab) +
+  geom_text(aes(label=round(get(paste0(i,"_",l,ifelse(m =="diff", "_diff","")))/ get(paste0(i,"_","gdp"))
+                            * 100,1)),
+            position=position_dodge(width=0.9),
+            hjust=-0.25, color="grey10",
+            size = 3,
+            family = "Source Sans Pro") +
+  scale_fill_manual(name = "Region", values = get(paste0(i,"_pal"))) +
+  scale_x_continuous(expand = expansion(mult = c(0, .1)), limits = c(0,8)) +
+  geom_vline(xintercept = 0, size = 0.25)+
+  theme(panel.grid.major.x =  element_line(color = "grey90",
+                                           linewidth = 0.15,
+                                           linetype = "dashed"),
+        panel.background = element_blank(),
+        axis.line=element_line(size = 0.2),
+        axis.line.y=element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.ticks.x = element_line(linewidth = 0.2),
+        axis.title.y = element_blank(),
+        # axis.text.y = element_blank(),
+        legend.position = "none",
+        text = element_text(family = "Source Sans Pro"),
+        strip.background = element_rect(colour="white",
+                                        fill="white"),
+        strip.text = element_text(size=10))
+
+
+ggsave(filename = paste0("Figure_2.png"),
+       path = resultspath,
+       width = 8,
+       height = 6)
+
+
+
+
+```
+
+Although economic losses do not represent an actual loss to GDP, a sense of the scale can be gained by expressing the economic consequences with respect to GDP. Figure \ref{figure_cost_by_region} displays the economic burden of disease due to mental disorders under the three estimation approaches by GBD region, as a percent of regional GDP. (Estimates by absolute values per DALY are provided in the Supplementary appendix, along with mapped data visualizing estimates across all values per DALY.) Across approaches, the greatest change in estimated burden occurs in Eastern Europe, Latin America, North America, and Southern sub-Saharan Africa. `r results_sentence3`
 
 ## Discussion
 
-This study explores possible alternative approaches to estimating the global burden of mental illness and the economic losses thereof. In particular, we propose a composite approach to address contention in the classification of mental disorders. This approach suggests that the global DALYs attributable to mental disorders could exceed 400 million per year, or 16% of the total burden. 
+This study explores possible alternative approaches to estimating the global burden of mental illness and the economic losses thereof. In particular, we propose a composite approach to address contention in the classification of mental disorders. `r discussion_sentence1`
 
-When applied against an economic value per DALY of one times GDP per capita, this approach further suggests that the per year losses associated with this burden could exceed 4·7 trillion USD in 2019. When adjusting for the uncertainty in estimates of the attributable burden of disease, the losses could range from 3·1 trillion to more than 6·9 trillion USD. Adjusting for purchasing power parity would increase the magnitude of these estimates, with ranges from 4·8 to 10·6 trillion international dollars at the global scale.
+`r discussion_sentence2` Adjusting for purchasing power parity would increase the magnitude of these estimates, with ranges from 4.8 to 10.6 trillion international dollars at the global scale.
 
-Put in context of the existing literature, our epidemiological and economic estimates provide two important contributions. First, our findings echo in magnitude those of Vigo and colleagues,[@vigoEstimatingTrueGlobal2016] which have highlighted that suicide and premature mortality due to mental disorders are potentially large sources of underestimation in the current GBD classification. Second, when including these sources of attributable mortality, the economic findings suggest staggering loses. We estimate that in 2019, the losses would already be over 1·8 trillion USD greater than Bloom and colleagues’ global losses projections for 2030 (2·9 trillion 2019 USD, using the same value per DALY approach).[@bloomGlobalEconomicBurden2011]
+Put in context of the existing literature, our epidemiological and economic estimates provide two important contributions. First, our findings echo in magnitude those of Vigo and colleagues,[@vigoEstimatingTrueGlobal2016] which have highlighted that suicide and premature mortality due to mental disorders are potentially large sources of underestimation in the current GBD classification. Second, when including these sources of attributable mortality, the economic findings suggest staggering loses. `r discussion_sentence3`[@bloomGlobalEconomicBurden2011]
 
 Our findings add to a growing literature concerning the classification of mental disorders, in particular related to underscoring the importance of including premature mortality attributable to mental disorders in burden conceptualizations.[@vigoBurdenMentalNeurological2020; @vigoEstimatingTrueGlobal2016; @vigoTrueGlobalDisease2022; @whitefordChallengesEstimatingTrue2016] These calls have most recently been emphasized by GBD collaborators who have urged that “the differential mortality gap for individuals with mental disorders needs to be reflected within the GBD framework.”[@gbd2019mentaldisorderscollaboratorsGlobalRegionalNational2022] Our composite approach to assigning attributable mortality presents one potential attempt for acknowledging this differential mortality gap. Our economic analysis further provides updated monetary estimates of the burden of mental illness; to our knowledge, this is the first such analysis of the global economic burden of mental disorders in over a decade.
 
-Our results should, however, be interpreted with several limitations in mind. First, our estimation approaches themselves all draw upon modeled data (i.e., GBD estimates). While GBD generates descriptions of morbidity and mortality at fine demographic and geographic levels, it is important to emphasize that the sophisticated modeling approaches implemented often draw on (potentially little) available underlying empirical data.[@tichenorMetricPartnershipsGlobal2020] These inputs can be extremely limited for particular diseases and geographical locations, especially so for mental disorders. By way of example, the GBD 2019 Data Input Sources Tool retrieves 3,084 separate data sources for mental disorders. Of these, only 60 pertain to sub-Saharan Africa (1·9%) and 58 to South Asia (1·8%).[@instituteforhealthmetricsandevaluationihmeGlobalBurdenDisease] By comparison, of the 6,064 records pertaining to maternal and neonatal disorders, 631 are for sub-Saharan Africa (10·4%) and 270 for South Asia (4·5%). These severely limited inputs reflect a dearth of global mental health data; as of 2017, the World Mental Health survey initiative had conducted interviews in just 26 countries, only 13 of which were classified as low- or middle-income.[@steinCrossnationalEpidemiologySocial2017]
+Our results should, however, be interpreted with several limitations in mind. First, our estimation approaches themselves all draw upon modeled data (i.e., GBD estimates). While GBD generates descriptions of morbidity and mortality at fine demographic and geographic levels, it is important to emphasize that the sophisticated modeling approaches implemented often draw on (potentially little) available underlying empirical data.[@tichenorMetricPartnershipsGlobal2020] These inputs can be extremely limited for particular diseases and geographical locations, especially so for mental disorders. By way of example, the GBD 2019 Data Input Sources Tool retrieves 3,084 separate data sources for mental disorders. Of these, only 60 pertain to sub-Saharan Africa (1.9%) and 58 to South Asia (1.8%).[@instituteforhealthmetricsandevaluationihmeGlobalBurdenDisease] By comparison, of the 6,064 records pertaining to maternal and neonatal disorders, 631 are for sub-Saharan Africa (10.4%) and 270 for South Asia (4.5%). These severely limited inputs reflect a dearth of global mental health data; as of 2017, the World Mental Health survey initiative had conducted interviews in just 26 countries, only 13 of which were classified as low- or middle-income.[@steinCrossnationalEpidemiologySocial2017]
 
-Relatedly, our composite approach relies on pooled estimates of the relative risk of mortality from a systematic review and meta-analysis that itself is limited by the available data it draws upon[@walkerMortalityMentalDisorders2015]. The review identified 203 studies for inclusion, of which only two were located in Africa, 16 in Asia, and one in South America. While the authors found that the estimates of mortality risk did not vary by region, the limited representation of studies from the world’s most populous and epidemiologically diverse continents is a considerable shortcoming. It is possible, for instance, that the relative risk of all-cause mortality associated with mental disorders is lower where the burden of mortality is more heavily concentrated among child, maternal, and infectious diseases, and is higher where the burden is dominated by NCDs. Therefore, to reach a conservative estimate of attributable mortality, we separately estimated population attributable fractions for natural and unnatural causes of death and restricted our allocation of YLLs from natural causes to NCDs—meaning no deaths from maternal or infectious diseases were attributed to mental disorders under the composite approach.
+Relatedly, our composite approach relies on pooled estimates of the relative risk of mortality from a systematic review and meta-analysis that itself is limited by the available data it draws upon.[@walkerMortalityMentalDisorders2015] The review identified 203 studies for inclusion, of which only two were located in Africa, 16 in Asia, and one in South America. While the authors found that the estimates of mortality risk did not vary by region, the limited representation of studies from the world’s most populous and epidemiologically diverse continents is a considerable shortcoming. It is possible, for instance, that the relative risk of all-cause mortality associated with mental disorders is lower where the burden of mortality is more heavily concentrated among child, maternal, and infectious diseases, and is higher where the burden is dominated by NCDs. Therefore, to reach a conservative estimate of attributable mortality, we separately estimated population attributable fractions for natural and unnatural causes of death and restricted our allocation of YLLs from natural causes to NCDs—meaning no deaths from maternal or infectious diseases were attributed to mental disorders under the composite approach.
 
-Furthermore, our composite approach allocates mortality due to mental disorders by calculating population attributable fractions using the conventional formula, which may be biased in the presence of confounding or effect heterogeneity.[@darrowConfoundingBiasAttributable2011] In particular, the use of adjusted risk ratios (as in the current analysis) may result in anticonservative bias if the crude risk ratios are lower than the adjusted ones. To mitigate the potential for bias, our sensitivity analysis presents results under conservative assumptions for risk ratios and estimates of prevalence and mortality. 
+Furthermore, our composite approach allocates mortality due to mental disorders by calculating population attributable fractions using the conventional formula, which may be biased in the presence of confounding or effect heterogeneity.[@darrowConfoundingBiasAttributable2011] In particular, the use of adjusted risk ratios (as in the current analysis) may result in anticonservative bias if the crude risk ratios are lower than the adjusted ones. To mitigate the potential for bias, our sensitivity analysis presents results under conservative assumptions for risk ratios and estimates of prevalence and mortality.
 
-Despite these limitations, our findings underscore both that the true burden of mental disorders may only partially be captured by current estimation approaches, and that, consequently, the associated economic losses may be much higher than previously estimated. We note that our findings may themselves be an underestimate, as our composite approach excludes deaths due to neonatal, maternal, and infectious diseases attributable to mental disorders. However, we observe that conventional estimation approaches may fail to capture large shares of premature mortality attributable to mental health causes, both from self-inflicted and unnatural causes of death and mortality from NCDs. Capturing this share of the burden emphasizes that mental health is a critical risk factor for premature mortality, as well as a direct source of morbidity. 
+Despite these limitations, our findings underscore both that the true burden of mental disorders may only partially be captured by current estimation approaches, and that, consequently, the associated economic losses may be much higher than previously estimated. We note that our findings may themselves be an underestimate, as our composite approach excludes deaths due to neonatal, maternal, and infectious diseases attributable to mental disorders. However, we observe that conventional estimation approaches may fail to capture large shares of premature mortality attributable to mental health causes, both from self-inflicted and unnatural causes of death and mortality from NCDs. Capturing this share of the burden emphasizes that mental health is a critical risk factor for premature mortality, as well as a direct source of morbidity.
 
-The magnitude of economic costs associated with mental disorders raises the need for health economics research, particularly on returns on investment and costing for effective prevention and treatment strategies.[@patelAddressingBurdenMental2016] Further work is also needed to strengthen the measurement of the global burden of mental illness, not only for more fully capturing the morbidity and mortality of mental disorders, but also for incorporating the impacts of new and evolving threats—such as pandemics, conflicts and climate change—to population mental health. 
+The magnitude of economic costs associated with mental disorders raises the need for health economics research, particularly on returns on investment and costing for effective prevention and treatment strategies.[@patelAddressingBurdenMental2016] Further work is also needed to strengthen the measurement of the global burden of mental illness, not only for more fully capturing the morbidity and mortality of mental disorders, but also for incorporating the impacts of new and evolving threats—such as pandemics, conflicts and climate change—to population mental health.
 
 Our study highlights that mental health—far from being an issue solely concentrated in high-income regions alone— is a major global issue, one that imposes a significant toll to health and welfare. The large magnitude of these twin burdens highlights the urgency for global action to support mental health financing and to bolster its prioritization.
 
-## Acknowledgements 
+## Acknowledgements
 
-We thank David Bloom, Goodarz Danaei, and Daniel Vicente Vigo for their feedback on an earlier version of the paper, as well as five anonymous reviewers for their valuable and constructive comments on our manuscript. This study received no funding.
+We thank David Bloom, Goodarz Danaei, and Daniel Vicente Vigo for their feedback on an earlier version of the paper, as well as five anonymous reviewers for their valuable and constructive comments on our manuscript. 
 
-### Author conntributors
+### Author contributions
 
 All authors contributed to study conception, methodology, and interpretation. DA oversaw data acquisition, programming, formal analysis, visualization, the first draft of the manuscript. All authors contributed to critical revision of the manuscript, with responses to reviewers and subsequent revisions led by DA. All authors had access to and verified all the data and accept responsibility for the decision to submit for publication.
 
@@ -147,6 +1478,7 @@ We declare no competing interests.
 
 GBD estimates are available for download from the Global Health Data Exchange and are available freely for non-commercial users under the Open Data Commons Attribution License (https://ghdx.healthdata.org/gbd-2019). All codes used for the analysis in this article are available on GitHub (https://github.com/darias5/gmh_econ).
 
+\newpage
 
 
 

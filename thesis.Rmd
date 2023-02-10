@@ -1,40 +1,61 @@
 ---
-title: " "
+title: " "		
 output:
-    pdf_document:
-        number_sections: TRUE
-        
+  pdf_document:
+    number_sections: TRUE
+    # citation_package: natbib
+
+    # pandoc_args: ['--lua-filter=section-bibliographies.lua.txt']
+    # pandoc_args: ['--lua-filter=multibib.lua']
+    
+reference-section-title: Works Cited
+
 geometry: margin=1in
-fontsize: 12pt
+fontsize: 11pt
 indent: true
 header-includes:
-  - \usepackage{float}
   - \usepackage{sectsty}
   - \usepackage{setspace}\spacing{2}
   - \usepackage{fancyhdr}
-  - \usepackage{lastpage}
-  - \usepackage{dcolumn}
-  # - \usepackage{natbib}\bibliographystyle{agsm}
-  # - \usepackage[nottoc]{tocbibind}
+  - \usepackage[utf8]{inputenc}
+  - \usepackage[utf8]{lscape}
+  - \newcommand{\blandscape}{\begin{landscape}}
+  - \newcommand{\elandscape}{\end{landscape}}
+  - \usepackage[nottoc]{tocbibind}
+  # - \usepackage{float}
+  # - \usepackage{chapterbib}
+  # - \usepackage{lastpage}
+  # - \usepackage{dcolumn}
+  # - \usepackage[backend=biber,style=authoryear-icomp]{biblatex}
+  # - \addbibresource{bibliography.bib}  
   
-bibliography: bibliography.bib
+bibliography: main.bib
+# natbiboptions: "numbers"
+csl: https://www.zotero.org/styles/the-lancet 
+
+  # intro: intro.bib
+  # ch1: chapter1.bib
+  # 
+
 
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+
+```{r setup0, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, include = FALSE, echo = TRUE) 
 
 ```
 
 \allsectionsfont{\centering\normalsize}
 \subsectionfont{\raggedright}
 \subsubsectionfont{\raggedright}
+
 \pagenumbering{roman}
 \pagestyle{empty}
 
 \begin{centering}
 
-\vspace*{24pt}
+\vspace*{36pt}
 
 \large
 
@@ -50,7 +71,7 @@ by
 
 {\ Daniel Arias}
 
-\vspace{24pt}
+\vspace{36pt}
 
 A dissertation submitted to the faculty of \\
 the Harvard T.H. Chan School of Public Health\\
@@ -58,12 +79,12 @@ in partial fulfillment of the requirements\\
 for the degree of \emph{Doctor of Philosophy}\\
 in the Department of Global Health and Population
 
-\vspace{36pt}
+\vspace{42pt}
 
 Harvard University \\
-Boston, Massachusetts
+Cambridge, Massachusetts
 
-\vspace{36pt}
+\vspace{42pt}
 
 `r format(Sys.time(), '%B %Y')`
 
@@ -96,23 +117,13 @@ Dissertation Advisor: Stéphane Verguet \hfill Daniel Arias
 
 \end{centering}
 
-testsets
-
-etstestsetest . estsetset 
-
-Lorem ipsum dolor sit amet, nunc pulvinar sapien et ligula ullamcorper malesuada proin. Faucibus a pellentesque sit amet porttitor eget. Quam adipiscing vitae proin sagittis nisl rhoncus. Quis blandit turpis cursus in hac habitasse platea dictumst. Feugiat vivamus at augue eget arcu. Duis convallis convallis tellus id interdum velit laoreet id donec. Ornare quam viverra orci sagittis eu volutpat odio. Netus et malesuada fames ac turpis egestas maecenas. Faucibus turpis in eu mi bibendum neque egestas. Sed velit dignissim sodales ut. Dolor sed viverra ipsum nunc aliquet bibendum enim facilisis gravida.
-
-Interdum varius sit amet mattis vulputate. Dui id ornare arcu odio ut sem nulla pharetra diam. Neque gravida in fermentum et sollicitudin ac orci. Nibh ipsum consequat nisl vel pretium lectus quam id leo. Mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus et netus. Massa tempor nec feugiat nisl pretium fusce id velit ut. Vivamus at augue eget arcu dictum varius duis at consectetur. Odio ut enim blandit volutpat maecenas volutpat blandit aliquam etiam. Mauris ultrices eros in cursus. Tristique senectus et netus et malesuada.
-
 Imperdiet sed euismod nisi porta lorem mollis aliquam. Eget lorem dolor sed viverra ipsum nunc aliquet bibendum enim. Eget lorem dolor sed viverra. Vitae proin sagittis nisl rhoncus mattis. Mi sit amet mauris commodo quis imperdiet massa tincidunt. Quis auctor elit sed vulputate mi. Augue eget arcu dictum varius duis at consectetur lorem. Commodo elit at imperdiet dui accumsan sit amet. Consequat semper viverra nam libero justo laoreet sit. Quis hendrerit dolor magna eget est lorem ipsum. Eget arcu dictum varius duis at consectetur lorem. Fermentum posuere urna nec tincidunt praesent semper feugiat. Integer quis auctor elit sed vulputate mi sit amet. Ultricies integer quis auctor elit. Metus vulputate eu scelerisque felis imperdiet proin fermentum. Ut porttitor leo a diam sollicitudin tempor id eu nisl. Cras adipiscing enim eu turpis egestas. Cursus euismod quis viverra nibh cras pulvinar mattis nunc sed.
 
 Augue eget arcu dictum varius duis at. Tempor orci eu lobortis elementum nibh. Nibh sit amet commodo nulla. At varius vel pharetra vel. In metus vulputate eu scelerisque felis imperdiet. Venenatis tellus in metus vulputate eu. Aliquam sem fringilla ut morbi tincidunt augue. Risus feugiat in ante metus dictum at tempor commodo ullamcorper. In dictum non consectetur a erat nam. Ut sem viverra aliquet eget sit. Eleifend donec pretium vulputate sapien nec sagittis aliquam. Neque viverra justo nec ultrices dui. Turpis in eu mi bibendum neque egestas. Tellus rutrum tellus pellentesque eu tincidunt tortor aliquam nulla facilisi.
 
-Semper eget duis at tellus at urna condimentum. Viverra justo nec ultrices dui sapien eget. Etiam dignissim diam quis enim lobortis scelerisque fermentum dui. Sapien nec sagittis aliquam malesuada. Ac auctor augue mauris augue neque. Enim sed faucibus turpis in eu mi bibendum neque. Proin sagittis nisl rhoncus mattis rhoncus. Vel elit scelerisque mauris pellentesque pulvinar. Aliquam etiam erat velit scelerisque in dictum. Dictum varius duis at consectetur lorem donec massa sapien. Risus at ultrices mi tempus imperdiet nulla malesuada pellentesque. Faucibus purus in massa tempor nec feugiat nisl pretium fusce.
+Augue eget arcu dictum varius duis at. Tempor orci eu lobortis elementum nibh. Nibh sit amet commodo nulla. At varius vel pharetra vel. In metus vulputate eu scelerisque felis imperdiet. Venenatis tellus in metus vulputate eu. Aliquam sem fringilla ut morbi tincidunt augue. Risus feugiat in ante metus dictum at tempor commodo ullamcorper. In dictum non consectetur a erat nam. Ut sem viverra aliquet eget sit. Eleifend donec pretium vulputate sapien nec sagittis aliquam. Neque viverra justo nec ultrices dui. Turpis in eu mi bibendum neque egestas. Tellus rutrum tellus pellentesque eu tincidunt tortor aliquam nulla facilisi.
 
-Arcu odio ut sem nulla pharetra diam sit amet. Lorem ipsum dolor sit amet consectetur. Vitae aliquet nec ullamcorper sit amet risus nullam eget. Condimentum lacinia quis vel eros donec ac odio. Nulla posuere sollicitudin aliquam ultrices sagittis. Quis blandit turpis cursus in hac habitasse platea dictumst quisque. Amet risus nullam eget felis. Nec sagittis aliquam malesuada bibendum arcu vitae. In vitae turpis massa sed elementum tempus egestas sed sed. Netus et malesuada fames ac turpis egestas integer. Turpis tincidunt id aliquet risus feugiat. Lorem ipsum dolor sit amet consectetur adipiscing elit ut aliquam. Pretium vulputate sapien nec sagittis aliquam malesuada bibendum arcu vitae. Lectus nulla at volutpat diam ut venenatis tellus.
-
-\newpage
+\cleardoublepage
 
 \begin{spacing}{1}
 
@@ -130,38 +141,55 @@ Arcu odio ut sem nulla pharetra diam sit amet. Lorem ipsum dolor sit amet consec
 
 \listoftables
 
-\newpage
+\cleardoublepage
 
 \end{spacing}
 
 ```{r frontmatter, child='frontmatter.Rmd'}
 ```
 
-\newpage
+\cleardoublepage
 
 \pagenumbering{arabic}
 
 ```{r intro, child='intro.Rmd'}
 ```
 
-\newpage
+
+\cleardoublepage
 
 ```{r paper1, child='paper1.Rmd'}
 ```
 
-\newpage
+
+\cleardoublepage
 
 ```{r paper2, child='paper2.Rmd'}
 ```
 
-\newpage
+\cleardoublepage
 
 ```{r paper3, child='paper3.Rmd'}
 ```
 
-\newpage
+\cleardoublepage
 
 ```{r conclusion, child='conclusion.Rmd'}
 ```
 
-\newpage
+\cleardoublepage
+
+
+```{r todo}
+
+### TO DO / KNOWN ISSUES
+
+# Separate bibliography for each section
+# Numbered figures and tables by section
+# Check that sequential articles are represented by a dash
+# Table of figures and tables
+# Acronyms with acronym down
+# Institutional authors need to be fixed in bibliography
+
+```
+

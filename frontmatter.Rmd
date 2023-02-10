@@ -8,6 +8,13 @@ indent: true
 
 \section*{Acknowledgements}
 
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lacinia quis vel eros donec ac odio tempor. Urna nec tincidunt praesent semper feugiat nibh.
+
+Tortor aliquam nulla facilisi cras fermentum odio eu feugiat. Magna ac placerat vestibulum lectus mauris ultrices eros. Pulvinar proin gravida hendrerit lectus. Nisi scelerisque eu ultrices vitae auctor eu. Quis hendrerit dolor magna eget est lorem ipsum. At consectetur lorem donec massa sapien faucibus et molestie. Feugiat in fermentum posuere urna nec tincidunt praesent. 
+
+Facilisis gravida neque convallis a cras. Massa id neque aliquam vestibulum morbi blandit. Faucibus purus in massa tempor nec feugiat nisl pretium fusce. Amet facilisis magna etiam tempor orci eu lobortis. Odio tempor orci dapibus ultrices in iaculis nunc sed augue. Nulla aliquet porttitor lacus luctus accumsan tortor posuere ac ut. Sit amet aliquam id diam maecenas. Rhoncus aenean vel elit scelerisque mauris pellentesque pulvinar pellentesque habitant. Urna nunc id cursus metus aliquam.
+
+
 <!-- Thank you to: -->
 
 <!-- Stéphane Verguet -->
@@ -45,7 +52,7 @@ indent: true
 
 \begin{raggedright}
 
-\emph{Dedicated to ....}
+\emph{Dedicated to lorem ipsum...}
 
 \end{raggedright}
 

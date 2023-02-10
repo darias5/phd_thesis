@@ -1,15 +1,744 @@
----
-title: ''
-output: pdf_document
 
----
 
-\addcontentsline{toc}{section}{Paper 3}
-\section*{Paper 3}
+```{r loading, include=FALSE}
 
-Thank you for following this tutorial! 
 
-I hope you'll find it useful to write a very professional dissertation. 
+source("C:/Users/danie/Dropbox (Harvard University)/mh_scm/code/0_prep_file.R")
 
-\cite{ngTracingPathChikungunya2010}
+load(file = paste(datapath,"data_its_state.Rdata", sep = "/"))
 
+data_its_state <- data_temp 
+
+load(file = paste(datapath,"data_its_county.Rdata", sep = "/"))
+
+data_its_county <- data_temp 
+
+load(file = paste(datapath,"data_its_international.Rdata", sep = "/"))
+
+data_its_international <- data_temp 
+
+rm(data_temp)
+
+load(file = paste(resultspath, "1_data",
+                  "model_outputs_all_main.Rdata", sep = "/"))
+
+load(file = paste(resultspath, "1_data",
+                  "model_outputs_all_US.Rdata", sep = "/"))
+
+load(file = paste(resultspath, "1_data",
+                  "model_outputs_all_international.Rdata", sep = "/"))
+
+load(file = paste(resultspath, "1_data",
+                  "model_outputs_all_diseases.Rdata", sep = "/"))
+
+
+ function_model_main <- function(data, polity = "include", levels = 
+                                   "exclude"){
+   
+   data_temp <- data %>%
+     filter(bandwidth == 40 & 
+               cleaning == TRUE &
+              time == "daily" &
+               day_of_week_fe == TRUE &
+               month_fe == TRUE &
+               geograph_fe == TRUE &
+              cits == "TRUE" &
+              weights == "population")
+   
+   if (levels == "exclude") {
+     
+       data_temp <- data_temp %>%
+     filter( geography == "county")
+     
+   }
+
+   if (polity == "exclude") {
+     
+       data_temp <- data_temp %>%
+     filter(polity == "all")
+     
+   }
+   
+   return(data_temp)
+   
+ }
+
+
+
+model_output_main <- model_outputs_all_US %>%
+  function_model_main()
+
+
+function_clean_diseases <- function(data){
+  
+  data %>%
+    mutate(disease = str_to_sentence(str_replace_all(disease, "_", " "))) %>%
+    mutate(disease = ifelse(disease == "Attention deficit hyperactivity disorder", "ADHD", disease),
+           disease = ifelse(disease == "Generalized anxiety disorder", "GAD", disease),
+           disease = ifelse(disease == "Major depressive disorder", "MDD", disease),
+           disease = ifelse(disease == "Avoidant personality disorder", "AvPD", disease)) 
+  
+}
+
+
+
+
+list_diseases_all <- read.xlsx(paste(datapath, 
+                         "list_of_diseases.xlsx", sep = "/")) %>%
+  filter(mh_indicator == 1) %>%
+  select(search)
+
+list_diseases_all <- list_diseases_all$search
+
+mental_disorders <- c("anxiety", "depression", "major_depressive_disorder")
+geography <- c("state", "county", "international")
+
+paper3_abstract <- paste0("For searches related to depression, we observe a statistically significant slope change of -0.0304 percentage points per day (p < 0.0001, 99\\% CI: -0.0321– -0.0286) and a level shift of -0.184 (p < 0.0001, 99\\% CI: -0.226– -0.143), above and beyond changes in slope and level observed for searches for headaches. For anxiety, we observe a similar slope change decline of 0.0383 percentage points per day (p < 0.0001, 99\\% CI: -0.0400– -0.0366) and a level shift of -0.339 (p < 0.0001, 99\\% CI: -0.378– -0.299).  We do not observe significant variation of estimates across predominately Democrat or Republican voting states and counties, and our results are robust to alternative specifications of bandwidth, fixed effects, and data cleaning decisions.")
+
+```
+
+# The impact of COVID-19 vaccine developments on Google COVID-19 search trends for mental health symptoms: a controlled interrupted time series analysis
+
+\begin{centering}
+
+\emph{Daniel Arias, Jessica Cohen, Karestan Koenen, Margaret McConnell, Stéphane Verguet}
+
+\vspace{24pt}
+
+\noindent\rule{8cm}{0.4pt}
+
+\end{centering}
+
+\begin{raggedright}
+
+\vspace*{\fill}
+
+{\bf Background:} A key obstacle to studying the effects of public health responses on population mental health in the US is a lack of daily surveillance data on mental health indicators. A potential marker of population mental health is the use of Internet search data, which offers the potential for real-time, large-scale analysis and identification of evolving mental health issues. 
+
+{\bf Methods:} We utilize controlled interrupted time series (CITS) approach to evaluate whether the development and announcement of safe and effective COVID-19 vaccines reduced Google searches related to symptoms of depression and anxiety. By comparing how search trends changed in the post period for mental health symptoms above and beyond changes observed in the same period for physical health symptoms, we estimate measures of association between the vaccine announcement and changes in mental health symptom search density. We adjust for state, month, and day of week effects, and we apply a sensitivity analysis to assess the robustness of our estimates to alternative specifications. We further examine whether estimates varied among states and counties that predominantly voted for the Democratic Party candidate in the 2020 presidential election compared to the Republican candidate.
+
+{\bf Findings and interpretation:} Under our main specification, we find evidence of reduced search density associated with the announcement of vaccine safety data for Google search trends for depression and anxiety. `r paper3_abstract`
+
+\emph{Keywords: mental health, controlled interrupted time series, Google searches, United States, COVID-19 vaccines.}
+
+\end{raggedright}
+
+\newpage
+
+
+## Introduction
+It has been well-documented that throughout the pandemic, symptoms of depression and anxiety have markedly increased among US adults. While it is likely that the pandemic has a direct effect on worsened mental health status due to fear of contracting and spreading the virus, public health responses to the pandemic—including lockdowns, school closures, and social distancing measures—likely have an indirect effect as well. Existing research suggests that the effects of these measures on mental health vary, and may be protective, null, or even harmful. Studies of lockdowns in multiple countries, for example, point to worsened feelings of isolation and hopelessness exacerbated by isolation measures. By contrast, the distribution of safe and effective vaccines against COVID-19 has been shown to reduce symptoms of depression and anxiety by as much as XXX. 
+
+
+* Describe symptoms database and reference published literature using it to predict COVID-19 cases and deaths [@alruilyPredictionCovid19Transmission2022; @abbasAssociationsGoogleSearch2021; @saegnerForecastingSurveillanceCOVID192022]
+
+A recently published evaluation of Google’s COVID-19 Search Trends Symptoms Dataset found strong correlation between search trends for depression and anxiety with indicators of mental health service utilization and need reported in the US Census Household Pulse Survey (HPS) with rates of emergency department visits for mental health condition as reported in the US Centers for Disease Control and Prevention’s (CDC) National Syndromic Surveillance Program (NSSP).[@vaidyanathanEvaluationInternetSearches2022]
+
+
+* Motivation to explore vaccine announcement: evidence that vaccination itself reduced depression and anxiety -- do we see earlier reductions from an anticipatory effect?
+* Motivation to analyze by polity: Vaccination became politically charged in the US, possible bias from impact of 2020 election on mental health searches
+* Overview of approach: CITS using searches for headache as a control, adjusting for fixed effects, subgroup analysis by polity, analysis for 6 different mental health symptoms
+
+## Methods
+
+### Data
+
+#### Shock date
+
+We take as our first credible signal of the imminent availability of safe and effective COVID-19 vaccines to be November 16, 2020. On November 9, Pzifer announced than early vaccine trial data showed 90% efficacy;[@thomasPfizerEarlyData2020] on the 16th, Moderna similarly announced preliminary results showing 94.5% efficacy for their vaccine.[@gradyEarlyDataShow2020] While U.S. Food and Drug Administration (FDA) Emergency Use Authorization (EUA) was not granted until December, the concurrent announcements of vaccine efficacy were widely reported and interpreted by many public health practitioners and laypersons as a substantial signal of a new phase of the pandemic, with Moderna's chief executive officer calling the news "a game changer" in the fight against COVID-19.
+
+#### Symptoms dataset
+
+We access U.S. county- and state-level data from Google’s COVID-19 Search Trends Symptoms Dataset[@Wahltinez2020](hereafter referred to as the symptoms dataset) between January 1, 2020 and April 1, 2021 for six symptoms: anxiety, depression, generalized anxiety disorders, headache, major depressive disorders, and panic attacks. Data on headaches was obtained to provide a control trend from a common health symptom with comparative characteristics to mental health complaints.
+
+* Linear interpolation to replace missing values
+* Also used smoothing to address outliers (sensitivity analysis showed no difference when unadjusted values were used)
+* Not all counties reported data (due to data privacy concerns, smaller county results were not included in the symptoms dataset)
+
+#### Voting dataset
+
+We further obtained county-level presidential election returns for 2020 from the MIT Election Data and Science Lab,[@mitelectiondataandsciencelabCountyPresidentialElection2022] which we then used to calculate aggregate county and state votes (including absentee, early, and election day ballots) won by each candidate. The aggregate votes were then used to determine vote share and margins (e.g., the percentage points difference in vote share between the candidate with the most votes to the runner up); margins were then used to sort counties and states into quintiles, with the 20% most Republican-voting localities appearing in the symptoms dataset sorted into bin 1 and the 20% most Democratic-voting localities sorted into bin 5.
+
+* Joined to symptoms dataset by FIPS code
+
+## Statistical analysis
+
+All analyses were completed using R (version 4.2.1).[@rcoreteamLanguageEnvironmentStatistical2022]
+
+### Modeling approach
+
+We use a controlled interrupted time series (CITS) approach.
+
+Model equation for Google search density (measured as the ratio between the normalized search volume for a given symptom during a given week and the median search volume for that symptom between 2018 and 2020):
+
+$$Y_{d,it} = \lambda_0 + \lambda_1 time_t + \lambda_2 Post_i + \lambda_3 time_t*Post_i + $$
+$$ \alpha_d treated_{di} + \beta_d time_t*treated_{di} + \delta_{d} Post_i*treated_{di} + \gamma_d time_t*Post_i*treated_{di} + \epsilon_{it}$$
+where $time_t$: is a continuous variable that captures the days leading to the vaccine announcement, $Post_i$: is an indicator variable which equals 1 in the "post" period and 0 otherwise, and $treated_di$: is an indicator variable which equals 1 if the observation is for a mental health condition $d$, 0 if for headaches. 
+
+The CITS effect estimates of interest are given by $\delta$, which reflects the additional level shift among mental health related symptoms searches compared to searches for headaches after the vaccine announcement, and  $\gamma$, the additional change in search density over time (i.e., slope change) comparing the same.
+
+* Fixed effects included for day of week, month, and state
+* Trim bandwidth to 40 days before and after the announcement
+* Subgroup analysis by polity to examine whether effects were different in very Democrat leaning geographies vs. Republican leaning ones
+
+### Sensitivity analysis
+
+Interacted modeling decisions:
+
+* County vs. state level aggregated data
+* Replacement of outliers with smoothing
+* Fixed effects for day of week
+* Fixed effects for month
+* Fixed effects for state
+* Bandwidth selection (30, 40, 50, 60 days)
+
+128 models for each disease and polity level (384 models per disease, 2,304 in total across all 6 conditions)
+
+### Ethics statement
+The Institutional Review Board (IRB) of the Harvard T.H. Chan School of Public Health has determined that the study was not human subjects research, and that additional review was not required (protocol number: IRB23-0095, determined on January 25, 2023).
+
+
+## Results
+
+```{r}
+
+
+
+```
+
+
+* Sharp declines in searches for depression and anxiety following vaccine announcement
+* No meaningful differences in searches for major depression and major anxiety, panic attacks, or sleep disorders
+* Results do not strongly vary by polity
+
+
+## Discussion
+
+* Shows that event the announcement of a safe and effective vaccine led to a significant shift in searches. If searches are taken as a reasonable proxy of mental health status, the period following the announcement saw both a sharp decline in depression and anxiety
+
+* Lack of heterogeneity by polity is interesting, given evidence that polity is a strong predictor of attitudes towards COVID-19 vaccination. Also makes bias from an uncommon shock (e.g., 2020 election) less likely to explain the results
+
+
+\newpage
+
+```{r figure_cits_outputs, include = TRUE, echo=FALSE, warnings = FALSE, fig.width = 7, fig.height = 8, fig.align='center', out.width = '95%', fig.scap="Controlled interrupted time series effect estimates on Google Search density by symptom.", out.extra='',  fig.cap="\\label{figure_cits_outputs}Controlled interrupted time series effect estimates (A: slope change per 10 days and B: level shift)  on Google Search density by symptom. Effect estimates are represented as thick, horizontal lines in between colored bands, which represent the 99\\% confidence intervals for the estimates. Colors reflect the sign and magnitude of effect estimates. Dark blue values above zero indicate an increase in search density, while the yellow and green negative values indicate a decrease. The dotted horizontal line depicts a null effect. ADHD: Attention deficit hyperactivity disorder. GAD: Generalized anxiety disorder. MDD: Major depressive disorder."}
+
+
+model_outputs_all_main %>% 
+   function_model_main("exclude") %>%
+  function_clean_diseases () %>%
+  arrange(disease) %>%
+   mutate(estimate = ifelse(coefficient == "post:time:trt", estimate*10, estimate),
+         lower_99 = ifelse(coefficient == "post:time:trt", lower_99*10, lower_99),
+         upper_99 = ifelse(coefficient == "post:time:trt", upper_99*10, upper_99)
+         ) %>%
+    mutate(coefficient = ifelse(coefficient == "post:time:trt", "A: slope change (per 10 days)",
+                              ifelse(coefficient == "post:trt", "B: level shift", "ERROR"))) %>%
+  mutate(sign = ifelse(estimate >0, TRUE, FALSE)) %>%
+ 
+  ggplot(aes(x = disease, 
+             y = estimate, ymin = lower_99, ymax = upper_99, fill = estimate)) +
+  geom_crossbar() +
+    theme_classic() +
+      geom_hline(yintercept = 0, linetype='dotted') +
+
+   geom_point(alpha = 0.5) +
+  labs(x = "Symptom", y = "Estimate") +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(size=12),
+    text = element_text(family = "Source Sans Pro"),
+    axis.text.x = element_text(#size = 4, 
+                               angle = 90, vjust = 0.5, hjust=1)) +
+  facet_wrap(~coefficient, scales = "free_y", dir = "v") +
+  scale_fill_viridis(direction = -1
+    
+  )
+ #  
+ # scale_fill_manual(values = c(col_negative, col_positive),
+ #                      name = "")
+
+```
+
+
+
+```{r figure_all_diseases, include = TRUE, echo=FALSE, warnings = FALSE, fig.width = 6, fig.height = 4.5, fig.align='center', out.width = '95%',  fig.scap="Interrupted time series (ITS) effect estimates and confidence intervals by symptom.", out.extra='',  fig.cap="\\label{figure_all_diseases}Interrupted time series (ITS) effect estimates and confidence intervals by symptom. Effect estimates are presented by points;  for each symptom, the estimated slope change per day is shown on the x-axis, while the level shift over the post-announcement period is shown on the y-axis. The horizontal and vertical bars next to each point represent the 99\\% confidence intervals for the estimate slope change and level shift, respectively. Mental health-related symptoms are shown in blue, while physical symptoms are shown in grey. ADHD: Attention deficit hyperactivity disorder. MDD: Major depressive disorder."}
+
+
+model_outputs_all_diseases_graph <- model_outputs_all_diseases %>%
+  mutate(coefficient = ifelse(coefficient == "post:time", "slope",
+                              ifelse(coefficient == "post", "level", "ERROR"))) %>%
+  select(coefficient, estimate, lower_95, upper_95, disease, p_value) %>%
+  pivot_wider(names_from = coefficient,
+              values_from = c(estimate, lower_95, upper_95, p_value)) %>%
+  mutate(mh_indicator = ifelse(disease %in% list_diseases_all, 
+                               "Mental symptom",
+                               "Physical symptom"))  %>%
+      function_clean_diseases()
+
+  
+
+
+model_outputs_all_diseases_graph %>%
+  ggplot(aes(y = estimate_level, x = estimate_slope, color = mh_indicator, label = disease)) +
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) +
+  geom_errorbarh(aes(xmin = lower_95_slope, xmax = upper_95_slope), alpha = 0.3) +
+  geom_errorbar(aes(ymin = lower_95_level, ymax = upper_95_level), alpha = 0.3) +
+  theme_classic() +
+  geom_point(alpha = 0.75) +
+  theme(
+    legend.position = "bottom",
+    strip.text = element_text(size=12),
+    
+    text = element_text(family = "Source Sans Pro")) +
+      scale_color_manual(values = c(col_mh,
+                                    col_grey_lightest),
+                         name = "") +
+      labs(x = "Slope change", y = "Level shift") +
+  geom_text_repel(data=subset(model_outputs_all_diseases_graph, estimate_slope < -0.04 |
+                                (estimate_slope <.01 & mh_indicator ==  "Mental symptom")),
+                  size = 3)
+
+```
+
+
+```{r figures_cits_data, include = TRUE, echo=FALSE, warnings = FALSE, fig.width = 9.5, fig.height = 8, fig.align='center', out.width = '99%', fig.scap="Density of Google Search trends, by symptom and region, as a function of time.", out.extra='',  fig.cap="\\label{figures_cits_data}Density of Google Search trends, by symptom and region, as a function of time. In each row, search density data for two symptoms are displayed: one of three mental health symptoms (from top to bottom: anxiety, depression, and major depressive disorder) in blue and headaches in grey. In the first column, data from US states are shown, where each point represents the search density of a specific symptom on a specific date in a specific state. In the second column, data from US counties are shown; because of the large number of counties reporting data, county-level search data are shown as daily boxplots. In the third column, national data from Australia, the United Kingdom, Ireland, New Zealand, Singapore, and the United States are shown. Each graph shows the density of symptom searches on the y-axis, while time is centered and displayed as days prior to and following November 16, 2020 on the x-axis. The solid lines show predicted lines of best fit under a basic controlled interrupted time series (CITS) model (i.e., no fixed effects). US: United States."}
+
+n = 1
+
+
+for (m in mental_disorders) {
+  for (g in geography){
+    data_its <- get(paste0("data_its_",g))
+    
+    data_its_temp <- data_its %>%
+      mutate(post = ifelse(date > date_shock_vax, 1, 0),
+             trt = ifelse(search == "headache", 0, 1)) %>%
+      mutate(days_post_shock = as.numeric(date - date_shock_vax)) %>%
+      filter(days_post_shock %in% (-40:40) ) %>%
+      filter(search == m | search == "headache" ) 
+    
+    model <- glm(daily_mean_clean ~ post*days_post_shock*trt ,
+                 data_its_temp, family = "gaussian")
+    
+    data_its_temp <- data_its_temp %>% 
+      mutate(fitted = fitted(model),
+             trt = ifelse(trt == 0, "Headache", 
+                          str_to_sentence(str_replace_all(m, "_", " "))))
+    
+    m2 <- c(str_to_sentence(str_replace_all(m, "_", " ")))
+    
+    
+    if(g != "county"){
+      
+      plot <- data_its_temp %>% 
+        filter(days_post_shock %in% (-40:40) ) %>%
+        mutate(trt = factor(trt, 
+                            levels = c(m2,
+                                       "Headache"))) %>%
+        ggplot(aes(x = days_post_shock, y = fitted, group = trt, color = trt)) +
+        geom_line() +
+        theme_classic() +
+        labs(x = "Days after November 16, 2020",
+             y = "Density of Google Search trends",
+             color = "",
+             title = ifelse(g == "state", "U.S. states", 
+                            ifelse(g == "county", "U.S. counties",
+                                   "International data"))) +
+        theme(legend.position = "bottom") +
+        geom_vline(xintercept = 0, linetype='dotted') +
+        geom_point(aes(y = daily_mean_clean),
+                   alpha = 0.05) +
+        scale_color_manual(values = c(col_mh, col_headache),
+                           name = "")
+    }else{
+      
+      plot <- data_its_temp %>% 
+        filter(days_post_shock %in% (-40:40) ) %>%
+        mutate(trt = factor(trt, 
+                            levels = c(m2,
+                                       "Headache"))) %>%
+        ggplot(aes(x = days_post_shock, y = fitted, group = trt, color = trt)) +
+        geom_boxplot(aes(x = days_post_shock, y = daily_mean_clean, 
+                         group = interaction(trt, days_post_shock), color = trt, 
+                         fill = trt, outlier.shape = NA),
+                     outlier.shape = NA,
+                     alpha = 0.01) +
+        geom_line() +
+        theme_classic() +
+        labs(x = "Days after November 16, 2020",
+             y = "Density of Google Search trends",
+             color = "",
+             title = ifelse(g == "state", "US states", 
+                            ifelse(g == "county", "US counties",
+                                   "International data"))) +
+        theme(legend.position = "bottom") +
+        geom_vline(xintercept = 0, linetype='dotted') +
+        scale_color_manual(values = c(col_mh, col_headache),
+                           name = "") +
+        scale_fill_manual(values = c(col_mh, col_headache),
+                          name = "")
+      
+    }
+    
+    
+  
+
+assign(paste0("plot_",n), plot)
+
+n = n+1
+
+  }
+}
+
+    combo_plot_1 <- cowplot::plot_grid(plot_1,
+                                       plot_2,
+                                      plot_3,
+                                      plot_4,
+                                       plot_5,
+                                      plot_6,
+                                      plot_7,
+                                       plot_8,
+                                      plot_9,
+                       align='v', ncol=3, axis='b')    
+    
+    print(combo_plot_1)
+
+```
+
+
+\blandscape
+
+
+```{r fig_multiverse_analysis,include = TRUE, echo=FALSE, warnings = FALSE,  fig.width = 20, fig.height = 12, fig.align='center', out.width = '99%', fig.scap="Specification curve depicting the CITS effect estimates and confidence intervals for search density", out.extra='',  fig.cap="\\label{fig_multiverse_analysis}Specification curve depicting the CITS effect estimates and confidence intervals for search density, with panel A depicting the estimated slope change and panel B depicting the estimate level shift. Within each panel, the effect estimates across different models are depicted as circles in the upper graph; the darkly and lightly shaded regions above and below these circles correspond to 95\\% and 99\\% confidence intervals of these estimates, respectively. The dotted horizontal line depicts a null effect. The effect estimates and confidence intervals of the main specification are highlighted in orange. Below each model, a legend of shaded and unshaded boxes indicates which modeling decisions correspond to a given model, with boxes shaded teal showing active features. The three vertical columns show effect estimates by symptom. From left to right, these are anxiety, depression, and major depressive disorder. FE: fixed effects. CITS: controlled interrupted time series. FE: fixed effects. CITS: controlled interrupted time series."}
+
+
+    model_outputs_temp <- model_outputs_all_international %>%
+      filter(time == "daily") %>%
+  filter(disease %in% mental_disorders) %>%
+  mutate(disease = str_to_sentence(str_replace_all(disease, "_", " ")))
+    
+    
+    preferred_model <- model_outputs_temp %>% 
+      filter(bandwidth == 40 & 
+               cleaning == TRUE &
+               day_of_week_fe == TRUE &
+               month_fe == TRUE &
+               geograph_fe == TRUE &
+               geography == "county") %>%
+      select(model_number) %>%
+      unique()
+    
+    preferred_model <- preferred_model$model_number
+    
+    
+    min_space = 0.5
+    y_min_val = min(model_outputs_temp$lower_99)
+    y_max_val = max(model_outputs_temp$upper_99)
+    
+    
+    coef_plot_a <-  model_outputs_temp %>%
+      filter(coefficient == "post:time:trt") %>%
+      mutate(model_preference = ifelse(model_number %in% preferred_model, 
+                                       "Main",
+                                       "Alternative")) %>%
+      mutate(model_preference = factor(model_preference, 
+                                       levels = c("Main", 
+                                                  "Alternative"))) %>%
+
+      ggplot(aes(x = reorder(model_number, estimate),
+                 y = (estimate),
+                 fill = model_preference,           
+                 color = model_preference)) +
+      geom_hline(yintercept=0, linetype='dotted') +
+      geom_crossbar(aes(ymin = (lower_99), 
+                        ymax = (upper_99)),
+                    fatten = 0,
+                    alpha = 0.2) +
+      geom_crossbar(aes(ymin = (lower_95),
+                        ymax = (upper_95)),
+                    fatten = 0,
+                    alpha = 0.3) +
+      geom_point(alpha = 1, size=1) +
+      theme_classic() +
+      theme(axis.text.x = element_blank(),
+            legend.position = "top",
+            axis.title = element_blank(),
+            axis.ticks.x = element_blank(),
+            strip.text = element_text(size=12),
+            text = element_text(family = "Source Sans Pro")) +
+      # coord_cartesian(xlim=c(1-min_space, max(nrow(model_outputs_temp))+min_space)) +
+      scale_color_manual(values = c(col_model_main,
+                                    col_model_other),
+                         name = "") +
+      scale_fill_manual(values = c(col_model_main,
+                                   col_model_other),
+                        name = "") +
+      # labs(title =  paste0("CITS effect estimates on Google search density for: ", tolower(str_replace_all(d, "_", " "))),
+      #      subtitle = "A: slope change") +
+      facet_wrap(~disease, scales = "free_x")
+    
+    
+    
+    
+    control_plot_a <- 
+      
+      model_outputs_temp %>%
+      filter(coefficient == "post:time:trt") %>%
+      mutate(
+        "State level" = ifelse(geography == "state", 1, 0),
+        "County level" = ifelse(geography == "county", 1, 0),
+        "International level" = ifelse(geography == "international", 1, 0),
+        # "Daily data" = ifelse(time == "daily", 1, 0),
+        # "Weekly data" = ifelse(time == "weekly", 1, 0),
+        "Replaced outliers?" = ifelse(cleaning == TRUE, 1, 0),
+        "FE: day of week" = ifelse(day_of_week_fe == TRUE, 1, 0),
+        "FE: month" = ifelse(month_fe == TRUE, 1, 0),
+        "FE: state" = ifelse(geograph_fe == TRUE, 1, 0),
+        # "Bandwidth = 30" = ifelse(bandwidth == 30, 1, 0),
+        "Bandwidth = 40" = ifelse(bandwidth == 40, 1, 0),
+        "Bandwidth = 50" = ifelse(bandwidth == 50, 1, 0),
+        "Bandwidth = 60" = ifelse(bandwidth == 60, 1, 0)
+        
+        ) %>%
+      
+      
+      dplyr::select(model_number, estimate, disease, 'State level':'Bandwidth = 60') %>%
+      pivot_longer(cols = c('State level':'Bandwidth = 60'), 
+                   names_to = "spec_name", 
+                   values_to = "spec_status") %>%
+      mutate(spec_name = factor(spec_name, 
+                                levels = c("State level",
+                                           "County level",
+                                           "International level",
+                                           # "Daily data",
+                                           # "Weekly data",
+                                           "Replaced outliers?",
+                                           "FE: day of week",
+                                           "FE: month",
+                                           "FE: state",
+                                           # "Bandwidth = 30",
+                                           "Bandwidth = 40",
+                                           "Bandwidth = 50",
+                                           "Bandwidth = 60"))) %>%
+      mutate(spec_name = fct_rev(spec_name)) %>%
+      
+      ggplot(aes(x = reorder(model_number, estimate), 
+                 y = spec_name, 
+                 fill = as.factor(spec_status))) +
+      geom_point(shape=22, size=1.25) +
+      
+      scale_fill_manual(values = c(col_spec_no, col_spec_yes),
+                        name = "") +
+      guides(fill= "none") +
+      # scale_y_continuous(breaks = unique(control_grid_logit$y), 
+      #                    labels = unique(control_grid_logit$key),
+      #                    limits=c(min(control_grid_logit$y)-1, max(control_grid_logit$y)+1)) +
+      #scale_x_continuous(breaks=c(1:nrow(model_outputs_temp))) +
+      # coord_cartesian(xlim=c(1-min_space, nrow(model_outputs_temp)+min_space)) +
+      theme_classic() +
+      theme(panel.grid.major.y = element_blank(),
+            panel.grid.minor.y = element_blank(),
+            axis.text.x = element_blank(),
+            strip.text.x = element_blank(),
+            axis.title = element_blank(),
+            axis.text.y = element_text(size=10),
+            axis.ticks = element_blank(),
+            axis.line = element_blank(),
+            strip.text = element_text(size=12),
+            text = element_text(family = "Source Sans Pro"))+
+      facet_wrap(~disease, scales = "free_x")
+    
+
+    coef_plot_b <-  model_outputs_temp %>%
+      filter(coefficient != "post:time:trt") %>%
+
+      mutate(model_preference = ifelse(model_number %in% preferred_model, 
+                                       "Main",
+                                       "Alternative")) %>%
+      mutate(model_preference = factor(model_preference, 
+                                       levels = c("Main", 
+                                                  "Alternative"))) %>%
+
+      ggplot(aes(x = reorder(model_number, estimate),
+                 y = (estimate),
+                 fill = model_preference,           
+                 color = model_preference)) +
+      geom_hline(yintercept=0, linetype='dotted') +
+      geom_crossbar(aes(ymin = (lower_99), 
+                        ymax = (upper_99)),
+                    fatten = 0,
+                    alpha = 0.2) +
+      geom_crossbar(aes(ymin = (lower_95),
+                        ymax = (upper_95)),
+                    fatten = 0,
+                    alpha = 0.3) +
+      geom_point(alpha = 1, size=1) +
+      theme_classic() +
+      theme(axis.text.x = element_blank(),
+            legend.position = "none",
+            axis.title = element_blank(),
+            axis.ticks.x = element_blank(),
+            strip.text = element_text(size=12),
+            text = element_text(family = "Source Sans Pro")) +
+      # coord_cartesian(xlim=c(1-min_space, max(nrow(model_outputs_temp))+min_space)) +
+      scale_color_manual(values = c(col_model_main,
+                                    col_model_other),
+                         name = "") +
+      scale_fill_manual(values = c(col_model_main,
+                                   col_model_other),
+                        name = "") +
+      labs(subtitle = "B: level shift")  +
+      facet_wrap(~disease, scales = "free_x")
+    
+    
+    
+    control_plot_b <- 
+      
+      model_outputs_temp %>%
+      filter(coefficient != "post:time:trt") %>%
+     mutate(
+        "State level" = ifelse(geography == "state", 1, 0),
+        "County level" = ifelse(geography == "county", 1, 0),
+        "International level" = ifelse(geography == "international", 1, 0),
+        # "Daily data" = ifelse(time == "daily", 1, 0),
+        # "Weekly data" = ifelse(time == "weekly", 1, 0),
+        "Replaced outliers?" = ifelse(cleaning == TRUE, 1, 0),
+        "FE: day of week" = ifelse(day_of_week_fe == TRUE, 1, 0),
+        "FE: month" = ifelse(month_fe == TRUE, 1, 0),
+        "FE: state" = ifelse(geograph_fe == TRUE, 1, 0),
+        # "Bandwidth = 30" = ifelse(bandwidth == 30, 1, 0),
+        "Bandwidth = 40" = ifelse(bandwidth == 40, 1, 0),
+        "Bandwidth = 50" = ifelse(bandwidth == 50, 1, 0),
+        "Bandwidth = 60" = ifelse(bandwidth == 60, 1, 0)
+        
+        ) %>%
+      
+      
+      dplyr::select(model_number, estimate, disease, 'State level':'Bandwidth = 60') %>%
+      pivot_longer(cols = c('State level':'Bandwidth = 60'), 
+                   names_to = "spec_name", 
+                   values_to = "spec_status") %>%
+      mutate(spec_name = factor(spec_name, 
+                                levels = c("State level",
+                                           "County level",
+                                           "International level",
+                                           # "Daily data",
+                                           # "Weekly data",
+                                           "Replaced outliers?",
+                                           "FE: day of week",
+                                           "FE: month",
+                                           "FE: state",
+                                           # "Bandwidth = 30",
+                                           "Bandwidth = 40",
+                                           "Bandwidth = 50",
+                                           "Bandwidth = 60"))) %>%
+      mutate(spec_name = fct_rev(spec_name)) %>%
+      
+      ggplot(aes(x = reorder(model_number, estimate), 
+                 y = spec_name, 
+                 fill = as.factor(spec_status))) +
+      geom_point(shape=22, size=1.25) +
+      
+      scale_fill_manual(values = c(col_spec_no, col_spec_yes),
+                        name = "") +
+      guides(fill= "none") +
+      # scale_y_continuous(breaks = unique(control_grid_logit$y), 
+      #                    labels = unique(control_grid_logit$key),
+      #                    limits=c(min(control_grid_logit$y)-1, max(control_grid_logit$y)+1)) +
+      #scale_x_continuous(breaks=c(1:nrow(model_outputs_temp))) +
+      # coord_cartesian(xlim=c(1-min_space, nrow(model_outputs_temp)+min_space)) +
+      theme_classic() +
+      theme(panel.grid.major.y = element_blank(),
+            panel.grid.minor.y = element_blank(),
+            axis.text.x = element_blank(),
+            strip.text.x = element_blank(),
+            axis.title = element_blank(),
+            axis.text.y = element_text(size=10),
+            axis.ticks = element_blank(),
+            axis.line = element_blank(),
+            strip.text = element_text(size=12),
+            text = element_text(family = "Source Sans Pro"))+
+      facet_wrap(~disease, scales = "free_x")
+
+    combo_plot <- cowplot::plot_grid(coef_plot_a, 
+                       control_plot_a, 
+                       coef_plot_b, 
+                       control_plot_b, 
+                       rel_heights=c(1,0.5, 1,0.5), 
+                       align='v', ncol=1, axis='b')          
+    
+   
+    ggsave(filename = paste0("sensitivity_analysis_all_international.jpg"),
+           plot = last_plot(),
+           path = resultspath,
+           width = 18,
+           height = 14)
+    
+        print(combo_plot)
+
+  
+
+
+```
+
+
+
+
+```{r fig_political, include = TRUE, echo=FALSE, warnings = FALSE,fig.scap="CITS effect estimates and confidence intervals symptom, region, and predominant political ideology.", out.extra='', fig.width = 10, fig.height = 5, fig.align='center', out.width = '95%',  fig.cap="\\label{fig_political}CITS effect estimates and confidence intervals symptom, region, and predominant political ideology, with panel A depicting the estimated slope change and panel B depicting the estimate level shift. The vertical panels show CITS effect estimates by three mental health symptoms (from left to right: anxiety, depression, and major depressive disorder); for each symptom, estimates are separately reported using county- and state-level data. For a given symptom and region, three CITS estimates are reported: one estimated from a sample of all counties or states (shown in purple), one conducted solely among the most Democratic counties or states (by 2020 presidential election vote share, shown in blue, and one among the most Republican counties or states (shown in red). Within each panel, the effect estimates across different models are depicted as points on a horizontal bar; the darkly and lightly shaded regions above and below these circles correspond to 95\\% and 99\\% confidence intervals of these estimates, respectively. The dotted horizontal line in each panel depicts a null effect. CITS: controlled interrupted time series. US: United States."}
+
+
+model_outputs_all_US %>%
+  function_model_main(levels = "include") %>%
+  filter(disease %in% mental_disorders) %>%
+  function_clean_diseases() %>%
+  mutate(geography = ifelse(geography == "state", "US states", "US counties")) %>%
+  mutate(polity = ifelse(polity == 1, "Red states/counties (top 20% most Republican", 
+                         ifelse(polity == 5, "Blue states/counties (top 20% most Democratic)", "All"))) %>%
+  mutate(polity = factor(polity, 
+                         levels = c("All", 
+                                    "Blue states/counties (top 20% most Democratic)",
+                                    "Red states/counties (top 20% most Republican"))) %>%
+  mutate(coefficient = ifelse(coefficient == "post:time:trt", "A: slope change",
+                              ifelse(coefficient == "post:trt", "B: level shift", "ERROR"))) %>%
+ ggplot(aes(x = reorder(model_number, estimate),
+                 y = (estimate),
+                 fill = polity,           
+                 color = polity)) +
+      geom_hline(yintercept=0, linetype='dotted') +
+      geom_crossbar(aes(ymin = (lower_99), 
+                        ymax = (upper_99)),
+                    fatten = 0,
+                    alpha = 0.2) +
+      geom_crossbar(aes(ymin = (lower_95),
+                        ymax = (upper_95)),
+                    fatten = 0,
+                    alpha = 0.3) +
+      geom_point(alpha = 1, size=1) +
+      theme_classic() +
+      theme(axis.text.x = element_blank(),
+            legend.position = "bottom",
+            axis.title = element_blank(),
+            axis.ticks.x = element_blank(),
+            strip.text = element_text(size=12),
+            text = element_text(family = "Source Sans Pro")) +
+  facet_grid( coefficient ~ disease + geography, scales = "free") +
+   scale_fill_manual(values = c(col_all, col_dem, col_red),
+                        name = "Political ideology")  +
+  
+   scale_color_manual(values = c(col_all, col_dem, col_red),
+                        name = "Political ideology") 
+    
+   
+ 
+  
+rm(packages_and_paremeters_on)
+
+
+```
+
+
+\elandscape
+
+\newpage

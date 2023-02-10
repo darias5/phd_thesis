@@ -1025,7 +1025,11 @@ discussion_sentence3 <- paste0("We estimate that in 2019, the losses would alrea
 
 \noindent\rule{8cm}{0.4pt}
 
+\begin{spacing}{1}
+
 A version of this paper was accepted for publication by \emph{eClinicalMedicine} on September 9, 2022 and was published in Volume 54, Issue 101675 in December 2022.  
+
+\end{spacing}
 
 \noindent\rule{8cm}{0.4pt}
 
@@ -1085,7 +1089,7 @@ Second, we attempt to capture premature mortality attributable to mental disorde
 
 Following Vigo and colleagues, we replicate reallocations in neurological and musculoskeletal conditions, and further include alcohol and mental use disorders, as these were previously classified under mental disorders within the GBD classification.
 
-This provides estimates of YLDs due to mental disorders. We then estimate the PAF of mortality due to mental disorders, using GBD prevalence estimates and relative risk estimates for natural-cause and unnatural-cause mortality generated from a systematic review and meta-analysis by Walker et al.[@walkerMortalityMentalDisorders2015] A comparison of our allocation approach with those of Vigo et al. and the original GBD hierarchical allocation is shown in Table 1.
+This provides estimates of YLDs due to mental disorders. We then estimate the PAF of mortality due to mental disorders, using GBD prevalence estimates and relative risk estimates for natural-cause and unnatural-cause mortality generated from a systematic review and meta-analysis by Walker et al.[@walkerMortalityMentalDisorders2015] A comparison of our allocation approach with those of Vigo et al. and the original GBD hierarchical allocation is shown in Table 1.1.
 
 ```{r table1_1, echo = FALSE, include = TRUE, out.width = '100%'}
 
@@ -1097,7 +1101,7 @@ knitr::include_graphics("table1_1.png")
 Our approach to capturing premature mortality relies on a pooled relative risk estimate for mortality by natural and unnatural causes, drawn from 148 studies identified by Walker et al.[@walkerMortalityMentalDisorders2015] These studies collectively reflect over 338,000 deaths across 29 countries and 6 continents. The majority of deaths (67%) recorded in studies with disaggregated data arose from acute and chronic illnesses, while unnatural causes such as injury and suicide represented 18% of deaths (the rest being unallocated). Overall, the pooled risk of all-cause mortality was 2.2 times higher (95% confidence interval (CI): 2.1-2.3) among people with mental disorders compared to those without. Using this relative risk estimate, Walker and colleagues calculated a PAF to estimate that 8 million deaths were due to mental disorders in 2012.
 
 While Walker and colleagues used a global estimate of the worldwide prevalence of mental disorders in their study to calculate the PAF, we use GBD estimates of prevalence to derive both global- and country-level results. The PAF for a given disorder d and country c is given by:
-\[ PAF_{(d,c)}= \frac{p_{(d,c)}\ (RR_d-1)}{1+p_{(d,c)}\ (RR_d-1)}\ \ \ ,\ \ \ \ \ \ \ \ \ \ \ \ (1)\]
+\[ PAF_{(d,c)}= \frac{p_{(d,c)}\ (RR_d-1)}{1+p_{(d,c)}\ (RR_d-1)}\ \ \ ,\ \ \ \ \ \ \ \ \ \ \ \ (1.1)\]
 
 where $p_{d,c}$ is the prevalence of a given disorder in a country and $RR_d$ is the relative risk of mortality estimated by Walker et al.[@walkerMortalityMentalDisorders2015]
 
@@ -1128,7 +1132,6 @@ The research draws exclusively on secondary country-level data reported at the n
 This study received no funding. All authors (DA, SV, and SS) had access to the data and shared in the decision to submit this article for publication.
 
 \blandscape
-
 ```{r table1_2, echo = FALSE, include = TRUE, out.width = '100%'}
 
 knitr::include_graphics("table1_2.png")
@@ -1142,9 +1145,9 @@ knitr::include_graphics("table1_2.png")
 
 `r results_sentence1`
 
-Rates of DALYs and deaths attributable to mental disorders under the different estimation approaches are presented by GBD region (Figure \ref{figure_gbd_adjusted}). Geographically, the composite approach allocated a large portion of DALYs (to mental disorders) in Eastern Europe, North and Latin America, and sub-Saharan Africa. This is largely driven by the inclusion of premature mortality in the composite approach. Estimates of DALYs by country income group and GBD region are reported in Table 2. (Estimates of deaths are reported in Table S4-6.)
+Rates of DALYs and deaths attributable to mental disorders under the different estimation approaches are presented by GBD region (Figure \ref{figure_gbd_adjusted}). Geographically, the composite approach allocated a large portion of DALYs (to mental disorders) in Eastern Europe, North and Latin America, and sub-Saharan Africa. This is largely driven by the inclusion of premature mortality in the composite approach. Estimates of DALYs by country income group and GBD region are reported in Table 1.2. (Estimates of deaths are reported in Table S4-6.)
 
-Under the three approaches, we calculated the economic value of mental disorder losses (Table 3). `r results_sentence2`. Further adjusting for purchasing power parity, the global value of mental illness losses would exceed 7.2 trillion international dollars in 2019 (Table S7).
+Under the three approaches, we calculated the economic value of mental disorder losses (Table 1.3). `r results_sentence2`. Further adjusting for purchasing power parity, the global value of mental illness losses would exceed 7.2 trillion international dollars in 2019 (Table S7).
 
 ```{r table1_3, echo = FALSE, include = TRUE, out.width = '100%'}
 

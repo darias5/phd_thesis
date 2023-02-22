@@ -1,0 +1,269 @@
+
+\subsection*{Appendix 1}
+
+\addcontentsline{toc}{subsection}{Appendix 1}
+
+```{r appendix_1, child='appendix_1.Rmd'}
+```
+
+\newpage
+
+\subsection*{Appendix 2}
+
+```{r library_appendix, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+# Loading libraries
+# library(MASS) # We load this and then detach it just to clear the package
+# library(margins) # We load this and then detach it just to clear the package
+# library(lme4) # We load this and then detach it just to clear the package
+# detach("package:lme4", unload=TRUE) # Needed to use dplyr's select function
+# detach("package:margins", unload=TRUE) # Needed to use dplyr's select function
+# detach("package:MASS", unload=TRUE) # Needed to use dplyr's select function
+library(readxl)
+library(readr)
+library(dplyr)
+library(zoo)
+library(tidyr)
+library(psych)
+library(ggplot2)
+library(RColorBrewer)
+library(sp)
+library(broom)
+library(sf)
+library(scales)
+library(viridis)
+library(data.table)
+library(ggpubr)
+library(ggmap)
+library(maps)
+library(mapdata)
+library(ggrepel)
+library(table1)
+library(stringr) 
+library(stringi)
+library(fixest)
+library(stats)
+library(lubridate)
+library(forecast)
+library(gtools)
+# library(devtools)
+library(reticulate)
+library(stargazer)
+library(lwgeom)
+if (!require("ggsflabel")) devtools::install_github("yutannihilation/ggsflabel")
+library(openxlsx)
+library(gganimate)
+library(transformr)
+library(huxtable)
+library(ggtext)
+library(margins)
+library(ncdf4) # package for netcdf manipulation
+library(magrittr)
+library(lmtest)
+library(sandwich)
+library(rgee)
+library(gt)
+library(knitr)
+library(webshot2)
+library(sysfonts)
+library(showtext)
+font_add_google("Source Sans Pro")
+library(gridExtra)
+library(tibble)
+showtext_auto() 
+showtext_opts(dpi = 300)  
+# library(googledrive)
+# drive_auth(email = TRUE)
+library(rmdHelpers)
+library(gtExtras)
+library(kableExtra)
+library(DescTools)
+library(rvest)
+library(httr)
+library(polite)
+library(janitor)
+library(cowplot)
+library(ggridges)
+# library(ggsn)
+
+# library(glmmTMB)
+
+# Setting directories - change these to your local directory
+path <- 'C:/Users/danie/Dropbox (Harvard University)/madagascar_mh'
+code <- paste(path,'code', sep = "/")
+path_python  = "C:/Users/danie/AppData/Local/Programs/Python/Python310/python.exe"
+
+# Data
+datasource <- paste('C:/Users/danie/Dropbox (Harvard University)/data',
+                    sep = "/") # The complete data set is not uploaded to 
+# Github. Ask golden@hsph.harvard.edu for access. 
+datapath <- paste(path,'data', sep = "/")
+datapath_reference  <- paste(datapath,'0_reference', sep = "/")
+data_mh_chd  <- paste(datapath,'1_mental_health', sep = "/")
+data_mh_csb <- data_mh_chd  
+data_mh_chu_chrr <- paste(data_mh_chd,'pathologies neuropsychiatriques CHU CHRR', sep = "/")
+data_gps <- paste(datapath,'2_gps', sep = "/")
+data_gps_sources <- paste(data_gps,'gps_sources', sep = "/")
+data_gps_sources_searches <- paste(data_gps_sources,'searches', sep = "/")
+data_gps_sources_reposit <- paste(data_gps_sources,'repositories', sep = "/")
+data_climate_path  <- paste(datapath,'3_climate', sep = "/")
+data_climate_era  <- paste(data_climate_path,'ERA5', sep = "/")
+data_climate_esa  <- paste(data_climate_path,'ESA_CCI', sep = "/")
+
+# Results
+resultspath <- paste(path,'results', sep = "/")
+mh_path <- paste(resultspath,'1_mental_health', sep = "/")
+gpspath <- paste(resultspath,'2_gps', sep = "/")
+gpspath_admin_names <- paste(gpspath,'0_reference', sep = "/")
+gpspath_fig <-  paste(gpspath,'1_figures', sep = "/")
+gpspath_spread <-  paste(gpspath,'2_spreadsheets', sep = "/")
+gpspath_spread_fuzzy <-  paste(gpspath_spread,'3_fuzzy_matching', sep = "/")
+analysispath <- paste(resultspath,'4_analysis', sep = "/")
+analysis_figures <- paste(analysispath,'1_figures', sep = "/")
+analysis_models <- paste(analysispath,'3_models', sep = "/")
+
+
+# Shapefiles
+mappath <- paste(path,'shapefiles', sep = "/")
+mappath_MOH <- paste(mappath,'MOH', sep = "/")
+mappath_OCHA <- paste(mappath,'OCHA', sep = "/")
+
+# Color palette 
+col_light = "cyan4"
+col_dark = "cyan3"
+col_bright = "coral"
+col_black = "black"
+col_grey_dark = "grey20"
+col_grey_med = "grey40"
+col_grey_light = "grey80"
+col_grey_lightest = "grey85"
+col_soilmoisture = col_dark
+col_temperature = col_light
+col_interaction = col_bright
+col_cyclone = "steelblue2"
+  
+pal <- c("lightskyblue2", "steelblue2", "dodgerblue2", "dodgerblue3", "dodgerblue4", "darkblue")
+
+col_within_threshold = "cyan3"
+col_beyond_threshold = "coral"
+
+col_centroid <- "grey20"
+col_exact_all <- "cyan2"
+col_exact_rhino <- "cyan3"
+col_exact_val <- "cyan4"
+col_search <- "coral"
+
+col_CH <- "coral"
+col_CHD <- "coral1"
+col_CHR <- "coral3"
+col_CSB <- "steelblue2"
+col_CSB1 <- "steelblue1"
+col_CSB2 <- "steelblue3"
+col_other <-  "grey20"
+
+col_model_main <- "#F3AB00"
+col_model_other <- col_grey_med
+col_spec_yes <-  "#73BDBF"
+col_spec_no <-  "white"
+
+col_cases <- "chartreuse3"
+col_no_cases <- "deeppink3"
+
+col_eco_rainforest <-"#32A42F"
+col_eco_highlands <- "#B9CF19"
+col_eco_arid <- "#FEEE19"
+col_eco_drydecid <- "#FCAF3E"
+
+# Thresholds
+# These are cut off values that will be used in the GPS do file
+
+length_lim <- 15  # The maximum distance allowed when the same facility has
+# two GPS coordinates in the data sources for the center of
+# those two coordinates to be used as the facility's location.
+# Note: the selection of 15 is arbitrarily conservative. Spatial resolution of 
+# climate data is typically ~ 30km x 30 km
+
+
+area_lim <- length_lim*length_lim
+
+# The maximum area of the convex hull allowed when the same facility has
+# 3+ GPS coordinates in the data sources for the centroid of
+# that convex hull to be used as the facility's location
+
+fokontany_lim <- area_lim    # A small fokotanty is one that is ____ km ^2 or smaller
+
+commune_lim <- area_lim    # A small commune is one that is ____ km ^2 or smaller
+
+# Lags: specify how many lags you want for the explanatory variables (e.g., soil moisture, temp)
+
+lags_number <- 18
+
+# Climate data start and end date
+start_date <- as.Date("2010-01-01")
+end_date <- as.Date("2020-07-01")
+
+start_date_climate <- start_date - lags_number*31 #This ensures there is data for the lagged exposure
+end_date_climate <- end_date
+
+# ESA CCI trim dates
+date1 <- 200801
+date2 <- 202112
+
+# Seed and sampling fraction
+set.seed(1960) # Madgascar's year of independence
+sample_fraction = .01
+
+
+######################
+##      MAPS        ##
+######################
+#   
+# # There are two map options available. One set of shapefiles were available
+# # from humdata.org, while the other set was provided by the MOH.
+#   
+# # Loading high-resolution maps of St. Lucia (from data.humdata.org)
+map_mdg_0_un <- st_read(paste0(mappath_OCHA,"/",
+                               "mdg_admbnda_adm0_BNGRC_OCHA_20181031.shp"))
+map_mdg_1_un <- st_read(paste0(mappath_OCHA,"/",
+                               "mdg_admbnda_adm1_BNGRC_OCHA_20181031.shp"))
+map_mdg_2_un <- st_read(paste0(mappath_OCHA,"/",
+                               "mdg_admbnda_adm2_BNGRC_OCHA_20181031.shp"))
+map_mdg_3_un <- st_read(paste0(mappath_OCHA,"/",
+                               "mdg_admbnda_adm3_BNGRC_OCHA_20181031.shp"))
+loaded_maps_un <- 1
+
+
+
+# Load in data from MOH
+map_mdg_0 <- st_read(paste0(mappath_MOH,"/",
+                            "adm0_mada_utm38S.shp"))
+map_mdg_1 <- st_read(paste0(mappath_MOH,"/",
+                            "adm1_mada_utm38S.shp"))
+map_mdg_2 <- st_read(paste0(mappath_MOH,"/",
+                            "adm2_mada_utm38S.shp"))
+map_mdg_3 <- st_read(paste0(mappath_MOH,"/",
+                            "adm3_mada_utm38S.shp"))
+map_mdg_4 <- st_read(paste0(mappath_MOH,"/",
+                            "adm4_mada_utm38S.shp"))
+
+
+```
+
+\addcontentsline{toc}{subsection}{Appendix 2}
+
+\subsubsection*{Appendix 2.1: Health system data cleaning}
+
+\addcontentsline{toc}{subsubsection}{Appendix 2.1}
+
+```{r appendix_2, child='appendix_2.1.Rmd'}
+```
+\newpage
+
+\subsubsection*{Appendix 2.2: Health facility geocoding and validation}
+
+\addcontentsline{toc}{subsubsection}{Appendix 2.2}
+
+```{r appendix_3, child='appendix_2.2.Rmd'}
+```
+
+\newpage

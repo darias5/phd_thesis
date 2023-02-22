@@ -2,6 +2,7 @@
 title: " "		
 output:
   pdf_document:
+    pandoc_args: !expr acronymsdown::add_filter()
     number_sections: TRUE
     # citation_package: natbib
 
@@ -22,6 +23,7 @@ header-includes:
   - \newcommand{\blandscape}{\begin{landscape}}
   - \newcommand{\elandscape}{\end{landscape}}
   - \usepackage[nottoc]{tocbibind}
+  # - \usepackage{acro}
   # - \usepackage{float}
   # - \usepackage{chapterbib}
   # - \usepackage{lastpage}
@@ -37,13 +39,21 @@ csl: https://www.zotero.org/styles/the-lancet
   # ch1: chapter1.bib
   # 
 
+acronyms:
+  insert_loa: false
+  loa_title: ""
+
+  # loa_title: "List of Acronyms"
+  keys:
+    - shortname: LMIC
+      longname: low and middle income country
 
 ---
 
 
 ```{r setup0, include=FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, include = FALSE, echo = TRUE) 
-
+library(acronymsdown)
 ```
 
 \allsectionsfont{\centering\normalsize}
@@ -117,7 +127,9 @@ Dissertation Advisor: Stéphane Verguet \hfill Daniel Arias
 
 \end{centering}
 
-Imperdiet sed euismod nisi porta lorem mollis aliquam. Eget lorem dolor sed viverra ipsum nunc aliquet bibendum enim. Eget lorem dolor sed viverra. Vitae proin sagittis nisl rhoncus mattis. Mi sit amet mauris commodo quis imperdiet massa tincidunt. Quis auctor elit sed vulputate mi. Augue eget arcu dictum varius duis at consectetur lorem. Commodo elit at imperdiet dui accumsan sit amet. Consequat semper viverra nam libero justo laoreet sit. Quis hendrerit dolor magna eget est lorem ipsum. Eget arcu dictum varius duis at consectetur lorem. Fermentum posuere urna nec tincidunt praesent semper feugiat. Integer quis auctor elit sed vulputate mi sit amet. Ultricies integer quis auctor elit. Metus vulputate eu scelerisque felis imperdiet proin fermentum. Ut porttitor leo a diam sollicitudin tempor id eu nisl. Cras adipiscing enim eu turpis egestas. Cursus euismod quis viverra nibh cras pulvinar mattis nunc sed.
+Imperdiet sed euismod nisi porta lorem mollis aliquam. Eget lorem dolor sed viverra ipsum nunc aliquet bibendum enim. Eget lorem dolor sed viverra. Vitae proin sagittis nisl rhoncus mattis. Mi sit amet mauris commodo quis imperdiet massa tincidunt. Quis auctor elit sed vulputate mi. Augue eget arcu dictum varius duis at consectetur lorem. Commodo elit at imperdiet dui accumsan sit amet. Consequat semper viverra nam libero justo laoreet sit. Quis hendrerit dolor magna eget est lorem ipsum. Eget arcu dictum varius duis at consectetur lorem. Fermentum posuere urna nec tincidunt praesent semper feugiat. Integer quis auctor elit sed vulputate mi sit amet. Ultricies integer quis auctor elit. Metus vulputate eu scelerisque felis imperdiet proin fermentum. Ut porttitor leo a diam sollicitudin tempor id eu nisl. Cras adipiscing enim eu turpis egestas. Cursus euismod quis viverra nibh cras pulvinar mattis nunc sed.[@vaidyanathanEvaluationInternetSearches2022]
+
+This is a \acr{LMIC}. This is also a \acr{LMIC}.
 
 Augue eget arcu dictum varius duis at. Tempor orci eu lobortis elementum nibh. Nibh sit amet commodo nulla. At varius vel pharetra vel. In metus vulputate eu scelerisque felis imperdiet. Venenatis tellus in metus vulputate eu. Aliquam sem fringilla ut morbi tincidunt augue. Risus feugiat in ante metus dictum at tempor commodo ullamcorper. In dictum non consectetur a erat nam. Ut sem viverra aliquet eget sit. Eleifend donec pretium vulputate sapien nec sagittis aliquam. Neque viverra justo nec ultrices dui. Turpis in eu mi bibendum neque egestas. Tellus rutrum tellus pellentesque eu tincidunt tortor aliquam nulla facilisi.
 
@@ -140,6 +152,8 @@ Augue eget arcu dictum varius duis at. Tempor orci eu lobortis elementum nibh. N
 \newpage
 
 \listoftables
+
+\newpage
 
 \cleardoublepage
 
@@ -172,18 +186,36 @@ Augue eget arcu dictum varius duis at. Tempor orci eu lobortis elementum nibh. N
 ```{r paper3, child='paper3.Rmd'}
 ```
 
-\cleardoublepage
+\newpage
 
 ```{r conclusion, child='conclusion.Rmd'}
 ```
 
 \cleardoublepage
 
+\section*{References}
+
+\addcontentsline{toc}{section}{References}
+
+<div id="refs"></div>
+
+\cleardoublepage
+
+\section*{Supplementary materials}
+
+\addcontentsline{toc}{section}{Supplementary materials}
+
+```{r appendix_all, child='appendix.Rmd'}
+```
+
+\newpage
+
 
 ```{r todo}
 
 ### TO DO / KNOWN ISSUES
 
+# Maps in Chapter 1 need to be improved to eliminate errors in cartographic resolution
 # Separate bibliography for each section
 # Numbered figures and tables by section
 # Check that sequential articles are represented by a dash

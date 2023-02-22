@@ -1,0 +1,4005 @@
+---
+title: ""
+subtitle: ""
+---
+
+
+```{r parameters-and-data_2_2, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+
+### CSB
+
+csb_10to15 <- read.csv(paste(data_mh_csb, 'Affections mentales et troubles psychiques GESIS CSB 2010-2015.csv',
+                             sep = "/"), 
+                       header=TRUE) %>%
+  mutate(across(.cols=where(is.integer), .fns=as.numeric)) %>%
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  rename(year = cAnnee,
+         month = Periode,
+         region = Region,
+         district = District,
+         commune = commune,
+         clinic_name = FS,
+         disease = cDesc,
+         '0-to-28-days' = X0.à.28j,
+         '29-days-to-11-months' = X29j.à.11.m,
+         '1-to-4-years' = X1.à.4.ans,
+         '5-to-14-years' = X5.à.14.ans,
+         '15-to-24-years' = X15.à.24.ans,
+         '25-years-plus' = X25.et.plus,
+         total = total,     
+         referalls = Référés) %>%
+  mutate(sex = "both",
+         year = as.character(year),
+         month = as.integer(factor(month, levels = month.name)),
+         date = as.yearmon(paste(year, month), "%Y %m")) %>%
+  relocate(date, .after = month) %>%
+  pivot_longer(cols = '0-to-28-days':referalls, names_to = "subgroup", values_to = "count")
+
+csb_15to16 <- read.csv(paste(data_mh_csb, 'troubles mentaux GESIS CSB 2015-2016.csv',
+                             sep = "/"), 
+                       header=TRUE)
+
+csb_17 <- read.csv(paste(data_mh_csb, 'troubles mentaux GESIS CSB 2017.csv',
+                         sep = "/"), 
+                   header=TRUE)
+
+csb_18 <- read.csv(paste(data_mh_csb, 'troubles mentaux GESIS CSB 2018.csv',
+                         sep = "/"), 
+                   header=TRUE)
+
+csb_19 <- read.csv(paste(data_mh_csb, 'troubles mentaux GESIS CSB 2019.csv',
+                         sep = "/"), 
+                   header=TRUE)
+
+csb_15to19 <- rbind(csb_15to16,csb_17, csb_18, csb_19) %>%
+  mutate(across(.cols=where(is.integer), .fns=as.numeric)) %>%
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  mutate(total_male = X0.à.28j_Masculin + 
+           X29j.à.11.m_Masculin + 
+           X1.à.4.ans_Masculin + 
+           X5.à.14.ans_Masculin + 
+           X15.à.24.ans_Masculin +
+           X25.à.59.ans_Masculin +
+           X60.ans.et.plus_Masculin,
+         
+         total_female = X0.à.28j_Feminin + 
+           X29j.à.11.m_Feminin + 
+           X1.à.4.ans_Feminin + 
+           X5.à.14.ans_Feminin + 
+           X15.à.24.ans_Feminin +
+           X25.à.59.ans_Feminin +
+           X60.ans.et.plus_Feminin) %>% 
+  
+  rename(year = cAnnee,
+         month = Periode,
+         region = Region,
+         district = District,
+         commune = Commune,
+         clinic_name = FS,
+         disease = cDesc,
+         '0-to-28-days_male' =  X0.à.28j_Masculin,
+         '0-to-28-days_female' =  X0.à.28j_Feminin,  
+         '29-days-to-11-months_male' = X29j.à.11.m_Masculin,
+         '29-days-to-11-months_female' = X29j.à.11.m_Feminin,
+         '1-to-4-years_male' = X1.à.4.ans_Masculin,
+         '1-to-4-years_female' = X1.à.4.ans_Feminin,
+         '5-to-14-years_male' = X5.à.14.ans_Masculin,
+         '5-to-14-years_female' = X5.à.14.ans_Feminin,
+         '15-to-24-years_male' =X15.à.24.ans_Masculin,
+         '15-to-24-years_female' = X15.à.24.ans_Feminin,
+         '25-to-59-years_male' = X25.à.59.ans_Masculin,
+         '25-to-59-years_female' = X25.à.59.ans_Feminin,
+         '60-years-plus_male' = X60.ans.et.plus_Masculin,
+         '60-years-plus_female' = X60.ans.et.plus_Feminin,
+         referalls_male = Référés_Masculin,
+         referalls_female = Référés__Feminin) %>% 
+  mutate(year = as.character(year),
+         month = as.integer(factor(month, levels = month.name)),
+         date = as.yearmon(paste(year, month), "%Y %m")) %>%
+  relocate(date, .after = month) %>%
+  pivot_longer(cols = '0-to-28-days_male':total_female,
+               names_to = c("subgroup","sex"), 
+               names_sep = "_",
+               values_to = "count") %>%
+  group_by(date, clinic_name, disease, subgroup) %>%
+  mutate(both = sum(count)) %>%
+  pivot_wider(names_from = sex, values_from = count) %>%
+  pivot_longer(cols = c(both, male, female),
+               names_to = "sex",
+               values_to = "count") %>%
+  ungroup() 
+
+csb_data <- rbind(csb_10to15, csb_15to19)
+rm(csb_10to15, csb_15to19, csb_15to16,csb_17, csb_18, csb_19)
+
+
+# CHD 
+chd_data <- read.csv(paste(data_mh_chd, 'Maladies neuro-psychiques CHD.csv',
+                           sep = "/"), 
+                     header=TRUE) %>%
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  mutate(total = X0.à.28j +
+           X29j.à.11.m +
+           X1.à.4.ans +
+           X5.à.14.ans +
+           X15.à.24.ans +
+           X25.et.plus,
+         commune = "NA") %>%
+  rename(year = cAnnee,
+         month = Periode,
+         region = Region,
+         district = District,
+         clinic_name = FS,
+         disease = cDesc,
+         '0-to-28-days' = X0.à.28j,
+         '29-days-to-11-months' = X29j.à.11.m,
+         '1-to-4-years' = X1.à.4.ans,
+         '5-to-14-years' = X5.à.14.ans,
+         '15-to-24-years' = X15.à.24.ans,
+         '25-years-plus' = X25.et.plus,
+         referalls = Référés) %>%
+  mutate(sex = "both",
+         year = as.character(year),
+         month = as.integer(factor(month, levels = month.name)),
+         date = as.yearmon(paste(year, month), "%Y %m")) %>%
+  relocate(date, .after = month) %>%
+  relocate(commune, .after = district) %>%
+  pivot_longer(cols = '0-to-28-days':total, names_to = "subgroup", values_to = "count")
+
+
+# CHU and CHRR
+
+chu_files <- as.vector(list.files(data_mh_chu_chrr))
+chu_data <- data.frame(matrix(ncol = 12, nrow = 0))
+
+for (x in chu_files) {
+  
+  chu_data_r <- read.csv(paste(data_mh_chu_chrr, x,
+                               sep = "/"), 
+                         header=TRUE) 
+  
+  chu_data <- rbind(chu_data, chu_data_r)
+  
+  rm(chu_data_r)
+  
+}
+chu_data <- chu_data %>%
+  mutate(across(.cols=where(is.integer), .fns=as.numeric)) %>%
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  mutate(district = "NA",
+         commune = "NA") %>%
+  rename(year = cAnnee,
+         month = Periode,
+         region = Region,
+         clinic_name = FS,
+         disease = cDesc,
+         '0-to-28-days' = X0.à.28j,
+         '29-days-to-11-months' = X29j.à.11.m,
+         '1-to-4-years' = X1.à.4.ans,
+         '5-to-14-years' = X5.à.14.ans,
+         '15-to-24-years' = X15.à.24.ans,
+         '25-years-plus' = X25.et.plus,
+         total = total) %>%
+  mutate(sex = "both",
+         year = as.character(year),
+         month = as.integer(factor(month, levels = month.name)),
+         date = as.yearmon(paste(year, month), "%Y %m")) %>%
+  relocate(date, .after = month) %>%
+  relocate(district, .after = region) %>%
+  relocate(commune, .after = district) %>%
+  pivot_longer(cols = '0-to-28-days':total, names_to = "subgroup", values_to = "count")
+
+mh_english_disease <- read_excel(
+  paste(datapath_reference, "disease_names_crosswalk.xlsx", sep = "/"))
+
+data_mh <- rbind(csb_data, chd_data, chu_data) %>% # Join all data
+  select(commune, district, region, clinic_name) %>%
+  mutate(region = str_to_title(region), # Capitalizing region names
+         clinic_name = str_squish(clinic_name)) %>%
+  unique()
+
+rm(chd_data, chu_data, csb_data, mh_english_disease)
+
+
+# Saving start time (to help time the code)
+start <- proc.time()
+start <- as.numeric(start["elapsed"])
+
+# RPushbullet is a package that uses the app Pushbullet to send notifcations
+# to a device. This is entirely optional, but is handly for tracking progress.
+ifelse(require("RPushbullet") == TRUE, 
+       pbPost("note", "Appendix 2 started", paste0("GPS do file started.")),
+       "")
+
+n_facilities_name <- data_mh %>% select(clinic_name) %>% unique %>% nrow()
+n_facilities <- data_mh %>% unique %>% nrow()
+
+```
+\paragraph*{Overview of Madagascar's health sector}
+
+\addcontentsline{toc}{paragraph}{Overview of Madagascar's health sector}
+
+In Madagascar, public health facilities can be broadly classified under four types:
+
+* **Basic** health facilities (*centre santé de base*, or CSB)
+* **District** referral hospitals (*centre hospitalier de référence de district*, or CHD/CHRD)
+* **Regional** referral hospitals (*centre hospitalier de référence régionale*, or CHRR)
+* **University** hospitals (*centre hospitalier universitaire*, or CHU)
+
+According to the World Bank, there were 3,246 of these facilities operating in Madagascar in 2012. @guillemotMadagascarClimateChange2018 Of these, 3,074 were CSB facilities. CSB facilities are classified as either level 1 or 2 based on population, staffing, and services provided. Facilities may be upgraded over time, such that a CSB1 facility is converted into a CSB2. At the district level, 150 CHD facilities were functional in 2012. Like CSB facilities, CHD facilities are classified as either level 1 or level 2; these facilities provide essential medical services and—in the case of CHD2 facilities—surgical care. At the regional level, 16 CHRR and 6 CHU facilities were operational in 2012, providing specialized medical and surgical care.
+
+In addition to these public facilities, private primary health facilities (*formations sanitaires privées de base*, or FSB) are also operational and report data to the Ministère de la Santé Publique. A USAID private health sector report identified 825 FSB facilities in  Madagascar operating and providing data in 2017. @brunnerMadagascarPrivateHealth2017
+
+\paragraph*{Sample of health facilities}
+
+\addcontentsline{toc}{paragraph}{Sample of health facilities}
+
+The sample of health facilities in our study was obtained from health facility data from Madagascar's *Gestion du Système d'Information Sanitaire* (GESIS). While the format of outputs from GESIS vary across years and facility type, there are four variables which uniquely identify facilities.
+
+* **Region**: The region of Madagascar that contains the facility's catchment area. All facilities have a value for this variable.
+* **District**: The district of Madagascar (2nd largest administrative unit) that contains the facility's catchment area. Only district- and commune-level facilities will have a value for this variable; regional-level hospitals  have an "*NA*" for this variable.
+* **Commune**: The commune of Madagascar (3rd largest unit) that contains the facility's catchment area. District- and regional-level hospitals have an "*NA*" for this variable.
+* **FS**: The facility type and name. The facility type will typically be identified with an acronym (e.g., CSB2, CHD1, etc.), with the facility name following thereafter. The facility name will occasionally be the same as the commune, district, or region that corresponds with the facility's catchment area (e.g., CHRR Alaotra Mangoro). Some facilities are named for the village (*fokontany*) that they are located in. Other facilities are named for the groups that operate them (e.g., facilities named "EKAR" are operated by the *Eglizy Katôlika Apôstôlika Rômanina*, or the Roman Catholic Church).
+
+Before beginning to geolocate our sample, we began by identifying the unique facilities therein. At first pass, our sample included `r  prettyNum(n_facilities_name, big.mark = ",", scientific = FALSE)` uniquely named facilities. We observed, however, several instances where facilities in different regions shared the same facility name: for example, there is a CSB2 facility named "Ambalabe" in both the Sava and Atsimo Atsinanana regions, which are located at the northern and southern ends of Madagascar, respectively. 
+
+```{r table_facility-names-duplicates_1, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+data_mh_dup_names <- data_mh %>%
+  select(region, clinic_name) %>% unique()
+
+duplicates <- data_mh_dup_names$clinic_name[duplicated(data_mh_dup_names$clinic_name)]
+
+# data_mh_dup_names %>%
+#   select(region, clinic_name) %>%
+#   unique() %>%
+#   filter(clinic_name %in% duplicates) %>%
+#   relocate(clinic_name, .before = region) %>%
+#   arrange(clinic_name) %>%
+#   group_by(clinic_name) %>%
+#   summarise(region = paste(region, collapse = " | ")) %>%
+#   unique() %>%
+#   rename("Facility name" = clinic_name,
+#          "Regions" = region) %>%
+#   gt() %>% 
+#   tab_header(
+#     title = md("**Examples of duplicate facility names in different regions**")) %>%
+#   tab_options(table.font.names = "Source Sans Pro") %>%
+#   tab_style(
+#     locations = cells_column_labels(),
+#     style     = list(
+#       cell_text(weight = "bold"))
+#   )
+
+```
+
+These cases indicated that identifying unique facilities would require catchment area information (as well as facility name and type) to avoid erroneously classifying unique facilities as duplicates. 
+
+Using facility name, type, and catchment area to uniquely identify facilities in our sample, we identified `r  prettyNum(n_facilities, big.mark = ",", scientific = FALSE)` unique facilities. In order to classify these facilities by type, we extracted the relevant data from the "FS' variable; in doing so, we observed slight orthographic variations in the classification of facilities types (e.g., "CSB 1" vs. "CSB1") that required standardization.
+
+We further standardized region, district, and commune names in our sample against reference shapefiles to address variations in translation (e.g., "Atsimo" and "Sud" being the Malagasy and French words for "South"), abbreviation (e.g., "St." as an abbreviation for "Saint"), transposition (e.g., "Bevoay Beretra" transposed as "Beretra Bevoay"), accent marks (e.g., "Tovòna" vs. "Tovona"), spacing (e.g., "AmbalapaisoII" vs. "Ambalapaiso II"), separation vs. combination of names (e.g., "Tanambaovatrakaka" vs. "Tanambao Vahatrakaka"), hyphenation (e.g, "Ankiabe Salohy" and "Ankiabe-Salohy"), and spelling (e.g., "Mizilo Gare" vs.	"Mizilo Gara"). 
+
+
+```{r facility-name-standardization-function_1,  warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+capwords <- function(s, strict = FALSE) {
+  cap <- function(s) paste(toupper(substring(s, 1, 1)),
+                           {s <- substring(s, 2); if(strict) tolower(s) else s},
+                           sep = "", collapse = " " )
+  sapply(strsplit(s, split = " "), cap, USE.NAMES = !is.null(names(s)))
+}
+
+clean_clinic_type <- function(data){
+  data %>%
+    mutate(clinic_type = case_when(
+      str_detect(clinic_name, "CBS1") ~ "CSB1",
+      str_detect(clinic_name, "Centre de santé de base 2 ") ~ "CSB2",
+      str_detect(clinic_name, "Centre de Santé de Base de Deuxième Niveau ") ~ "CSB2",
+      str_detect(clinic_name, "Centre de Santé de Base de Niveau 2 ") ~ "CSB2",
+      str_detect(clinic_name, "Centre de Santé de Base de niveau II ") ~ "CSB2",
+      str_detect(clinic_name, "Centre De Santé De Base De Niveau II") ~ "CSB2",
+      str_detect(clinic_name, "Centre de Santé de Base I ") ~ "CSB1",
+      str_detect(clinic_name, "Centre de Santé de Base II ") ~ "CSB2",
+      str_detect(clinic_name, "Centre de Santé de Base Niveau 1 ") ~ "CSB1",
+      str_detect(clinic_name, "Centre de Santé de Base Niveau 2 ") ~ "CSB2",
+      str_detect(clinic_name, "Centre de Santé de Base Niveau I ")~ "CSB1",
+      str_detect(clinic_name, "Centre de Santé de Base Niveau II")~ "CSB2",
+      str_detect(clinic_name, "Centre du Santé de Base I ") ~ "CSB1",
+      str_detect(clinic_name, "Centre Hospitalier de District ") ~ "CHD",
+      str_detect(clinic_name, "Centre Hospitalier De Référence De District ") ~ "CHD",
+      str_detect(clinic_name, "Centre Hospitalier de Référence Régional ") ~ "CHRR",
+      str_detect(clinic_name, "Centre Hospitalier de Référence Régional de ") ~ "CHRR",
+      str_detect(clinic_name, "Centre Hospitalier Régional De Référence ") ~ "CHRR",
+      str_detect(clinic_name, "Centre Hosptalier de Référence du District du ") ~ "CHD",
+      str_detect(clinic_name, "Centre sante de base niveau II ") ~ "CSB2",
+      str_detect(clinic_name, "CHD 1") ~ "CHD1",
+      str_detect(clinic_name, "CHD 2") ~ "CHD2",
+      str_detect(clinic_name, "CHD1") ~ "CHD1",
+      str_detect(clinic_name, "CHD2") ~ "CHD2",
+      str_detect(clinic_name, "CHRD 1") ~ "CHD1",
+      str_detect(clinic_name, "CHRD 2") ~ "CHD2",
+      str_detect(clinic_name, "CHRD II ") ~ "CHD2",
+      str_detect(clinic_name, "CHRD1") ~ "CHD1",
+      str_detect(clinic_name, "CHRD2 ") ~ "CHD2",
+      str_detect(clinic_name, "CHRD2") ~ "CHD2",
+      str_detect(clinic_name, "CHRR ") ~ "CHRR",
+      str_detect(clinic_name, "CHRR II ") ~ "CHRR",
+      str_detect(clinic_name, "CHU ") ~ "CHU",
+      str_detect(clinic_name, "Csb 1 ") ~ "CSB1",
+      str_detect(clinic_name, "CSB 1") ~ "CSB1",
+      str_detect(clinic_name, "CSB 2") ~ "CSB2",
+      str_detect(clinic_name, "CSB I ")~ "CSB1",
+      str_detect(clinic_name, "CSB II")~ "CSB2",
+      str_detect(clinic_name, "Csb1") ~ "CSB1",
+      str_detect(clinic_name, "CSB1") ~ "CSB1",
+      str_detect(clinic_name, "CSB2") ~ "CSB2",
+
+      str_detect(clinic_name, "depot de medicament") ~ "Pharmacy",
+      str_detect(clinic_name, "Dépôt de médicaments ") ~ "Pharmacy",
+      str_detect(clinic_name, "Dépot de médicaments") ~ "Pharmacy",
+      str_detect(clinic_name, "Dépôt de médicaments") ~ "Pharmacy",
+      str_detect(clinic_name, "Dépôtde médicament ") ~ "Pharmacy",
+      str_detect(clinic_name, "Dépôts de médicaments") ~ "Pharmacy",
+      str_detect(clinic_name, "Dispensaire") ~ "Pharmacy",
+      str_detect(clinic_name, "Docteur ") ~ "FSP",
+      str_detect(clinic_name, "Dokotera ") ~ "FSP",
+      str_detect(clinic_name, "Dr ") ~ "FSP",
+      str_detect(clinic_name, "Fivarotampanafody ") ~ "Pharmacy",
+      str_detect(clinic_name, "Fivarotam-panafody ") ~ "Pharmacy",
+      str_detect(clinic_name, "FSP") ~ "FSP",
+      str_detect(clinic_name, "HP ") ~ "HP",
+      str_detect(clinic_name, "pharmacie de ") ~ "Pharmacy",
+      str_detect(clinic_name, "Pharmacie") ~ "Pharmacy",
+      str_detect(clinic_name, "Pharmacrie") ~ "Pharmacy",
+      str_detect(clinic_name, "Pharmacy") ~ "Pharmacy",
+      str_detect(clinic_name, "Pavillon Sainte Fleur") ~ "CHU", #https://maternitesaintefleur.wordpress.com/
+      TRUE ~ "Other/Unknown")) %>%
+    
+    mutate(clinic_type = case_when(
+          and(clinic_type == "Other/Unknown", 
+              str_detect(clinic_name, "Centre de santé de base")) ~ "CSB",
+                  and(clinic_type == "Other/Unknown", 
+              str_detect(clinic_name, "Centre De Santé ")) ~ "CSB",
+                  and(clinic_type == "Other/Unknown", 
+              str_detect(clinic_name, "Centre De Santé De Base ")) ~ "CSB",
+                  and(clinic_type == "Other/Unknown", 
+              str_detect(clinic_name, "CSB")) ~ "CSB",
+     TRUE ~ clinic_type))
+
+}
+
+clean_clinic_name <- function(data){
+  data %>%
+    mutate(clinic_name_clean = clinic_name) %>%
+    mutate(clinic_name_clean = gsub("CBS1", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre De Rééducation Motrice De Madagascar Antsirabe", "Centre De Rééducation Motrice Antsirabe", clinic_name_clean),
+           clinic_name_clean = gsub("Centre de santé de base 2 ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre de Santé de Base de Deuxième Niveau ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre de Santé de Base de Niveau 2 ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre de Santé de Base de niveau II ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre de Santé de Base de Niveau II ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre De Santé De Base De Niveau II", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre de Santé de Base I ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre de Santé de Base II ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre de Santé de Base Niveau 1 ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre de Santé de Base Niveau 2 ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre de Santé de Base Niveau I ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre de Santé de Base Niveau II", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre de santé de base", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre du Santé de Base I ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre De Santé ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre de Santé ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre de santé ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre De Santé De Base ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre Hospitalier de District ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre Hospitalier De Référence De District ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre Hospitalier de Référence de District ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre Hospitalier de Référence Régional ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre Hospitalier de Référence Régional de ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre Hospitalier De Référence Régional De ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre Hospitalier Régional De Référence ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre Hospitalier Régional de Référence ", "", clinic_name_clean),  
+           clinic_name_clean = gsub("Centre Hosptalier de Référence du District du ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Centre sante de base niveau II ", "", clinic_name_clean),
+           clinic_name_clean = gsub("CHD 1", "", clinic_name_clean),
+           clinic_name_clean = gsub("CHD 2", "", clinic_name_clean),
+           clinic_name_clean = gsub("CHD1", "", clinic_name_clean),
+           clinic_name_clean = gsub("CHD2", "", clinic_name_clean),
+           clinic_name_clean = gsub("CHRD2", "", clinic_name_clean),
+           clinic_name_clean = gsub("CHRR", "", clinic_name_clean),
+           clinic_name_clean = gsub("CHRR II", "", clinic_name_clean),
+           clinic_name_clean = gsub("CHU ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Csb 1", "", clinic_name_clean),
+           clinic_name_clean = gsub("CSB 1", "", clinic_name_clean),
+           clinic_name_clean = gsub("CSB 2", "", clinic_name_clean),
+           clinic_name_clean = gsub("CSB I ", "", clinic_name_clean),
+           clinic_name_clean = gsub("CHRD II ", "", clinic_name_clean),
+           clinic_name_clean = gsub("CHRD2 ", "", clinic_name_clean),
+           clinic_name_clean = gsub("CHRD 2 ", "", clinic_name_clean),
+           clinic_name_clean = gsub("CSB II", "", clinic_name_clean),
+           clinic_name_clean = gsub("Csb1", "", clinic_name_clean),
+           clinic_name_clean = gsub("CSB1", "", clinic_name_clean),
+           clinic_name_clean = gsub("CSB2", "", clinic_name_clean),
+           clinic_name_clean = gsub("CSBU ", "", clinic_name_clean),
+           clinic_name_clean = gsub("CSB ", "", clinic_name_clean),
+           clinic_name_clean = gsub("csb ", "", clinic_name_clean),
+           clinic_name_clean = gsub("FSP_", "", clinic_name_clean),
+           clinic_name_clean = gsub("FSP_", "", clinic_name_clean),
+           clinic_name_clean = gsub("FSP ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Pharmacie", "", clinic_name_clean),
+           clinic_name_clean = gsub("pharmacie de ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Pharmacy", "", clinic_name_clean),
+           clinic_name_clean = gsub("Pharmacrie", "", clinic_name_clean),
+           clinic_name_clean = gsub("PHARMACIE", "", clinic_name_clean),
+           clinic_name_clean = gsub("Dispensaire", "", clinic_name_clean),
+           clinic_name_clean = gsub("Dépôt  de médicament ", "", clinic_name_clean),
+           clinic_name_clean = gsub("depot de medicament", "", clinic_name_clean),
+           clinic_name_clean = gsub("Dépôt de médicaments", "", clinic_name_clean),
+           clinic_name_clean = gsub("Fivarotam-panafody", "", clinic_name_clean),
+           clinic_name_clean = gsub("Dépot de médicaments", "", clinic_name_clean),
+           clinic_name_clean = gsub("Dépot de Médicaments", "", clinic_name_clean),
+           clinic_name_clean = gsub("Dépôt de médicaments", "", clinic_name_clean),
+           clinic_name_clean = gsub("Dépôt de médicaments", "", clinic_name_clean),
+           clinic_name_clean = gsub("Dépôt de médicaments", "", clinic_name_clean),
+           clinic_name_clean = gsub("Dépôts de médicaments", "", clinic_name_clean),
+           clinic_name_clean = gsub("Dépôts de médicaments", "", clinic_name_clean),
+           clinic_name_clean = gsub("Docteur ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Dokotera ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Dr ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Fivarotam-Panafody", "", clinic_name_clean),
+           clinic_name_clean = gsub("Fivarotampanafody ", "", clinic_name_clean),
+           clinic_name_clean = gsub("HP HP", "", clinic_name_clean),
+           clinic_name_clean = gsub("HP", "", clinic_name_clean),
+           clinic_name_clean = gsub("Polyclinique", "", clinic_name_clean),
+           clinic_name_clean = gsub("Clinique ", "", clinic_name_clean),
+           clinic_name_clean = gsub("CH ", "", clinic_name_clean),
+           clinic_name_clean = gsub("CSBD ", "", clinic_name_clean),
+           clinic_name_clean = gsub("CSBU", "", clinic_name_clean),
+           clinic_name_clean = gsub("CSBD ", "", clinic_name_clean),
+           clinic_name_clean = gsub("CSBDS ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Medico Chirurgicale ", "", clinic_name_clean),
+           clinic_name_clean = gsub("CMC ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Loterana", "Luthérien", clinic_name_clean),
+           clinic_name_clean = gsub("Saint Luc Toliara I", "Saint Luc", clinic_name_clean),
+           clinic_name_clean = gsub(" Hospital", "", clinic_name_clean),
+           clinic_name_clean = gsub("Hôpital", "", clinic_name_clean),
+           clinic_name_clean = gsub("Hopitaly ", "", clinic_name_clean),
+           clinic_name_clean = gsub("Hopital ", "", clinic_name_clean),
+           clinic_name_clean = gsub(" Health Centre", "", clinic_name_clean),
+           clinic_name_clean = gsub(" Health Post", "", clinic_name_clean),
+           
+           # Finally, we replace hypens and underscores with spaces in the 
+           # clinic and district names. We also remove double spaces in 
+           #between words, and remove leading and trailing whitespace
+
+           clinic_name_clean = gsub("-", " ", clinic_name_clean),
+           clinic_name_clean = gsub("_", " ", clinic_name_clean),
+           clinic_name_clean = gsub("  ", " ", clinic_name_clean),
+           clinic_name_clean = trimws(clinic_name_clean),
+           clinic_name_clean = capwords(clinic_name_clean)) %>%
+    
+    filter(clinic_name_clean != "")
+}
+
+
+
+clean_catchment_area <- function(data){
+  
+  data %>% 
+    mutate(
+      region_name = gsub("NA", NA, region_name),
+      district_name = gsub("NA", NA, district_name),
+      commune_name = gsub("NA", NA, commune_name)
+    ) %>%
+    
+    mutate(
+      clinic_type = ifelse(
+        is.na(district_name) &
+          is.na(commune_name) &
+          clinic_type != "CHRR" &
+          clinic_type != "CHU",
+        "CHRR/CHU",
+        ifelse(
+          !is.na(district_name) &
+            is.na(commune_name) &
+            clinic_type != "CHD1" &
+            clinic_type != "CHD2",
+          "CHD",
+          clinic_type
+        )
+      )
+    ) %>%
+    
+    mutate(clinic_type_clean = ifelse(
+      and(is.na(district_name) | district_name =="",
+          is.na(commune_name) | commune_name ==""),
+      
+      # If the facility's catchment area is a
+      # region only, assign it as a cHR or CHU
+      
+      "CHR/CHU",
+      
+      # If the facility's catchment area is a district
+      # only, assign it as a CHD (no level specified)
+      
+      ifelse(is.na(commune_name) | commune_name =="",
+             "CHD",
+             
+             # If the facility's catchment area is
+             # a commune, assign it as a CSB or FSP
+             # (no level specified)
+             
+             "CSB/FSP")
+    )) %>%
+    
+    mutate(region_name = case_when(
+      str_detect(region_name, "Amoron'i Mania") ~ "Amoron I Mania",
+      TRUE ~ region_name
+    )) %>%
+    
+    mutate(
+      district_name = case_when(
+        str_detect(district_name, "Anosibe An'Ala") ~ "Anosibe-An'ala",
+        str_detect(district_name, "Antananarivo Atsimon") ~ "Antananarivo Atsimondrano",
+        str_detect(district_name, "Antananarivo Avaradr") ~ "Antananarivo Avaradrano",
+        str_detect(district_name, "Antananarivo Renivoh") ~ "Antananarivo Renivohitra",
+        str_detect(district_name, "Fenoarivo Atsinanana") ~ "Fenerive Est",
+        str_detect(district_name, "Mananara Avaratra") ~ "Mananara-Avaratra",
+        str_detect(district_name, "Nosy Boraha") ~ "Sainte Marie",
+        str_detect(district_name, "Ambovombe Androy") ~ "Ambovombe-Androy",
+        str_detect(district_name, "Tsiombe") ~ "Tsihombe",
+        str_detect(district_name, "Amboasary Atsimo") ~ "Amboasary-Atsimo",
+        str_detect(district_name, "Ankazoabo Atsimo") ~ "Ankazoabo",
+        str_detect(district_name, "Toliara I") ~ "Toliary-I",
+        str_detect(district_name, "Toliara II") ~ "Toliary-II",
+        str_detect(district_name, "Toliara-I") ~ "Toliary-I",
+        str_detect(district_name, "Toliara-II") ~ "Toliary-II",
+        str_detect(district_name, "Midongy Atsimo") ~ "Midongy-Atsimo",
+        str_detect(district_name, "Antanambao Manampont") ~ "Antanambao Manampontsy",
+        str_detect(district_name, "Antanambao Manampotsy") ~ "Antanambao Manampontsy",
+        str_detect(district_name, "Vohibinany") ~ "Brickaville",
+        str_detect(district_name, "Ambatoboeny") ~ "Ambato Boeni",
+        str_detect(district_name, "FenoarivoBe") ~ "Fenoarivobe",
+        str_detect(district_name, "Nosy Be") ~ "Nosy-Be",
+        str_detect(district_name, "Fianarantsoa II") ~ "Fianarantsoa I",
+        str_detect(district_name, "lalangina") ~ "Lalangina",
+        str_detect(district_name, "Belo Tsiribihina") ~ "Belo Sur Tsiribihina",
+        str_detect(district_name, "Vohimarina") ~ "Vohemar",
+        str_detect(district_name, "Befandriana Avaratra") ~ "Befandriana Nord",
+        str_detect(district_name, "Boriziny") ~ "Port-Berge (Boriziny-Vaovao)",
+        str_detect(district_name, "Nosy Varika") ~ "Nosy-Varika",
+        TRUE ~ district_name
+      )
+    ) %>%
+    
+    # A number of communes in the districts of Fianarantsoa and Toliara
+    # have been reclassifed under new district named (e., Lalangina), requiring
+    # that the district names for these communes be manually updated.
+    
+    mutate(
+      district_name = ifelse(
+        commune_name == "Alakamisy Ambohimahy" &
+          district_name == "Fianarantsoa I",
+        "Lalangina",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Alakamisy Itenina" &
+          district_name == "Fianarantsoa I",
+        "Vohibato",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Ambalakely" &
+          district_name == "Fianarantsoa I",
+        "Lalangina",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Ambalamahasoa" &
+          district_name == "Fianarantsoa I",
+        "Lalangina",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Ambalamidera" &
+          district_name == "Fianarantsoa I",
+        "Isandra",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Ambohimahavelona" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Ambolofoty" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Anakao" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Analamisampy" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Andianjanto Est" &
+          district_name == "Fianarantsoa I",
+        "Lalangina",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Andoharanomaintso" &
+          district_name == "Fianarantsoa I",
+        "Isandra",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Andrainjanto Centre" &
+          district_name == "Fianarantsoa I",
+        "Lalangina",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Andranohinaly" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Andranomiditra" &
+          district_name == "Fianarantsoa I",
+        "Vohibato",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Andranovorivato" &
+          district_name == "Fianarantsoa I",
+        "Vohibato",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Andranovory" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Andribavontsona" &
+          district_name == "Port-Berge (Boriziny-Vaovao),",
+        "Analalava",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Androy" &
+          district_name == "Fianarantsoa I",
+        "Lalangina",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Anjoma-tsara" &
+          district_name == "Fianarantsoa I",
+        "Isandra",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Ankarinarivo" &
+          district_name == "Fianarantsoa I",
+        "Isandra",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Ankaromalaza Mifanas" &
+          district_name == "Fianarantsoa I",
+        "Vohibato",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Ankililoaka" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Ankilimalinika" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Antanamalaza" &
+          district_name == "Antsirabe II",
+        "Ambatolampy",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Antanambao Ambary" &
+          district_name == "Betafo",
+        "Mandoto",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Antsahavaribe" &
+          district_name == "Vohemar",
+        "Sambava",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Beheloka" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Behompy" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Belalanda" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Betsinjaka" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Fandravandava" &
+          district_name == "Fianarantsoa I",
+        "Lalangina",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Fanjakana" &
+          district_name == "Fianarantsoa I",
+        "Isandra",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Ialananidro" &
+          district_name == "Fianarantsoa I",
+        "Lalangina",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Iavinomby" &
+          district_name == "Fianarantsoa I",
+        "Isandra",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Ihazoara" &
+          district_name == "Fianarantsoa I",
+        "Vohibato",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Isorana" &
+          district_name == "Fianarantsoa I",
+        "Isandra",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Ivoamba" &
+          district_name == "Fianarantsoa I",
+        "Lalangina",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Mahaditra" &
+          district_name == "Fianarantsoa I",
+        "Vohibato",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Mahasoabe" &
+          district_name == "Fianarantsoa I",
+        "Vohibato",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Mahatsinjo" &
+          district_name == "Fianarantsoa I",
+        "Lalangina",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Mahatsinjony" &
+          district_name == "Fianarantsoa I",
+        "Lalangina",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Maneva" &
+          district_name == "Fianarantsoa I",
+        "Vohibato",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Manombo" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Manorofify" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "MarofotyMarofoty" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Maromiandra" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Miary" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Milenaka" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Mitsinjo" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Nasandratrony" &
+          district_name == "Fianarantsoa I",
+        "Isandra",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Sahambavy" &
+          district_name == "Fianarantsoa I",
+        "Lalangina",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Soaindrana" &
+          district_name == "Fianarantsoa I",
+        "Vohibato",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Soalara" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Soatanana" &
+          district_name == "Fianarantsoa I",
+        "Isandra",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "St Augustin" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Taindambo" &
+          district_name == "Fianarantsoa I",
+        "Lalangina",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Talata Ampano" &
+          district_name == "Fianarantsoa I",
+        "Vohibato",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Tsianisiha" &
+          district_name == "Toliara-I",
+        "Toliary-II",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Vohibato Ouest" &
+          district_name == "Fianarantsoa I",
+        "Vohibato",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Vohimarina" &
+          district_name == "Fianarantsoa I",
+        "Vohibato",
+        district_name
+      ),
+      district_name = ifelse(
+        commune_name == "Vohitrafeno" &
+          district_name == "Fianarantsoa I",
+        "Vohibato",
+        district_name
+      )
+    ) %>%
+    
+    mutate(
+      commune_name = case_when(
+        str_detect(commune_name, "Alakamisy Ambohimahy") ~ "Alakamisy Ambohimaha",
+        str_detect(commune_name, "Alakamisy Itenina") ~ "Alakamisy Itenina",
+        str_detect(commune_name, "Ambadrika") ~ "Ambandrika",
+        str_detect(commune_name, "Ambalakely") ~ "Ambalakely",
+        str_detect(commune_name, "Ambalamahasoa") ~ "Ambalamahasoa",
+        str_detect(commune_name, "Ambalamanasy   II") ~ "Ambalamanasy II",
+        str_detect(commune_name, "Ambalamidera") ~ "Ambalamidera II",
+        str_detect(commune_name, "AmbalapaisoII") ~ "Ambalapaiso II",
+        str_detect(commune_name, "Ambararatabe /Nord") ~ "Ambararatabe Nord",
+        str_detect(commune_name, "Ambarijeby Atsimo") ~ "Ambarijeby Sud",
+        str_detect(commune_name, "Ambatoben'anja") ~ "Ambatoben'anjavy",
+        str_detect(commune_name, "AmbatofisakaII") ~ "Ambatofisaka II",
+        str_detect(commune_name, "AmbatoharananaI") ~ "Ambatoharanana",
+        str_detect(commune_name, "Ambatolampy Tsimahaf") ~ "Ambatolampy",
+        str_detect(commune_name, "Ambatolampy Tsimahafotsy") ~ "Ambatolampy",
+        str_detect(commune_name, "Ambatoriha/Est") ~ "Ambatoriha Est",
+        str_detect(commune_name, "Ambatotsipihana") ~ "Ambatotsipihina",
+        str_detect(commune_name, "Ambatovala") ~ "Ambatolava",
+        str_detect(commune_name, "Ambatry") ~ "Ambatry Mitsinjo",
+        str_detect(commune_name, "Ambinanin'Andravory") ~ "Ambinanin'andravory",
+        str_detect(commune_name, "Ambinaninandro") ~ "Ambinanindrano",
+        str_detect(commune_name, "Ambinaniroa-Andonaka") ~ "Ambinaniroa",
+        str_detect(commune_name, "Ambodiadabo Maitsokely") ~ "Ambodiadabo",
+        str_detect(commune_name, "Ambodiadabo") ~ "Ambodiadabo M",
+        str_detect(commune_name, "Ambodiampana Lokoho") ~ "Ambodiampana",
+        str_detect(commune_name, "Ambodiampanana") ~ "Ambodiampana",
+        str_detect(commune_name, "Ambodifarihy") ~ "Ambodifarihy Fenomanana",
+        str_detect(commune_name, "Ambodihazambo") ~ "Ambodihazoambo",
+        str_detect(commune_name, "Ambodimanga  I") ~ "Ambodimanga I",
+        str_detect(commune_name, "Ambodimanga II-B") ~ "Ambodimanga II",
+        str_detect(commune_name, "Ambodimotso Atsimo") ~ "Ambodimotso Sud",
+        str_detect(commune_name, "AmbodinonokaAntaratr") ~ "Ambodinonoka",
+        str_detect(commune_name, "Ambodirian'Isahafary") ~ "Ambodirian'i Sahafary",
+        str_detect(commune_name, "Amboditandroho") ~ "Amboditandroroho",
+        str_detect(commune_name, "Ambohibao Atsimo") ~ "Ambohibao Sud",
+        str_detect(commune_name, "Ambohibary") ~ "Ambohibary Vohilena",
+        str_detect(commune_name, "Ambohijato Mandritsara") ~ "Mandritsara",
+        str_detect(commune_name, "Ambohimahavelona") ~ " Ambohimahavelona",
+        str_detect(commune_name, "Ambohimalaza") ~ "Ambohimalaza Miray",
+        str_detect(commune_name, "Ambohimàna") ~ "Ambohimana",
+        str_detect(commune_name, "Ambohimanga Sud") ~ "Ambohimanga Du Sud",
+        str_detect(commune_name, "Ambohimanjaka") ~ "Sahatsiho Ambohimanjaka",
+        str_detect(commune_name, "AmbohimiarinaII") ~ "Ambohimiarina II",
+        str_detect(commune_name, "Ambohitralalana") ~ "Ambohitralanana",
+        str_detect(commune_name, "Ambohitrandriamanitr") ~ "Ambohitrandriamanitra",
+        str_detect(commune_name, "AmbohitsaraEst") ~ "Ambohitsara Est",
+        str_detect(commune_name, "Ambolidibe Atsinanana") ~ "Ambolidibe Est",
+        str_detect(commune_name, "Ambolofoty") ~ "Ambolofoty",
+        str_detect(commune_name, "Amboropotsy") ~ "Amborompotsy",
+        str_detect(commune_name, "Ampasimadinika") ~ "Ampasimadinika Manambolo",
+        str_detect(commune_name, "Ampasimborajka") ~ "Ampasimboraka",
+        str_detect(commune_name, "Ampasimpotsy") ~ "Ampasimpotsy Sud",
+        str_detect(commune_name, "Ampasipotsy Gare") ~ "Ampasimpotsy Gara",
+        str_detect(commune_name, "Ampasipotsy Madialaz") ~ "Ampasipotsy Mandialaza",
+        str_detect(commune_name, "Ampataka Manampaneva") ~ "Manampaneva",
+        str_detect(commune_name, "Ampataka Maroreny") ~ "Ampatakamaroreny",
+        str_detect(commune_name, "Anakao") ~ "Anakao",
+        str_detect(commune_name, "Analalaiva") ~ "Analaiva",
+        str_detect(commune_name, "Analamisampy") ~ "Analamisampy",
+        str_detect(commune_name, "Analamitsivala") ~ "Analamitsivalana",
+        str_detect(commune_name, "Anbatomainty") ~ "Ambatomainty",
+        str_detect(commune_name, "Andanandava") ~ "Antanandava",
+        str_detect(commune_name, "Andianjanto Est") ~ "Andrainjato Est",
+        str_detect(commune_name, "Andimaka") ~ "Andimaky Manambolo",
+        str_detect(commune_name, "Andoharanomaintso") ~ "Andoharanomaitso",
+        str_detect(commune_name, "Andoharanomaintso") ~ "Andoharanomaitso",
+        str_detect(commune_name, "Andrainjanto Centre") ~ "Andrainjato Centre",
+        str_detect(commune_name, "Andranohinaly") ~ "Andranohinaly",
+        str_detect(commune_name, "Andranomiditra") ~ "Andranomiditra",
+        str_detect(commune_name, "Andranomiely") ~ "Rambolamasoandro Andranomiely",
+        str_detect(commune_name, "Andranovorivato") ~ "Andranovorivato",
+        str_detect(commune_name, "Andranovory") ~ "Andranovory",
+        str_detect(commune_name, "Andravola") ~ "Andravola Vohipeno",
+        str_detect(commune_name, "Andrebakely") ~ "Andrebakely Nord",
+        str_detect(commune_name, "Andribavontsona") ~ "Andribavontsona",
+        str_detect(commune_name, "Androndrona") ~ "Androndrono",
+        str_detect(commune_name, "Androy") ~ "Androy",
+        str_detect(commune_name, "Anjapaly") ~ "Anjampaly",
+        str_detect(commune_name, "Anjeke Ankilira") ~ "Anjeky Ankilikira",
+        str_detect(commune_name, "Anjeva Gare") ~ "Anjeva Gara",
+        str_detect(commune_name, "Anjiabe") ~ "Anjiabe Ambony",
+        str_detect(commune_name, "Anjiaija") ~ "Anjiajia",
+        str_detect(commune_name, "Anjoman'Ankona") ~ "Anjoman'ankona",
+        str_detect(commune_name, "Anjoma-tsara") ~ "Anjoma Itsara",
+        str_detect(commune_name, "Ankadinondry") ~ "Ankadinondry Sakay",
+        str_detect(commune_name, "Ankafina") ~ "Ankafina Tsarafidy",
+        str_detect(commune_name, "Ankarinarivo") ~ "Ankarinarivo Manirisoa",
+        str_detect(commune_name, "Ankaromalaza Mifanas") ~ "Ankaromalaza Mifanasoa",
+        str_detect(commune_name, "Ankasakasa") ~ "Ankasakasa Tsibiray",
+        str_detect(commune_name, "Ankazoabo") ~ "Ankazoabo Sud",
+        str_detect(commune_name, "Ankazotokana I") ~ "Ankazotokana",
+        str_detect(commune_name, "Ankiabe Salohy") ~ "Ankiabe-Salohy",
+        str_detect(commune_name, "Ankiakabe-Nord") ~ " Ankiakabe Nord",
+        str_detect(commune_name, "Ankililoaka") ~ "Ankililoaka",
+        str_detect(commune_name, "Ankilimalinika") ~ "Ankilimalinike",
+        str_detect(commune_name, "Ankirondro") ~ "Bemarivo Ankirondro",
+        str_detect(commune_name, "Anontsibe") ~ "Anontsibe Centre",
+        str_detect(commune_name, "Anosiarivo") ~ "Anosiarivo I",
+        str_detect(commune_name, "Anosy Tsararafara") ~ "Anosy Tsararafa",
+        str_detect(commune_name, "Antalaha") ~ " Antalaha Ambonivohitra",
+        str_detect(commune_name, "Antanamalaza") ~ "Antanamalaza",
+        str_detect(commune_name, "Antanambao Ambary") ~ "Antanambao Ambary",
+        str_detect(commune_name, "Antanambao I") ~ "Antanambao",
+        str_detect(commune_name, "Antanambao Manampotsy") ~ "Antanambao Manampontsy",
+        str_detect(commune_name, "Antanambaon'Amberina") ~ "Antanambaon'amberina",
+        str_detect(commune_name, "Antananarivo I") ~ "1er Arrondissement",
+        str_detect(commune_name, "Antananarivo II") ~ "2e Arrondissement",
+        str_detect(commune_name, "Antananarivo III") ~ "3e Arrondissement",
+        str_detect(commune_name, "Antananarivo IV") ~ "4e Arrondissement",
+        str_detect(commune_name, "Antananarivo V") ~ "5e Arrondissement",
+        str_detect(commune_name, "Antananarivo VI") ~ "6e Arrondissement",
+        str_detect(commune_name, "Antanandava Nord") ~ "Antanandava",
+        str_detect(commune_name, "Antananivo /Haut") ~ "Antananivo Haut",
+        str_detect(commune_name, "Antanetibe Mahazaza") ~ "Antanetibe",
+        str_detect(commune_name, "Antanimora- Sud") ~ "Antanimora Atsimo",
+        str_detect(commune_name, "Antenina I") ~ "Antenina",
+        str_detect(commune_name, "Antoby") ~ "Antoby Est",
+        str_detect(commune_name, "Antohaboto") ~ "Antohabato",
+        str_detect(commune_name, "Antongo") ~ "Antongo Vaovao",
+        str_detect(commune_name, "Antokoboritelo") ~ "Marovitsika Sud",
+        str_detect(commune_name, "Antranonkarany") ~ "Antranokarany",
+        str_detect(commune_name, "Antsahavaribe") ~ "Antsahavaribe",
+        str_detect(commune_name, "Antsakomanondro") ~ "Antsakoamanondro",
+        str_detect(commune_name, "Antsapanimahazo") ~ "Antsampanimahazo",
+        str_detect(commune_name, "Antsirabe I") ~ "Antsirabe Afovoany Atsinanana",
+        str_detect(commune_name, "Antsiranana I") ~ "Diego Suarez",
+        str_detect(commune_name, "Antsoantany") ~ "Antsoatany",
+        str_detect(commune_name, "Bealampoana") ~ "Bealampona",
+        str_detect(commune_name, "Bealanana I") ~ "Bealanana",
+        str_detect(commune_name, "Beampombo  I") ~ "Beampombo I",
+        str_detect(commune_name, "Beandrarezona I") ~ "Beandrarezona",
+        str_detect(commune_name, "Befandriana Avaratra") ~ "Befandriana Nord",
+        str_detect(commune_name, "Befandriana-Sud") ~ "Befandriana Sud",
+        str_detect(commune_name, "Befetra") ~ "Befeta",
+        str_detect(commune_name, "Befotaka Avaratra") ~ "Befotaka Nord",
+        str_detect(commune_name, "Befotaka") ~ "Befotaka Sud",
+        str_detect(commune_name, "Beheloka") ~ "Beheloka",
+        str_detect(commune_name, "Behera") ~ "Behara",
+        str_detect(commune_name, "Behompy") ~ "Behompy",
+        str_detect(commune_name, "Belafika Haut") ~ "Belafike Haut",
+        str_detect(commune_name, "Belalanda") ~ "Belalanda",
+        str_detect(commune_name, "Belambo") ~ "Belambo Firaisana",
+        str_detect(commune_name, "Belaoko Marovato") ~ "Belaoka Marovato",
+        str_detect(commune_name, "Belo sur Mer") ~ "Belo Sur Mer",
+        str_detect(commune_name, "Belo Tsiribihina") ~ "Belo Sur Tsiribihina",
+        str_detect(commune_name, "Belotsiribihina") ~ "Belo Sur Tsiribihina",
+        str_detect(commune_name, "Bemaneviky H") ~ "Bemaneviky Haut Sambirano",
+        str_detect(commune_name, "BenatoToby") ~ "Benato Toby",
+        str_detect(commune_name, "Mangarivot") ~ "Mangarivotra",
+        str_detect(commune_name, "Beraketa") ~ "Bereketa",
+        str_detect(commune_name, "Berevo Ranobe") ~ "Berevo/ranobe",
+        str_detect(commune_name, "Beroy Sud") ~ "Beroy Atsimo",
+        str_detect(commune_name, "Betioky Sud") ~ "Betioky Atsimo",
+        str_detect(commune_name, "Betsakotsako Andrano") ~ "Betsakotsako Andranotsara",
+        str_detect(commune_name, "Betsimiositra") ~ "Betsimisotra",
+        str_detect(commune_name, "Betsinjaka") ~ "Betsinjaka",
+        str_detect(commune_name, "Bevoay Beretra") ~ " Beretra Bevoay",
+        str_detect(commune_name, "Bevonotro") ~ "Bevonotra",
+        str_detect(commune_name, "Efatsy Anandroza") ~ "Efatsy",
+        str_detect(commune_name, "Enakara Haut") ~ "Enakara-Haut",
+        str_detect(commune_name, "Enaniiliha") ~ "Enaniliha",
+        str_detect(commune_name, "Ereda") ~ "Erada",
+        str_detect(commune_name, "Etrotroka") ~ "Etrotroka Atsimo",
+        str_detect(commune_name, "Fandravandava") ~ "Fandrandava",
+        str_detect(commune_name, "Fanjakana") ~ "Fanjakana",
+        str_detect(commune_name, "Faux-Cap") ~ "Betanty (Faux Cap)",
+        str_detect(commune_name, "Fenoevo") ~ "Fenoevo-Efita",
+        str_detect(commune_name, "Fieferana") ~ "Fiaferana",
+        str_detect(commune_name, "Foulpointe") ~ "Mahavelona (Foulpointe)",
+        str_detect(commune_name, "Ialananidro") ~ "Ialananindro",
+        str_detect(commune_name, "Iavinomby") ~ "Iavonomby Vohibola",
+        str_detect(commune_name, "Ibity") ~ "Alatsinainy Ibity",
+        str_detect(commune_name, "Ihaborano Namohora") ~ "Namohora Iaborano",
+        str_detect(commune_name, "Ihazoara") ~ "Ihazoara",
+        str_detect(commune_name, "Iloto") ~ "Menamaty Iloto",
+        str_detect(commune_name, "Imady") ~ "Imerina Imady",
+        str_detect(commune_name, "Imeritsiatosika") ~ "Imerintsiatosika",
+        str_detect(commune_name, "Isaka Ivondro") ~ "Isaka-Ivondro",
+        str_detect(commune_name, "Isaraha") ~ "Isahara",
+        str_detect(commune_name, "Isorana") ~ "Isorana",
+        str_detect(commune_name, "Ivatana") ~ "Vatana",
+        str_detect(commune_name, "Ivato Aéroport") ~ "Ivato Aeroport",
+        str_detect(commune_name, "Ivoamba") ~ "Ivoamba",
+        str_detect(commune_name, "Ivony") ~ "Ivony Miaramiasa",
+        str_detect(commune_name, "Kalalao") ~ "Ikalalao",
+        str_detect(commune_name, "Kianjandrandrakefina") ~ "Kianjandrakefina",
+        str_detect(commune_name, "labohazo") ~ "Iabohazo",
+        str_detect(commune_name, "Lavaraty Ivondro") ~ "Ivondro",
+        str_detect(commune_name, "Mahaditra") ~ "Mahaditra",
+        str_detect(commune_name, "Mahafasa") ~ "Mahafasa Centre",
+        str_detect(commune_name, "Mahajanga I") ~ "Mahajanga",
+        str_detect(commune_name, "Mahasoabe") ~ "Mahasoabe",
+        str_detect(commune_name, "Mahatsara Lefaka") ~ "Mahatsara Iefaka",
+        str_detect(commune_name, "Mahatsinjo Atsinanana") ~ "Mahatsinjo Est",
+        str_detect(commune_name, "Mahatsinjo") ~ "Mahatsinjony",
+        str_detect(commune_name, "Mahatsinjony") ~ "Mahatsinjony",
+        str_detect(commune_name, "Mahazina") ~ "Mahazina Ambohipierenana",
+        str_detect(commune_name, "Manajary Urbain") ~ "Mananjary",
+        str_detect(commune_name, "Manakambahiny Est") ~ "Manakambahiny Antsinanana",
+        str_detect(commune_name, "Manakambahiny Ouest") ~ "Manakambahiny Andrefana",
+        str_detect(commune_name, "Manakara") ~ "Manakara",
+        str_detect(commune_name, "Manambotra Sud") ~ "Manambotra Atsimo",
+        str_detect(commune_name, "Manapatrana") ~ "Manampatrana",
+        str_detect(commune_name, "Mandromodromotra") ~ "Mandromondromotra",
+        str_detect(commune_name, "Maneva") ~ "Maneva",
+        str_detect(commune_name, "Manombo") ~ "Manombo Sud",
+        str_detect(commune_name, "Manorofify") ~ "Manorofify",
+        str_detect(commune_name, "Marintampona") ~ "Maritampona",
+        str_detect(commune_name, "Marivorahona") ~ "Tanambao Marivorahona",
+        str_detect(commune_name, "Maroarivo") ~ "Maroarivo Ankazomanga",
+        str_detect(commune_name, "MarofotyMarofoty") ~ "Marofoty",
+        str_detect(commune_name, "Maromiandra") ~ "Maromiandra",
+        str_detect(commune_name, "Maromokotra-Loky") ~ "Maromokotra Loky",
+        str_detect(commune_name, "Marosavoa Bas") ~ "Marosavoa",
+        str_detect(commune_name, "Marovitsika") ~ "Marovitsika Sud",
+        str_detect(commune_name, "Merimandroso") ~ "Imerimandroso",
+        str_detect(commune_name, "Miary") ~ "Miary Ambohibola",
+        str_detect(commune_name, "Milenaka") ~ "Milenaka",
+        str_detect(commune_name, "Mitsinjo") ~ "Mitsinjo Betanimena",
+        str_detect(commune_name, "Mizilo Gare") ~ "Mizilo Gara",
+        str_detect(commune_name, "Moramanga Urbain") ~ "Moramanga",
+        str_detect(commune_name, "Morarano Gare") ~ "Morarano Gara",
+        str_detect(commune_name, "Morombe") ~ "Cu Morombe",
+        str_detect(commune_name, "Nagnarena") ~ "Nanarena Besakoa",
+        str_detect(commune_name, "Nasandratrony") ~ "Nasandratrony",
+        str_detect(commune_name, "Niarovana") ~ "Niarovana Marosampanana",
+        str_detect(commune_name, "Nosibe Masianaka") ~ "Masianaka",
+        str_detect(commune_name, "Onilhy") ~ "Onilahy",
+        str_detect(commune_name, "Port Bergé I") ~ "Port Berge",
+        str_detect(commune_name, "Port Bergé II") ~ "Port Berge II",
+        str_detect(commune_name, "Rantabe Est") ~ "Rantabe",
+        str_detect(commune_name, "Rantabe Sud") ~ "Rantabe",
+        str_detect(commune_name, "Razanaka") ~ "Vohipeno Razanaka",
+        str_detect(commune_name, "Sahamadio") ~ "Sahamadio Fisakana",
+        str_detect(commune_name, "Sahambavy") ~ "Sahambavy",
+        str_detect(commune_name, "Sahambo") ~ "Sahambano",
+        str_detect(commune_name, "Sahanivotry Atsimo") ~ "Sahanivotry Manandona",
+        str_detect(commune_name, "Sakamahily-Ouest") ~ "Sakamahily",
+        str_detect(commune_name, "Sakay") ~ "Tanamarina Sakay",
+        str_detect(commune_name, "Sakona") ~ "Sakoana",
+        str_detect(commune_name, "Sambava Urbain") ~ "Sambava Cu",
+        str_detect(commune_name, "Sarobaratra") ~ "Sarobaratra Ifanja",
+        str_detect(commune_name, "Soaindrana") ~ "Soaindrana",
+        str_detect(commune_name, "Soalara") ~ "Soalara Sud",
+        str_detect(commune_name, "Soatanana") ~ "Soatanana",
+        str_detect(commune_name, "St Augustin") ~ "Saint Augustin",
+        str_detect(commune_name, "Taindambo") ~ "Taindambo",
+        str_detect(commune_name, "Talata Ampano") ~ "Tatala Ampano",
+        str_detect(commune_name, "Talatan'Angavo") ~ "Talata Angavo",
+        str_detect(commune_name, "Taolagnaro") ~ "Fort-Dauphin",
+        str_detect(commune_name, "Tanakamba") ~ "Tanakambana",
+        str_detect(commune_name, "Tanambao  Daoud") ~ "Tanambao Daoud",
+        str_detect(commune_name, "Tanambaovatrakaka") ~ "Tanambao Vahatrakaka",
+        str_detect(commune_name, "Tanandava-Sud") ~ "Tanandava Sud",
+        str_detect(commune_name, "Tanandrano") ~ "Tandrano",
+        str_detect(commune_name, "Toamasina Suburbain") ~ "Toamasina Suburbaine",
+        str_detect(commune_name, "Tovòna") ~ "Tovona",
+        str_detect(commune_name, "Tsarahonenana") ~ "Tsarahonenana Sahanivotry",
+        str_detect(commune_name, "Tsarajomoko") ~ "Tsarajomoka",
+        str_detect(commune_name, "Tsaratanana") ~ "Tsaratanana I",
+        str_detect(commune_name, "Tsiafajavona Ankarat") ~ "Tsiafajavona Ankaratra",
+        str_detect(commune_name, "Tsianisiha") ~ "Tsianisiha",
+        str_detect(commune_name, "Tsianofàna") ~ "Tsianofana",
+        str_detect(commune_name, "Tsinjoarivo") ~ "Tsinjoarivo Imanga",
+        str_detect(commune_name, "Tsiombe") ~ "Tsihombe",
+        str_detect(commune_name, "Tsiroanomadidy Ville") ~ "Tsiroanomandidy Fihaonana",
+        str_detect(commune_name, "Tsiroanomandidy Ville") ~ "Tsiroanomandidy Fihaonana",
+        str_detect(commune_name, "Vatolatsaky") ~ "Vatolatsaka",
+        str_detect(commune_name, "Vilihazo") ~ "Viliahazo",
+        str_detect(commune_name, "Vinaninony Avaratra") ~ "Vinaninony Atsimo",
+        str_detect(commune_name, "Vineta Andamasiny") ~ "Andamasiny Vineta",
+        str_detect(commune_name, "Vohibato Ouest") ~ "Vohibato Ouest",
+        str_detect(commune_name, "Vohimarina") ~ "Vohimarina",
+        str_detect(commune_name, "Vohitrafeno") ~ "Vohitrafeno",
+        str_detect(commune_name, "Zomabealoka") ~ "Zoma Bealoka",
+        TRUE ~ commune_name
+      )
+    ) %>%
+    unique()
+  
+  
+}
+
+```
+
+```{r facility-name-standardization-application_1, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+facilities_all <- data_mh %>%
+  rename(region_name = region,
+         district_name = district,
+         commune_name = commune) %>%
+  clean_clinic_type() %>%
+  clean_clinic_name() %>%
+  clean_catchment_area()
+
+```
+
+A summary of the standardization changes is provided below.
+
+\begin{spacing}{1}
+
+\addcontentsline{lot}{table}{Table S2.6: Standardization of region names.}
+
+
+``` {r table_standardization_region_1, results = TRUE, , warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+column2 <- data_mh %>% select(commune, district, region) %>% unique()
+column1 <- facilities_all %>% select(region_name, district_name, commune_name) %>% unique()
+
+r_old <- column1 %>% select(region_name) %>% unique()
+r_new <- column2 %>% select(region) %>% unique()
+
+cbind(r_old, r_new) %>% mutate(test = region_name == region) %>%
+  filter(test == FALSE) %>%
+  relocate(region, .before = region_name) %>%
+  rename("Name in data" = region,
+         "Standardized name" = region_name) %>%
+  select(!test) %>%
+  gt() %>%
+  tab_header(
+    title = md("**Table S2.6: Standardization of region names**"))
+
+```
+
+
+\addcontentsline{lot}{table}{Table S2.7: Standardization of district names.}
+
+
+``` {r table_standardization_district_1, results = TRUE, , warning = FALSE, message = FALSE, echo = FALSE, include = TRUE}
+
+district_old <- c("Anosibe An'Ala", "Antananarivo Atsimon", "Antananarivo Avaradr", "Antananarivo Renivoh", "Fenoarivo Atsinanana", "Mananara Avaratra", "Nosy Boraha", "Ambovombe Androy", "Tsiombe", "Amboasary Atsimo", "Ankazoabo Atsimo", "Toliara I", "Toliara II", "Toliara-I", "Toliara-II", "Midongy Atsimo", "Antanambao Manampont", "Antanambao Manampotsy", "Vohibinany", "Ambatoboeny", "FenoarivoBe", "Nosy Be", "Fianarantsoa II", "lalangina", "Belo Tsiribihina", "Vohimarina", "Befandriana Avaratra", "Boriziny", "Nosy Varika")
+
+district_new <- c("Anosibe-An'ala", "Antananarivo Atsimondrano", "Antananarivo Avaradrano", "Antananarivo Renivohitra", "Fenerive Est", "Mananara-Avaratra", "Sainte Marie", "Ambovombe-Androy", "Tsihombe", "Amboasary-Atsimo", "Ankazoabo", "Toliary-I", "Toliary-II", "Toliary-I", "Toliary-II", "Midongy-Atsimo", "Antanambao Manampontsy", "Antanambao Manampontsy", "Brickaville", "Ambato Boeni", "Fenoarivobe", "Nosy-Be", "Fianarantsoa I", "Lalangina", "Belo Sur Tsiribihina", "Vohemar", "Befandriana Nord", "Port-Berge (Boriziny-Vaovao)", "Nosy-Varika")
+
+as.data.frame(cbind(district_old, district_new)) %>%
+  arrange(district_old) %>%
+  rename("Name in data" = district_old,
+         "Standardized name" = district_new) %>%
+  gt() %>%
+  tab_header(
+    title = md("**Table S2.7: Standardization of district names**")) %>%
+  tab_options(table.font.names = "Source Sans Pro") %>%
+  tab_style(
+    locations = cells_column_labels(),
+    style     = list(
+      cell_text(weight = "bold"))
+  )
+```
+
+\addcontentsline{lot}{table}{Table S2.8: Standardization of district names, based on commune name.}
+
+
+``` {r table_standardization_district_commune_1, results = TRUE, , warning = FALSE, message = FALSE, echo = FALSE, include = TRUE}
+
+district_tobechanged <- c("Antsirabe II", "Port-Berge (Boriziny-Vaovao)", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Betafo", "Vohemar", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I")
+
+
+district_communes_affected <- c("Antanamalaza", "Andribavontsona", "Ambalamidera", "Andoharanomaintso", "Anjoma-tsara", "Ankarinarivo", "Fanjakana", "Iavinomby", "Isorana", "Nasandratrony", "Soatanana", "Alakamisy Ambohimahy", "Ambalakely", "Ambalamahasoa", "Andianjanto Est", "Andrainjanto Centre", "Androy", "Fandravandava", "Ialananidro", "Ivoamba", "Mahatsinjo", "Mahatsinjony", "Sahambavy", "Taindambo", "Antanambao Ambary", "Antsahavaribe", "Ambohimahavelona", "Ambolofoty", "Anakao", "Analamisampy", "Andranohinaly", "Andranovory", "Ankililoaka", "Ankilimalinika", "Beheloka", "Behompy", "Belalanda", "Betsinjaka", "Manombo", "Manorofify", "MarofotyMarofoty", "Maromiandra", "Miary", "Milenaka", "Mitsinjo", "Soalara", "St Augustin", "Tsianisiha", "Alakamisy Itenina", "Andranomiditra", "Andranovorivato", "Ankaromalaza Mifanas", "Ihazoara", "Mahaditra", "Mahasoabe", "Maneva", "Soaindrana", "Talata Ampano", "Vohibato Ouest", "Vohimarina", "Vohitrafeno")
+
+
+district_changed <- c("Ambatolampy", "Analalava", "Isandra", "Isandra", "Isandra", "Isandra", "Isandra", "Isandra", "Isandra", "Isandra", "Isandra", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Mandoto", "Sambava", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato")
+
+
+as.data.frame(cbind(district_tobechanged, district_changed, district_communes_affected)) %>%
+  arrange(district_tobechanged) %>%
+  relocate(district_communes_affected, .before = district_tobechanged) %>%
+  rename("District name in data" = district_tobechanged,
+         "Communes" = district_communes_affected,
+         "District name, updated" = district_changed) %>%
+  gt() %>% 
+  tab_header(
+    title = md("**Table S2.8: Standardization of district names, based on commune name**")) %>%
+  tab_options(table.font.names = "Source Sans Pro") %>%
+  tab_style(
+    locations = cells_column_labels(),
+    style     = list(
+      cell_text(weight = "bold"))
+  )
+
+```
+\addcontentsline{lot}{table}{Table S2.9: Standardization of commune names.}
+
+``` {r table_standardization_commune_1, results = TRUE, , warning = FALSE, message = FALSE, echo = FALSE, include = TRUE}
+
+
+commune_old <- c("Alakamisy Ambohimahy", "Alakamisy Itenina", "Ambadrika", "Ambalakely", "Ambalamahasoa", "Ambalamanasy   II", "Ambalamidera", "AmbalapaisoII", "Ambararatabe /Nord",
+                 "Ambarijeby Atsimo", "Ambatoben'anja", "AmbatofisakaII", "AmbatoharananaI", "Ambatolampy Tsimahaf", "Ambatolampy Tsimahafotsy", "Ambatoriha/Est", "Ambatotsipihana", 
+                 "Ambatovala", "Ambatry", "Ambinanin'Andravory", "Ambinaninandro", "Ambinaniroa-Andonaka", "Ambodiadabo Maitsokely", "Ambodiadabo", "Ambodiampana Lokoho",
+                 "Ambodiampanana", "Ambodifarihy", "Ambodihazambo", "Ambodimanga  I", "Ambodimanga II-B", "Ambodimotso Atsimo", "AmbodinonokaAntaratr", "Ambodirian'Isahafary",
+                 "Amboditandroho", "Ambohibao Atsimo", "Ambohibary", "Ambohijato Mandritsara", "Ambohimahavelona", "Ambohimalaza", "Ambohimàna", "Ambohimanga Sud",
+                 "Ambohimanjaka", "AmbohimiarinaII", "Ambohitralalana", "Ambohitrandriamanitr", "AmbohitsaraEst", "Ambolidibe Atsinanana", "Ambolofoty", "Amboropotsy",
+                 "Ampasimadinika", "Ampasimborajka", "Ampasimpotsy", "Ampasipotsy Gare", "Ampasipotsy Madialaz", "Ampataka Manampaneva", "Ampataka Maroreny", "Anakao",
+                 "Analalaiva", "Analamisampy", "Analamitsivala", "Anbatomainty", "Andanandava", "Andianjanto Est", "Andimaka", "Andoharanomaintso", "Andoharanomaintso",
+                 "Andrainjanto Centre", "Andranohinaly", "Andranomiditra", "Andranomiely", "Andranovorivato", "Andranovory", "Andravola", "Andrebakely", "Andribavontsona",
+                 "Androndrona", "Androy", "Anjapaly", "Anjeke Ankilira", "Anjeva Gare", "Anjiabe", "Anjiaija", "Anjoman'Ankona", "Anjoma-tsara", "Ankadinondry", "Ankafina",
+                 "Ankarinarivo", "Ankaromalaza Mifanas", "Ankasakasa", "Ankazoabo", "Ankazotokana I", "Ankiabe Salohy", "Ankiakabe-Nord", "Ankililoaka", "Ankilimalinika",
+                 "Ankirondro", "Anontsibe", "Anosiarivo", "Anosy Tsararafara", "Antalaha", "Antanamalaza", "Antanambao Ambary", "Antanambao I", "Antanambao Manampotsy",
+                 "Antanambaon'Amberina", "Antananarivo I", "Antananarivo II", "Antananarivo III", "Antananarivo IV", "Antananarivo V", "Antananarivo VI", "Antanandava Nord",
+                 "Antananivo /Haut", "Antanetibe Mahazaza", "Antanimora- Sud", "Antenina I", "Antoby", "Antohaboto", "Antongo", "Antokoboritelo", "Antranonkarany", "Antsahavaribe",
+                 "Antsakomanondro", "Antsapanimahazo", "Antsirabe I", "Antsiranana I", "Antsoantany", "Bealampoana", "Bealanana I", "Beampombo  I", "Beandrarezona I",
+                 "Befandriana Avaratra", "Befandriana-Sud", "Befetra", "Befotaka Avaratra", "Befotaka", "Beheloka", "Behera", "Behompy", "Belafika Haut", "Belalanda",
+                 "Belambo", "Belaoko Marovato", "Belo sur Mer", "Belo Tsiribihina", "Belotsiribihina", "Bemaneviky H", "BenatoToby", "Beraketa", "Berevo Ranobe",
+                 "Beroy Sud", "Betioky Sud", "Betsakotsako Andrano", "Betsimiositra", "Betsinjaka", "Bevoay Beretra", "Bevonotro", "Efatsy Anandroza", "Enakara Haut",
+                 "Enaniiliha", "Ereda", "Etrotroka", "Fandravandava", "Fanjakana", "Faux-Cap", "Fenoevo", "Fieferana", "Foulpointe", "Ialananidro", "Iavinomby", "Ibity",
+                 "Ihaborano Namohora", "Ihazoara", "Iloto", "Imady", "Imeritsiatosika", "Isaka Ivondro", "Isaraha", "Isorana", "Ivatana", "Ivato Aéroport", "Ivoamba",
+                 "Ivony", "Kalalao", "Kianjandrandrakefina", "labohazo", "Lavaraty Ivondro", "Mahaditra", "Mahafasa", "Mahajanga I", "Mahasoabe", "Mahatsara Lefaka",
+                 "Mahatsinjo Atsinanana", "Mahatsinjo", "Mahatsinjony", "Mahazina", "Manajary Urbain", "Manakambahiny Est", "Manakambahiny Ouest", "Manakara(com)",
+                 "Manambotra Sud", "Manapatrana", "Mandromodromotra", "Maneva", "Mangarivot", "Manombo", "Manorofify", "Marintampona", "Marivorahona", "Maroarivo", 
+                 "MarofotyMarofoty", "Maromiandra", "Maromokotra-Loky", "Marosavoa Bas", "Marovitsika", "Merimandroso", "Miary", "Milenaka", "Mitsinjo", "Mizilo Gare", 
+                 "Moramanga Urbain", "Morarano Gare", "Morombe", "Nagnarena", "Nasandratrony", "Niarovana", "Nosibe Masianaka", "Onilhy", "Port Bergé I", "Port Bergé II",
+                 "Rantabe Est", "Rantabe Sud", "Razanaka", "Sahamadio", "Sahambavy", "Sahambo", "Sahanivotry Atsimo", "Sakamahily-Ouest", "Sakay", "Sakona", "Sambava Urbain",
+                 "Sarobaratra", "Soaindrana", "Soalara", "Soatanana", "St Augustin", "Taindambo", "Talata Ampano", "Talatan'Angavo", "Taolognaro", "Tanakamba", "Tanambao  Daoud",
+                 "Tanambaovatrakaka", "Tanandava-Sud", "Tanandrano", "Toamasina Suburbain", "Tovòna", "Tsarahonenana", "Tsarajomoko", "Tsaratanana", "Tsiafajavona Ankarat",
+                 "Tsianisiha", "Tsianofàna", "Tsinjoarivo", "Tsiombe", "Tsiroanomadidy Ville", "Tsiroanomandidy Ville", "Vatolatsaky", "Vilihazo", "Vinaninony Avaratra",
+                 "Vineta Andamasiny", "Vohibato Ouest", "Vohimarina", "Vohitrafeno", "Zomabealoka")
+
+commune_new <- c("Alakamisy Ambohimaha", "Alakamisy Itenina", "Ambandrika", "Ambalakely", "Ambalamahasoa", "Ambalamanasy II", "Ambalamidera II", "Ambalapaiso II", "Ambararatabe Nord",
+                 "Ambarijeby Sud", "Ambatoben'anjavy", "Ambatofisaka II", "Ambatoharanana", "Ambatolampy", "Ambatolampy", "Ambatoriha Est", "Ambatotsipihina", "Ambatolava", 
+                 "Ambatry Mitsinjo", "Ambinanin'andravory", "Ambinanindrano", "Ambinaniroa", "Ambodiadabo", "Ambodiadabo M", "Ambodiampana", "Ambodiampana", "Ambodifarihy Fenomanana",
+                 "Ambodihazoambo", "Ambodimanga I","Ambodimanga II", "Ambodimotso Sud", "Ambodinonoka", "Ambodirian'i Sahafary", "Amboditandroroho", "Ambohibao Sud",
+                 "Ambohibary Vohilena", "Mandritsara", " Ambohimahavelona", "Ambohimalaza Miray", "Ambohimana", "Ambohimanga Du Sud", "Sahatsiho Ambohimanjaka",
+                 "Ambohimiarina II", "Ambohitralanana", "Ambohitrandriamanitra", "Ambohitsara Est", "Ambolidibe Est", "Ambolofoty", "Amborompotsy", "Ampasimadinika Manambolo",
+                 "Ampasimboraka", "Ampasimpotsy Sud", "Ampasimpotsy Gara", "Ampasipotsy Mandialaza", "Manampaneva", "Ampatakamaroreny", "Anakao", "Analaiva", "Analamisampy",
+                 "Analamitsivalana", "Ambatomainty", "Antanandava", "Andrainjato Est", "Andimaky Manambolo", "Andoharanomaitso", "Andoharanomaitso", "Andrainjato Centre",
+                 "Andranohinaly", "Andranomiditra", "Rambolamasoandro Andranomiely", "Andranovorivato", "Andranovory", "Andravola Vohipeno", "Andrebakely Nord", "Andribavontsona",
+                 "Androndrono", "Androy", "Anjampaly", "Anjeky Ankilikira", "Anjeva Gara", "Anjiabe Ambony", "Anjiajia", "Anjoman'ankona", "Anjoma Itsara", "Ankadinondry Sakay",
+                 "Ankafina Tsarafidy", "Ankarinarivo Manirisoa", "Ankaromalaza Mifanasoa", "Ankasakasa Tsibiray", "Ankazoabo Sud", "Ankazotokana", "Ankiabe-Salohy", " Ankiakabe Nord",
+                 "Ankililoaka", "Ankilimalinike", "Bemarivo Ankirondro", "Anontsibe Centre", "Anosiarivo I", "Anosy Tsararafa", " Antalaha Ambonivohitra", "Antanamalaza", "Antanambao Ambary",
+                 "Antanambao", "Antanambao Manampontsy", "Antanambaon'amberina", "1er Arrondissement", "2e Arrondissement", "3e Arrondissement", "4e Arrondissement", "5e Arrondissement",
+                 "6e Arrondissement", "Antanandava", "Antananivo Haut", "Antanetibe", "Antanimora Atsimo", "Antenina", "Antoby Est", "Antohabato", "Antongo Vaovao", "Marovitsika Sud", "Antranokarany",
+                 "Antsahavaribe", "Antsakoamanondro", "Antsampanimahazo", "Antsirabe Afovoany Atsinanana", "Diego Suarez", "Antsoatany", "Bealampona", "Bealanana", "Beampombo I",
+                 "Beandrarezona", "Befandriana Nord", "Befandriana Sud", "Befeta", "Befotaka Nord", "Befotaka Sud", "Beheloka", "Behara", "Behompy", "Belafike Haut", "Belalanda",
+                 "Belambo Firaisana", "Belaoka Marovato", "Belo Sur Mer", "Belo Sur Tsiribihina", "Belo Sur Tsiribihina", "Bemaneviky Haut Sambirano", "Benato Toby", "Bereketa", 
+                 "Berevo/ranobe", "Beroy Atsimo", "Betioky Atsimo", "Betsakotsako Andranotsara", "Betsimisotra", "Betsinjaka", " Beretra Bevoay", "Bevonotra", "Efatsy", "Enakara-Haut",
+                 "Enaniliha", "Erada", "Etrotroka Atsimo", "Fandrandava", "Fanjakana", "Betanty (Faux Cap)", "Fenoevo-Efita", "Fiaferana", "Mahavelona (Foulpointe)", "Ialananindro", 
+                 "Iavonomby Vohibola", "Alatsinainy Ibity", "Namohora Iaborano", "Ihazoara", "Menamaty Iloto", "Imerina Imady", "Imerintsiatosika", "Isaka-Ivondro", "Isahara",
+                 "Isorana", "Vatana", "Ivato Aeroport", "Ivoamba", "Ivony Miaramiasa", "Ikalalao", "Kianjandrakefina", "Iabohazo", "Ivondro", "Mahaditra", "Mahafasa Centre", 
+                 "Mahajanga", "Mahasoabe", "Mahatsara Iefaka", "Mahatsinjo Est", "Mahatsinjony", "Mahatsinjony", "Mahazina Ambohipierenana", "Mananjary", "Manakambahiny Antsinanana",
+                 "Manakambahiny Andrefana", "Manakara", "Manambotra Atsimo", "Manampatrana", "Mandromondromotra", "Maneva", "Mangarivotra", "Manombo Sud", "Manorofify", "Maritampona", 
+                 "Tanambao Marivorahona", "Maroarivo Ankazomanga", "Marofoty", "Maromiandra", "Maromokotra Loky", "Marosavoa", "Marovitsika Sud", "Imerimandroso", "Miary Ambohibola", 
+                 "Milenaka", "Mitsinjo Betanimena", "Mizilo Gara", "Moramanga", "Morarano Gara", "Cu Morombe", "Nanarena Besakoa", "Nasandratrony", "Niarovana Marosampanana", 
+                 "Masianaka", "Onilahy", "Port Berge", "Port Berge II", "Rantabe", "Rantabe", "Vohipeno Razanaka", "Sahamadio Fisakana", "Sahambavy", "Sahambano", "Sahanivotry Manandona",
+                 "Sakamahily", "Tanamarina Sakay", "Sakoana", "Sambava Cu", "Sarobaratra Ifanja", "Soaindrana", "Soalara Sud", "Soatanana", "Saint Augustin", "Taindambo", "Tatala Ampano", 
+                 "Talata Angavo", "Fort-Dauphin", "Tanakambana", "Tanambao Daoud", "Tanambao Vahatrakaka", "Tanandava Sud", "Tandrano", "Toamasina Suburbaine", "Tovona", "Tsarahonenana Sahanivotry",
+                 "Tsarajomoka", "Tsaratanana I", "Tsiafajavona Ankaratra", "Tsianisiha", "Tsianofana", "Tsinjoarivo Imanga", "Tsihombe", "Tsiroanomandidy Fihaonana", 
+                 "Tsiroanomandidy Fihaonana", "Vatolatsaka", "Viliahazo", "Vinaninony Atsimo", "Andamasiny Vineta", "Vohibato Ouest", "Vohimarina", "Vohitrafeno", "Zoma Bealoka")
+
+as.data.frame(cbind(commune_old, commune_new)) %>%
+  arrange(commune_old) %>%
+  mutate(test = commune_new == commune_old) %>%
+  filter(test == FALSE) %>%
+  select(!test) %>%
+  rename("Name in data" = commune_old,
+         "Standardized name" = commune_new) %>%
+  gt() %>%
+  tab_header(
+    title = md("**Table S2.9: Standardization of commune names**")) %>%
+  tab_options(table.font.names = "Source Sans Pro") %>%
+  tab_style(
+    locations = cells_column_labels(),
+    style     = list(
+      cell_text(weight = "bold"))
+  )
+
+
+n_facilities_combined <- facilities_all  %>% nrow()
+
+
+
+```
+
+```{r housekeeping_1a, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+rm(column1, column2, data_mh_dup_names, r_new, r_old, chu_files, commune_new, commune_old, district_new, district_communes_affected, district_old, district_tobechanged, duplicates)
+
+```
+
+\end{spacing}
+
+\vspace{24 pt}
+
+```{r facility-name-manual-cleaning_1, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+facilities_all <- facilities_all %>%
+  mutate(
+      clinic_type=
+      gsub(
+        "Pharmacy",
+        "FSP",
+        clinic_type
+      ),
+    
+    #Standardizing clinic names
+    clinic_name_clean=
+      gsub(
+        "MANARA PENITRA",
+        "Manara Penitra",
+        clinic_name_clean
+      ),
+    clinic_name_clean=
+      gsub(
+        "Manara-Penitra Antsiranana",
+        "Manara Penitra",
+        clinic_name_clean
+      ),
+    clinic_name_clean=
+      gsub("Vakinakaratra", "Vakinankaratra", clinic_name_clean),
+    clinic_name =
+      gsub(
+        "Hopitaly MANARA-PENITRA",
+        "Hopitaly Manara Penitra",
+        clinic_name
+      ),
+    clinic_name =
+      gsub(
+        "Hopitaly Manara-Penitra Antsiranana",
+        "Hopitaly Manara Penitra",
+        clinic_name
+      ),
+    
+        clinic_name_clean =
+      gsub(
+        "Manara Penitra Antsiranana",
+        "Manara Penitra",
+        clinic_name_clean
+      ),
+    clinic_name =
+      gsub("Vakinakaratra", "Vakinankaratra", clinic_name)
+  ) %>%
+  unique()
+
+n_FSP <- facilities_all %>% filter(clinic_type == "FSP") %>% nrow()
+n_CSB <- facilities_all %>% filter(clinic_type == "CSB") %>% nrow()
+n_CSB1 <- facilities_all %>% filter(clinic_type == "CSB1") %>% nrow()
+n_CSB2 <- facilities_all %>% filter(clinic_type == "CSB2") %>% nrow()
+n_CHD <- facilities_all %>% filter(clinic_type == "CHD") %>% nrow()
+n_CHD1 <- facilities_all %>% filter(clinic_type == "CHD1") %>% nrow()
+n_CHD2 <- facilities_all %>% filter(clinic_type == "CHD2") %>% nrow()
+n_CHRR <- facilities_all %>% filter(clinic_type == "CHRR") %>% nrow()
+n_CHU <- facilities_all %>% filter(clinic_type == "CHU") %>% nrow()
+n_CHRRCHU <- facilities_all %>% filter(clinic_type == "CHRR/CHU") %>% nrow()
+
+n_dif <- facilities_all %>% nrow
+n_dif <- n_facilities_combined - n_dif
+
+facilities_all <- facilities_all %>%
+    arrange(clinic_name, region_name, district_name, commune_name) %>%
+  mutate(facility_ID = seq.int(nrow(.)))
+
+
+n_facilities_new <- facilities_all  %>% nrow()
+
+facilities_all_nogps <- facilities_all
+facilities_all_gps <- facilities_all_nogps[-(1:nrow(facilities_all_nogps)),]
+facilities_all_gps <- facilities_all_gps %>% mutate(source ="") %>% mutate(geometry ="")
+```
+
+After standardizing facility types and catchment areas, the sample consisted of `r  prettyNum(n_facilities_combined, big.mark = ",", scientific = FALSE)` unique facilities. This list of facilities was then manually inspected for any remaining duplicates. From reviewing this list, we observed that in the Diana region, the regional hospitals named "Hopitaly MANARA-PENITRA" and "Hopitaly Manara-Penitra Antsiranana" are duplicates, but appear separately because the later name contains the city the hospital is located in, Antsiranana. We standardized the names of those facilities, which resolved `r  prettyNum(n_dif, big.mark = ",", scientific = FALSE)` duplicate(s).
+
+The final sample of `r  prettyNum(n_facilities_new, big.mark = ",", scientific = FALSE)` unique facilities consisted of:
+
+*  `r  prettyNum(n_CSB +n_CSB1 +n_CSB2, big.mark = ",", scientific = FALSE)` CSB facilities, including `r  prettyNum(n_CSB1, big.mark = ",", scientific = FALSE)` CSB1s, `r  prettyNum(n_CSB2, big.mark = ",", scientific = FALSE)` CSB2s, and `r  prettyNum(n_CSB, big.mark = ",", scientific = FALSE)` of unknown level;
+*   `r  prettyNum(n_FSP, big.mark = ",", scientific = FALSE)`  FSP facilities;
+*  `r  prettyNum(n_CHD + n_CHD1 + n_CHD2, big.mark = ",", scientific = FALSE)`  district hospitals, including `r  prettyNum(n_CHD1, big.mark = ",", scientific = FALSE)` CHD1 facilities, `r  prettyNum(n_CHD2, big.mark = ",", scientific = FALSE)` CHD2 facilities, and `r  prettyNum(n_CHD, big.mark = ",", scientific = FALSE)` facilities of unknown level, and
+*  `r  prettyNum(n_CHRR +n_CHU +n_CHRRCHU, big.mark = ",", scientific = FALSE)` regional hospitals, including `r  prettyNum(n_CHRR, big.mark = ",", scientific = FALSE)` CHRRs, `r  prettyNum(n_CHU, big.mark = ",", scientific = FALSE)` CHUs, and `r  prettyNum(n_CHRRCHU, big.mark = ",", scientific = FALSE)` of unknown type.
+
+\newpage
+
+\paragraph*{Matching Approach}
+
+\addcontentsline{toc}{paragraph}{Matching Approach}
+
+```{r function_gps-source-prep_1, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+# Throughout the code, we will be creating unique IDs to help match strings 
+# and facility joining of subseted data more easily. We define some prep functions here:
+
+gps_source_join_map <- function(data){
+  map_mdg_3 %>%
+  st_transform(., crs = 4326) %>% 
+  st_join(data,., join = st_within) %>%
+  select(clinic_name, clinic_type, source, 
+         COMMUNE_NA, DISTRICT_N, REGION_NAM, geometry) %>%
+  rename(commune_name = COMMUNE_NA, 
+         district_name = DISTRICT_N,
+         region_name = REGION_NAM) %>%
+      clean_clinic_name() %>%
+      clean_catchment_area() %>%
+      gps_source_match_prep() %>%
+    filter(!is.na(commune_name) & !is.na(district_name) & !is.na(region_name))
+    
+  }
+
+gps_source_match_prep <- function(data){
+  
+  data %>% mutate(ID =  seq.int(nrow(.)))
+  
+}
+
+n_facilities <- function(data){
+  nam <- paste("n_facilities", gps_source, sep = "_")
+  n_fac <- data %>% nrow()
+  assign(nam, n_fac,envir = .GlobalEnv)
+}
+
+map_clean_arrondis <- function(data){
+  
+data %>%  
+    
+    #  We drop the commune name for ALL hospitals
+    mutate(commune_name = ifelse(str_detect(clinic_type, "CH"),"",commune_name)) %>%
+    
+    #  We drop the district name for district and regional hospitals
+    mutate(district_name = ifelse(str_detect(clinic_type, "CHR"),"",district_name)) %>%
+    mutate(district_name = ifelse(str_detect(clinic_type, "CHU"),"",district_name)) %>%
+    
+    # In our data, Antananarivo Renivohitra had not yet been separated into separate
+    # districts whose names were the same as the communes. To aid in matching, we 
+    # replace the 6 district names for the 6 arrondissemenets as follows:
+    mutate(district_name = case_when(
+      str_detect(district_name, "Arrondissement") ~ "Antananarivo Renivohitra",
+      TRUE ~ district_name)) 
+}
+
+map_coordinates <- function(data, palette){
+
+  data %>%
+  mutate(type_2 = clinic_type,
+         type_2 = gsub("Pharmacy", "Other/Unknown", type_2),
+         type_2 = case_when(
+           str_detect(type_2, "CH") 
+           ~ "CHD/CHRR/CHU",
+           str_detect(type_2, "Hospital") 
+           ~ "CHD/CHRR/CHU",
+           TRUE ~ type_2)) %>%
+  ggplot(aes(geometry = geometry)) +
+  geom_sf(data = map_mdg_3_un,
+          size = 0.2,
+          color = col_grey_light,
+          fill = NA) +
+  geom_sf(data = map_mdg_2_un,
+          size = 0.2,
+          color = col_grey_med,
+          fill = NA) +
+  geom_sf(data = map_mdg_1_un,
+          size = 0.2,
+          color = col_black,
+          fill = NA) +
+  # geom_sf_text(data = map_mdg_1_un, aes(label = ADM1_EN),
+  #              size = 2, color = col_grey_light) +
+  theme_void() +
+  theme(text = element_text(family = "Source Sans Pro")) +
+  geom_sf(aes(color = (type_2)), alpha = 0.5, size = .75) +
+  scale_color_manual(values = palette,
+                     name = "Facility type")
+}
+
+# This code is not implemented, but is from 
+# https://milospopovic.net/crisp-topography-map-with-r/
+# and would add elevation for the image.
+
+
+# windowsFonts(georg = windowsFont('Georgia'))
+# 
+# # libraries we need
+# libs <- c("elevatr", "terra", "tidyverse", 
+#           "sf", "giscoR", "marmap")
+# 
+# # install missing libraries
+# installed_libs <- libs %in% rownames(installed.packages())
+# if (any(installed_libs == F)) {
+#   install.packages(libs[!installed_libs])
+# }
+# 
+# # load libraries
+# invisible(lapply(libs, library, character.only = T))
+# 
+# # 1. GET COUNTRY MAP
+# #---------
+# 
+# crsLONGLAT <- "+proj=longlat +datum=WGS84 +no_defs"
+# 
+# get_sf <- function(country_sf, country_transformed) {
+#   
+#   country_sf <- giscoR::gisco_get_countries(
+#     year = "2016",
+#     epsg = "4326",
+#     resolution = "10",
+#     country = "Madagascar")
+#   
+#   country_transformed <- st_transform(country_sf, crs = crsLONGLAT)
+#   
+#   return(country_transformed)
+# }
+# 
+# country_transformed <- get_sf()
+# 
+# # 2. GET ELEVATION DATA
+# #---------
+# 
+# get_elevation_data <- function(country_elevation, country_elevation_df) {
+#   
+#   country_elevation <- get_elev_raster(
+#     locations = country_transformed, 
+#     z = 9, 
+#     clip = "locations") 
+#   
+#   country_elevation_df <- as.data.frame(country_elevation, xy = T) %>%
+#     na.omit()
+#   
+#   colnames(country_elevation_df)[3] <- "elevation"
+#   
+#   return(country_elevation_df)
+# }
+# 
+# country_elevation_df <- get_elevation_data()
+# 
+# 
+# 
+# # 3. MAP
+# #---------
+# 
+# get_elevation_map <- function(country_map) {
+#   
+#   country_map <- ggplot() +
+#     geom_tile(data = country_elevation_df, 
+#               aes(x = x, y = y, fill = elevation)) +
+#     scale_fill_etopo() +
+#     coord_sf(crs = crsLONGLAT)+
+#     theme_minimal() +
+#     theme(text = element_text(family = "georg", color = "#22211d"),
+#           axis.line = element_blank(),
+#           axis.text.x = element_blank(),
+#           axis.text.y = element_blank(),
+#           axis.ticks = element_blank(),
+#           axis.title.x = element_blank(),
+#           axis.title.y = element_blank(),
+#           legend.position = "none",
+#           panel.grid.major = element_line(color = "white", size = 0.2),
+#           panel.grid.minor = element_blank(),
+#           plot.title = element_text(size=18, color="grey20", hjust=1, vjust=-5),
+#           plot.caption = element_text(size=8, color="grey70", hjust=.15, vjust=20),
+#           plot.margin = unit(c(t=0, r=0, b=0, l=0),"lines"), #added these narrower margins to enlarge maps
+#           plot.background = element_rect(fill = "white", color = NA), 
+#           panel.background = element_rect(fill = "white", color = NA),
+#           panel.border = element_blank()) +
+#     labs(x = "", 
+#          y = NULL, 
+#          title = "Topographic map of Madagascar", 
+#          subtitle = "")
+#   
+#   return(country_map)
+# }
+# 
+# 
+# get_elevation_map()
+
+
+```
+
+```{r function_approximate-string-matching, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+
+approximate_string_match  <- function(data,   # Df w/o coordinates
+                                      data_2, # Df w/ coordinates
+                                      option, # What level of catchment area should matching be done against?
+                                      type, # What restriction of facility type, if any, should be placed on the sample? 
+                                      strip_type = FALSE # Should the clinic type be ommitted?
+){
+  
+  if (type == "all") {
+    print("Matching against ALL facilities without coordinates")
+    data_2 <- data_2 %>%  map_clean_arrondis()
+  }
+  
+  if (type == "primary"){
+    
+    print("Matching against CSB/FSP facilities without coordinates")
+
+          data <- data %>% filter(clinic_type == "CSB" | clinic_type == "FSP" | 
+                                clinic_type == "CSB1" |clinic_type == "CSB2" )
+      data_2 <- data_2 %>%  filter(clinic_type == "CSB" | clinic_type == "FSP" | 
+                                clinic_type == "CSB1" |clinic_type == "CSB2" ) %>%
+        map_clean_arrondis()
+
+  }
+    
+  if (type == "district"){
+    
+    print("Matching against CHD facilities without coordinates")
+
+      data <- data %>% filter(clinic_type_clean == "CHD")
+      data_2 <- data_2 %>% filter(clinic_type_clean == "CHD") %>%
+        map_clean_arrondis()
+  }  
+  
+      
+  if (type == "region"){
+    
+    print("Matching against CHR and CHU facilities without coordinates")
+
+      data <- data %>% filter(clinic_type_clean == "CHR/CHU")
+      data_2 <- data_2 %>% filter(clinic_type_clean == "CHR/CHU") %>%
+        map_clean_arrondis()
+
+  }  
+  
+    if (type == "hospitals"){
+    
+    print("Matching against CHD, CHR, and CHU facilities without coordinates")
+
+      data <- data %>% filter(clinic_type != "CSB" & clinic_type != "FSP" &
+                                clinic_type != "CSB1" & clinic_type != "CSB2" )
+      data_2 <- data_2 %>%  filter(clinic_type != "CSB" & clinic_type != "FSP" & 
+                                clinic_type != "CSB1" & clinic_type != "CSB2" ) %>%
+        map_clean_arrondis()
+
+  }  
+  
+  if (type == "centroid_fokontany") {
+      
+    data_trim <- data %>% 
+      filter(!is.na(commune_name)) %>%
+      mutate(full_name = paste(region_name, district_name, commune_name, clinic_name_clean, sep = " ")) %>%
+      mutate(full_name = gsub("  ", " ", full_name),
+             full_name = trimws(full_name)) %>%
+      arrange(full_name) %>%
+      filter(!str_detect(full_name, "MSI"))
+    
+    # We then retrieve the unique commune-district-region names from our map data
+    data_trim_2 <- data_2 %>% 
+        mutate(DISTRICT_N = case_when(
+        str_detect(DISTRICT_N, "Arrondissement") ~ "Antananarivo Renivohitra",
+        TRUE ~ DISTRICT_N)) %>%
+      mutate(full_name = paste(REGION_NAM, DISTRICT_N, COMMUNE_NA, FOKONTANY_, 
+                                         sep = " ")) %>%
+      mutate(full_name = gsub("  ", " ", full_name),
+             full_name = trimws(full_name)) %>%
+      arrange(full_name) %>%
+      unique() %>%
+      
+      # We then calculate the area in km^2 for each commune
+      mutate(area_km = as.numeric(st_area(geometry)/1000000)) %>%
+      
+      # Find the centroid of each commune
+      st_centroid() %>%
+      
+      # And drop all columns except for the unique commune-district-region name, centroid, and area
+      select(area_km, full_name, geometry)
+
+    }
+  
+      if (type == "centroid_commune") {
+      
+  
+# We select all commune-level facilities and create a unique commune name, which includes
+# the commune, district, and region name (as some commune names may not be unique)
+data_trim <- data %>% 
+  filter(!is.na(commune_name)) %>%
+  mutate(full_name = paste(region_name, district_name, commune_name, sep = " ")) %>%
+  mutate(full_name = gsub("  ", " ", full_name),
+         full_name = trimws(full_name)) %>%
+  arrange(full_name) 
+
+# We then retrieve the unique commune-district-region names from our map data
+data_trim_2 <- data_2 %>%
+    mutate(DISTRICT_N = case_when(
+    str_detect(DISTRICT_N, "Arrondissement") ~ "Antananarivo Renivohitra",
+    TRUE ~ DISTRICT_N)) %>%
+  mutate(full_name = paste(REGION_NAM, DISTRICT_N, COMMUNE_NA, sep = " ")) %>%
+  mutate(full_name = gsub("  ", " ", full_name),
+         full_name = trimws(full_name)) %>%
+  arrange(full_name) %>%
+  unique() %>%
+  
+  # We then calculate the area in km^2 for each commune
+  mutate(area_km = as.numeric(st_area(geometry)/1000000)) %>%
+  
+  # Find the centroid of each commune
+  st_centroid() %>%
+  
+  # And drop all columns except for the unique commune-district-region name, centroid, and area
+  select(area_km, full_name, geometry)
+
+
+  }
+ 
+  
+  
+
+  if (option == "commune") {
+    data_trim <- data %>%
+      mutate(
+        full_name = paste(
+          ifelse(strip_type == TRUE,"", clinic_type),
+          clinic_name_clean,
+          commune_name,
+          district_name,
+          region_name,
+          sep = " "
+        )
+      )
+
+    data_trim_2 <- data_2 %>%
+      mutate(
+        full_name = paste(
+          ifelse(strip_type == TRUE,"", clinic_type),
+          clinic_name_clean,
+          commune_name,
+          district_name,
+          region_name,
+          sep = " "
+        )
+      )
+
+  }
+
+  if (option == "district") {
+    data_trim <- data %>%
+      mutate(full_name = paste(
+          ifelse(strip_type == TRUE,"", clinic_type),
+                               clinic_name_clean,
+                               district_name,
+                               region_name,
+                               sep = " "))
+
+    data_trim_2 <- data_2 %>%
+      mutate(full_name = paste(
+          ifelse(strip_type == TRUE,"", clinic_type),
+                               clinic_name_clean,
+                               district_name,
+                               region_name,
+                               sep = " "))
+
+
+  }
+
+  if (option == "region") {
+    data_trim <- data %>%
+      mutate(full_name = paste(
+          ifelse(strip_type == TRUE,"", clinic_type),
+                               clinic_name_clean,
+                               region_name,
+                               sep = " "))
+
+    data_trim_2 <- data_2 %>%
+      mutate(full_name = paste(
+          ifelse(strip_type == TRUE,"", clinic_type),
+                               clinic_name_clean,
+                               region_name,
+                               sep = " "))
+
+  }
+
+    
+  
+  # Now that the concatenated string for matching has been specified, a subset of the data
+  # are created that contain only the concatenated string ("full name") and an ID
+
+  data_no_gps <- data_trim %>%
+    select(full_name, facility_ID) %>%
+    mutate(full_name = str_squish(full_name))
+
+  
+     if (option == "none"){
+      
+    print("Matching on centroid")
+    data_gps <- data_trim_2 %>%
+    select(full_name, area_km) %>%
+    mutate(full_name = str_squish(full_name))
+    } else(
+  data_gps <- data_trim_2 %>%
+    select(full_name, ID) %>%
+    mutate(full_name = str_squish(full_name))
+    )
+
+  ## We can save on run time by using innerjoin to match facilities where a match is identical
+  perfect_matches <- inner_join(data_gps, data_no_gps)
+in_perfect_matches <- perfect_matches %>% select(facility_ID) %>% unique()
+  in_perfect_matches <- as.vector(in_perfect_matches$facility_ID)
+  data_no_gps <- data_no_gps %>%    
+    filter(!facility_ID %in% in_perfect_matches) 
+  
+  perfect_matches <-  perfect_matches %>% mutate(adist = 0, full_name_gps = full_name)
+
+    
+  # We then create apply the approximate string matching function, adist()
+  # and calculate for each member of the dataframe w/o coordinates its
+  # closest (by Levenshtein distance) pair in the dataframe w/ coordinates
+
+  dist.name <- adist(
+    data_no_gps$full_name,
+    data_gps$full_name,
+    partial = TRUE,
+    ignore.case = TRUE
+  )
+
+  min.name <- apply(dist.name, 1, min)
+
+  match.nogps.gps <- NULL
+  for (i in 1:nrow(dist.name)) {
+    s2.i <- match(min.name[i], dist.name[i, ])
+    s1.i <- i
+
+
+    match.nogps.gps <- rbind(
+      data.frame(
+        s2.i = s2.i,
+        s1.i = s1.i,
+        s2name = data_gps[s2.i, ]$full_name,
+        s1name = data_no_gps[s1.i, ]$full_name,
+        adist = min.name[i]
+      ),
+      match.nogps.gps
+    )
+
+  }
+
+ asm_matches <- match.nogps.gps %>%
+    rename(full_name = s2name) %>%
+    inner_join(., data_gps) %>%
+    rename(full_name_gps = full_name,
+           full_name = s1name)  %>%
+    inner_join(., data_no_gps) %>%
+    select(!c(s2.i, s1.i)) %>%
+   rbind(perfect_matches) %>%
+       arrange(adist)
+ 
+
+
+  assign("asm_match", asm_matches, envir = .GlobalEnv)
+  
+}
+
+table_aprox_string_matches <- function() {
+  
+  asm_match %>%
+    sample_frac(sample_fraction) %>% 
+    st_drop_geometry %>%
+    arrange(adist) %>%
+    select(full_name, full_name_gps, adist) %>%
+    rename("String (sample)" = full_name,
+           "String (coord.)"= full_name_gps,
+           "Levenshtein distance" = adist) %>%
+    gt() %>%
+    tab_header(
+    title = md(paste0("Step ",
+                            gsub("step_", "", step),
+                            ": Approximate string matches"))) %>%
+  tab_options(table.font.names = "Source Sans Pro") %>%
+  tab_style(
+    locations = cells_column_labels(),
+    style     = list(
+      cell_text(weight = "bold"))
+  )
+}
+
+# Now that the approximate string matches have been calculated, it is
+# possible to apply a maximum tolerable Levenshtein distance between pairs.
+# This function then applies that maximum, keeping only
+# pairs that are equal to or below that maximum distance.
+# It then adds those coordinates to the dataframe of facilities w/ coordinates.
+
+approximate_string_match_bind <- function(max_distance) {
+  asm_matches_retained <-
+    asm_match %>% filter(adist <= max_distance) %>%
+    unique()
+  
+  # Save matches that have been retained
+  
+  assign(paste("asm_matches_retained", step, sep = "_"), asm_matches_retained, envir = .GlobalEnv)
+  
+  # Save the number of matches, based on Levenshtein distance
+  
+  for (i in 0:max_distance) {
+    nam <- paste("n_adist", gps_source, i, sep = "_")
+    n_adist <-
+      asm_matches_retained %>% filter(adist == i) %>% nrow()
+    assign(nam, n_adist, envir = .GlobalEnv)
+  }
+  
+  facilities_all_gps_temp <- asm_matches_retained %>%
+    select(geometry, facility_ID) %>%
+    unique()
+  
+  duplicates <-
+    facilities_all_gps_temp$facility_ID[duplicated(facilities_all_gps_temp$facility_ID)]
+  
+  facilities_all_gps_temp <- facilities_all_gps_temp %>%
+    filter(!facility_ID %in% duplicates) %>%
+    mutate(source = label) %>%
+    inner_join(facilities_all)
+  
+  n_matched_facilities_temp <-   facilities_all_gps_temp %>% nrow()
+  
+  facilities_all_gps <-
+    rbind(facilities_all_gps, facilities_all_gps_temp) %>% unique()
+  
+  n_matched_facilities <- facilities_all_gps %>% nrow()
+  
+  with_gps <- facilities_all_gps %>% select(facility_ID) %>% unique()
+  with_gps <- as.vector(with_gps$facility_ID)
+  
+  facilities_all_nogps <- facilities_all %>%
+    filter(!facility_ID %in% with_gps) %>%
+    unique()
+  
+  n_unmatched_facilities <- facilities_all_nogps %>% nrow()
+  
+  assign("facilities_all_gps", facilities_all_gps, envir = .GlobalEnv)
+  assign("facilities_all_nogps", facilities_all_nogps, envir = .GlobalEnv)
+  assign(paste("n_matched_facilities", gps_source, sep = "_"),
+         n_matched_facilities_temp,
+         envir = .GlobalEnv  )
+  assign(paste("n_matched_facilities", step, sep = "_"),
+         n_matched_facilities, 
+         envir = .GlobalEnv)
+  assign("n_unmatched_facilities", n_unmatched_facilities, envir = .GlobalEnv)
+  
+}
+
+approximate_string_match_bind_centroid <- function(max_distance) {
+  
+  asm_matches_retained <-
+    asm_match %>% filter(adist <= max_distance) %>%
+    unique()
+  
+  # Save matches that have been retained
+  
+  assign(paste("asm_matches_retained", step, sep = "_"), asm_matches_retained, envir = .GlobalEnv)
+  
+  # Save the number of matches, based on Levenshtein distance
+  
+  for (i in 0:max_distance) {
+    nam <- paste("n_adist", gps_source, i, sep = "_")
+    n_adist <-
+      asm_matches_retained %>% filter(adist == i) %>% nrow()
+    assign(nam, n_adist, envir = .GlobalEnv)
+  }
+  
+  facilities_all_gps_temp <- asm_matches_retained %>%
+    filter(area_km <= ifelse(gps_source == "commune", commune_lim, fokontany_lim)) %>%
+    st_sf() %>% 
+    st_transform(crs = 4326) %>%
+    select(geometry, facility_ID) %>%
+    unique()
+  
+  duplicates <-
+    facilities_all_gps_temp$facility_ID[duplicated(facilities_all_gps_temp$facility_ID)]
+  
+  facilities_all_gps_temp <- facilities_all_gps_temp %>%
+    filter(!facility_ID %in% duplicates) %>%
+    mutate(source = label) %>%
+    inner_join(facilities_all)
+  
+  n_matched_facilities_temp <-   facilities_all_gps_temp %>% nrow()
+  
+  facilities_all_gps <-
+    rbind(facilities_all_gps, facilities_all_gps_temp) %>% unique()
+  
+  n_matched_facilities <- facilities_all_gps %>% nrow()
+  
+  with_gps <- facilities_all_gps %>% select(facility_ID) %>% unique()
+  with_gps <- as.vector(with_gps$facility_ID)
+  
+  facilities_all_nogps <- facilities_all %>%
+    filter(!facility_ID %in% with_gps) %>%
+    unique()
+  
+  n_unmatched_facilities <- facilities_all_nogps %>% nrow()
+  
+  assign("facilities_all_gps", facilities_all_gps, envir = .GlobalEnv)
+  assign("facilities_all_nogps", facilities_all_nogps, envir = .GlobalEnv)
+  assign(paste("n_matched_facilities", gps_source, sep = "_"),
+         n_matched_facilities_temp,
+         envir = .GlobalEnv  )
+  assign(paste("n_matched_facilities", step, sep = "_"),
+         n_matched_facilities, 
+         envir = .GlobalEnv)
+  assign("n_unmatched_facilities", n_unmatched_facilities, envir = .GlobalEnv)
+  
+}
+
+```
+
+**Step 1: Matching to validated spatial inventory of public facilities in Sub-Saharan Africa (Maina et al.)**
+``` {r step_1-loading_data, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+step = "step_1"
+gps_source = "who"
+label = "Exact - Validated sources"
+
+facilities_gps_who <- st_read(paste(data_gps_sources_reposit, 
+                                    "OCHA",
+                                    "suhsharan_health_facilities",
+                                    "sub-saharan_health_facilities.shp",
+                                    sep = "/")) %>%
+  filter(Country == "Madagascar") %>%
+  filter(Lat !=0 & Long !=0) %>%
+  mutate(clinic_name = Facility.n,
+         clinic_type = Facility.t,
+         
+         # Unfortunately, CHD, CHR, and CHU hospitals 
+         # are combined under "Hospital"
+         # so the shared prefix "CH" is used to reduce distance 
+         # to any hospital match
+         
+         clinic_type = gsub("Hospital", "CH", clinic_type),
+         
+         # "Health Post" corresponds to CSB1
+         
+         clinic_type = gsub("Health Post", "CSB1", clinic_type),
+         
+         # "Health Centre" corresponds to CSB2
+         clinic_type = gsub("Health Centre", "CSB2", clinic_type)) %>%
+  select(!c(Country, Ownership)) %>%
+    rename(source = LL.source,
+         latitude = Lat,
+         longitude = Long) 
+
+# We will be adding these data to an expanded spatial inventory later;
+# let us save a standardized subset of the columns for later use
+
+facilities_gps_who_0 <- facilities_gps_who %>%
+  select(clinic_type, latitude, longitude, source, clinic_name) %>%
+  st_drop_geometry()
+
+# Returning to the original inventory, we standardize commune, district,
+# and region names for the coordinates we observed
+
+facilities_gps_who <- facilities_gps_who%>%
+  gps_source_join_map()
+
+n_facilities(facilities_gps_who)
+
+```
+
+We began by gathering data from a validated spatial inventory of health facilities in Sub-Saharan Africa, @mainaSpatialDatabaseHealth2019 of which `r format(as.numeric(n_facilities_who), big.mark = ",")` coordinates were available for public facilities in Madagascar. 
+
+<!-- A figure of the facilities from the validated spatial inventory is below: -->
+
+<!-- ```{r figure_avail_gps_val,  results = TRUE, warning = FALSE, message = FALSE, echo = FALSE, include = TRUE} -->
+
+<!-- #fig.cap="\\label{figure_avail_gps}Validated spatial inventory of health facilities."} -->
+
+<!-- # Let's visualize the different coordinates we have available. -->
+
+<!-- facilities_gps_who %>%  -->
+<!--   map_coordinates(c(col_CH, col_CSB1, col_CSB2)) -->
+
+<!-- ``` -->
+
+In order to systematically match facilities in our sample to facilities in the spatial inventory, we implemented an approximate string matching technique. This technique—also known as "fuzzy string searching"—is a common approach to record linkage, where information from one source (e.g., our sample) needs to be linked to data from another (e.g., the spatial inventory). As its name suggests, this techniques allows for "strings" of text to be matched approximately, rather than exactly, to corresponding patterns. In our case, this can be helpful if the facility name is spelled slightly differently in our sample versus the spatial inventory, due to typographic errors in the raw data or small orthographic variations (e.g., writing "2" as "II", inclusion or omission of a dash, etc.). A description of how this approach can be implemented in R is available at www.R-bloggers.com. @docFuzzyStringMatching2015
+
+To account for similarly named facilities located in different regions, we constructed a full, standardized name for each facility that included facility name and catchment area prior to applying our matching technique. Facility type was standardized to align with the facility types in our sample. For example, the full, standardized name for the Alakamisy Tsarazaza Health Post located in the commune of Tsarazazaa in the Fandrian district of Amoron'I Mania region would be "Alakamisy Tsarazaza Tsarazazaa Fandrian Amoron'I Mania", with the facility classified as a CSB1 facility). 
+
+The similarity between two strings of text can be measured numerically using the Levenshtein (or edit) distance. @konstantinidisComputingEditDistance2007 The Levenshtein distance between two identical strings will be zero, while strings involving a single character edit (insertions, deletions or substitutions) will involve a distance of 1.
+
+To identify the closest matches between the full, standardized facility names in our sample and the spatial inventory, we calculated a matrix identifying the pair-wise Levenshtein distance between all possible combinations. For each member of our sample, we then selected the facility in the spatial inventory with the lowest Levenshtein distance (i.e., the nearest pair). 
+
+To maximize pair accuracy, we separately conducting matching among primary health facilities (i.e., FSPs and CSBs) and among hospitals (i.e., CHDs, CHRRs, and CHUs). For primary health facilities, the full, standardized facility names included the facility's region, district, and commune; for hospitals, the full name included the region and district only. To apply a conservative matching approach, we restricted matches to those with a Levenshtein distance no greater than 2.
+
+```{r step_1-approximate-string-matches-1, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+# Identify matched pairs with plausible matched information
+gps_source = "who_primary"
+approximate_string_match(facilities_all_nogps, facilities_gps_who, option = "commune", type = "primary", strip_type = TRUE)
+approximate_string_match_bind(2)
+
+```
+
+```{r step_1-approximate-string-matches-2, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+# Identify matched pairs with plausible matched information
+gps_source = "who_hospitals"
+approximate_string_match(facilities_all_nogps, facilities_gps_who, option = "district", type = "hospitals", strip_type = TRUE)
+approximate_string_match_bind(2)
+
+```
+
+<!-- A sample of nearest pairs from this matching in Step 1 is provided below: -->
+
+<!-- ```{r table_step_1_approximate_matches, results = TRUE, out.width="100%", warning = FALSE, message = FALSE, echo = FALSE, include = TRUE} -->
+
+<!-- tab_step_1 <-  table_aprox_string_matches() %>% -->
+<!--   tab_options(table.font.size = 10) %>% -->
+<!--   cols_width( -->
+<!--     ends_with("distance") ~ px(60), -->
+<!--     everything() ~ px(280) -->
+<!--   ) -->
+
+<!-- tab_step_1 %>% gtsave("tab_step_1.png") -->
+
+<!-- knitr::include_graphics("tab_step_1.png") -->
+
+<!-- # We restricted matches to those where hospitals were matched with hospitals, CSB1 facilities were matched to CSB1 facilities, and CSB2 facilities were matched to CSB2 facilities.   -->
+
+<!-- <!-- ``` --> 
+<!-- \newpage -->
+
+
+Using this approach, `r format(as.numeric(n_matched_facilities_step_1), big.mark = ",")` facilities (`r round(as.numeric(n_matched_facilities_step_1)/n_facilities_new * 100,0)`%) in our sample were matched to validated coordinates, of which `r format(as.numeric(n_adist_who_primary_0 + n_adist_who_hospitals_0), big.mark = ",")` facilities were matched based on identical string matches,  `r format(as.numeric(n_adist_who_primary_1 + n_adist_who_hospitals_1), big.mark = ",")` facilities were matched based on string matches with a Levenshtein distance of 1, and `r format(as.numeric(n_adist_who_primary_2 + n_adist_who_hospitals_2), big.mark = ",")` facilities  were matched based on string matches with a Levenshtein distance of 2.
+
+**Step 2: Matching to facility data from RHINoVision Decision Support System**
+
+We then gathered public health facility coordinate data from the RHINoVision Decision Support System, @rhinovisiondecisionsupportsystemMadagascarDecisionSupport which supports an open source database of health facility data in conjunction with USAID, the government of Madagascar, and other stakeholders. 
+
+```{r step_2-loading_data, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+step = "step_2"
+gps_source = "rhino"
+label = "Exact - RHINoVision"
+
+facilities_gps_3 <- read.csv(paste(data_gps_sources_reposit,
+                                   'MDMFL.csv', sep = "/"), 
+                             header=TRUE) %>%
+  rename(longitude = Longitude, latitude = Latitude, 
+         district_name = CommuneNom,
+         clinic_name = FacilityNom, 
+         clinic_type = FacilityType) %>%
+  select(district_name, clinic_name, 
+         clinic_type, latitude, longitude) %>%
+  
+  # Drop missing values
+  filter(latitude != 0) %>%
+  filter(longitude != 0) %>%
+  unique() %>%
+  mutate(source = "RHINoVision Decision Support System") %>%
+  select(clinic_name, longitude, latitude, source, clinic_type) 
+
+facilities_gps_rhino <- facilities_gps_3 %>%
+  st_as_sf(., coords = c("longitude", "latitude"), 
+           crs = 4326) 
+
+facilities_gps_rhino <- facilities_gps_rhino %>%
+ gps_source_join_map()
+
+n_facilities(facilities_gps_rhino)
+
+```
+
+RHINoVision's spatial inventory included coordinates for `r format(as.numeric(n_facilities_rhino), big.mark = ",")` primary health facilities in Madagascar. 
+
+<!-- A visualization of the available coordinates is provided below: -->
+
+<!-- ```{r figure_avail_gps_RHINO, results = TRUE, warning = FALSE, message = FALSE, echo = FALSE, include = TRUE} -->
+
+<!-- #fig.cap="\\label{figure_avail_gps}Expanded spatial inventory of health facilities."} -->
+
+<!-- # Let's visualize the different coordinates we have available. -->
+
+<!-- facilities_gps_rhino %>%  -->
+<!--   map_coordinates(c(col_CSB1, col_CSB2)) -->
+
+<!-- ``` -->
+
+We applied the same approximate string matching technique as in Step 1 against the RHINoVision spatial inventory, restricting matches only to primary health facilities in our sample (so as not to allow hospitals to be matched against the spatial inventory of basic health facilities). 
+
+```{r step_2-approximate-string-matches, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+# Identify matched pairs with plausible matched information
+
+approximate_string_match(facilities_all_nogps, facilities_gps_rhino, option = "commune", type = "primary", strip_type = TRUE)
+
+```
+
+<!-- \newpage -->
+
+<!-- A sample of nearest pairs from this matching in Step 2 is provided below: -->
+
+<!-- ```{r table_step_2_approximate_matches,results = TRUE, out.width="100%", warning = FALSE, message = FALSE, echo = FALSE, include = TRUE} -->
+
+<!-- tab_step_2 <- table_aprox_string_matches() %>% -->
+<!--   tab_options(table.font.size = 10) %>% -->
+<!--   cols_width( -->
+<!--     ends_with("distance") ~ px(60), -->
+<!--     everything() ~ px(280) -->
+<!--   ) -->
+
+<!-- tab_step_2 %>% gtsave("tab_step_2.png") -->
+
+<!-- knitr::include_graphics("tab_step_2.png") -->
+
+
+<!-- ``` -->
+
+Following visual inspection of the nearest approximate pairs, we retained matches with a maximum Levenshtein distance of 3, to allow for greater flexibility in matching.
+
+```{r step_2-approximate-string-filtering, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+approximate_string_match_bind(3)
+
+```
+
+Using this approach, `r format(as.numeric(n_matched_facilities_rhino), big.mark = ",")` facilities were matched to coordinates in the RHINoVision spatial inventory, of which `r format(as.numeric(n_adist_rhino_0), big.mark = ",")` facilities were matched based on identical string matches,  `r format(as.numeric(n_adist_rhino_1), big.mark = ",")` facilities were matched based on string matches with a Levenshtein distance of 1, `r format(as.numeric(n_adist_rhino_2), big.mark = ",")` facilities were matched based on string matches with a Levenshtein distance of 2, and `r format(as.numeric(n_adist_rhino_3), big.mark = ",")` facilities were matched based on string matches with a Levenshtein distance of 3. (`r format(as.numeric(n_adist_rhino_0+n_adist_rhino_1+n_adist_rhino_2+n_adist_rhino_3 - n_matched_facilities_rhino), big.mark = ",")` matches were duplicates and were removed.)
+
+In total, matching to our expanded inventory in Step 2 led to `r format(as.numeric(n_matched_facilities_step_2), big.mark = ",")` facilities (`r round(as.numeric(n_matched_facilities_step_2)/n_facilities_new * 100,0)`% of our sample) being geolocated.
+
+**Step 3: Matching to any spatial sources**
+
+```{r step_3-loading_data, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+step = "step_3"
+gps_source = "any"
+label = "Exact - All sources"
+
+facilities_gps_who_0 <- facilities_gps_who_0 %>%
+  rename(type = clinic_type)
+
+facilities_gps_OCHA_1 <- st_read(paste(data_gps_sources_reposit, 
+                                       "OCHA",
+                                       "hotosm_mdg_health_facilities_points_shp",
+                                       "hotosm_mdg_health_facilities_points.shp",
+                                       sep = "/")) %>%
+  select(name, geometry, osm_id) %>%
+  unique() %>%
+  filter(!is.na(name)) %>%
+  rename(clinic_name = name, ID_OSM = osm_id)
+
+facilities_gps_coordinates <- facilities_gps_OCHA_1 %>%
+  st_coordinates()
+facilities_gps_coordinates <- as.data.frame(facilities_gps_coordinates)
+facilities_gps_OCHA_1 <- cbind(facilities_gps_OCHA_1, facilities_gps_coordinates)
+
+facilities_gps_OCHA_1 <- facilities_gps_OCHA_1 %>%
+  st_drop_geometry() %>%
+  select(clinic_name, X, Y, ID_OSM)
+
+crs_system <- st_crs(facilities_gps_OCHA_1)
+with_gps_OCHA <- facilities_gps_OCHA_1 %>% select(ID_OSM) %>% unique()
+with_gps_OCHA <- with_gps_OCHA$ID_OSM
+
+#OpenStreetMap contributors
+# Contributor	Global Healthsites Mapping Project  
+
+facilities_gps_OCHA_2 <- read_csv(paste(data_gps_sources_reposit, 
+                                        "OCHA",
+                                        "madagascar.csv", 
+                                        sep = "/")) %>%
+  filter(!is.na(X)) %>%
+  filter(!is.na(Y)) %>%
+  filter(!is.na(name)) %>%
+  select(name, X, Y, osm_id) %>%
+  rename(clinic_name = name, ID_OSM = osm_id) %>%
+  unique() %>%
+  filter(!ID_OSM %in% with_gps_OCHA) %>%
+  st_drop_geometry()
+
+facilities_gps_OCHA <- rbind(facilities_gps_OCHA_1, 
+                             facilities_gps_OCHA_2)
+
+rm(facilities_gps_OCHA_1, facilities_gps_OCHA_2, facilities_gps_coordinates)
+
+# Import first source of data: OpenStreetMap data
+facilities_gps_0 <- facilities_gps_OCHA %>%
+  rename(latitude = Y,
+         longitude = X) %>%
+  mutate(source = "OpenStreetMap", type = NA) %>%
+  select(!c(ID_OSM))
+
+rm(facilities_gps_OCHA)
+
+# Import next source of GPS data
+facilities_gps_1 <- read_excel(paste(data_gps_sources_reposit, 
+                                     "20220630 Health clinic GPS points.xlsx", 
+                                     sep = "/")) %>%
+  unique() %>%
+  
+  # GPS coordinates are saved in a single string. Separate these into long and lat columns
+  mutate(geometry = str_sub(Geometry, 8,-2)) %>%
+  mutate(latitude = as.numeric(sub(".* ", "", geometry)),
+         longitude = as.numeric(sub(" .*", "", geometry))) %>%
+  
+  # Trim dataset
+  select(region, district, commune, type, FS, longitude, latitude) %>%
+  rename(clinic_name = FS, district_name = commune) %>%
+  
+  # Drop missing values
+  filter(!is.na(longitude)) %>%
+  filter(!is.na(latitude)) %>%
+  mutate(source = "File 1 (Consultant?)") %>%
+  select(clinic_name, longitude, latitude, source, type)
+
+# Import next source of GPS data
+facilities_gps_2 <- read.csv(paste(data_gps_sources_reposit,
+                                   'Health clinic data points.csv', sep = "/"), 
+                             header=TRUE) %>%
+  
+  # Ensure longitude is saved as numeric, not character 
+  mutate(longitude = as.numeric(longitude)) %>%
+  select(Nom.Commune, Type..CSB1..CSB2.., 
+         Nom.complet.FS.1, latitude, longitude) %>% 
+  rename(clinic_name = Nom.complet.FS.1, 
+         district_name = Nom.Commune, type = Type..CSB1..CSB2..) %>%
+  unique() %>%
+  mutate(source = "File 2 (MOH?)") %>%
+  select(clinic_name, longitude, latitude, source, type) %>%
+  
+  # Drop missing values
+  filter(!is.na(longitude)) %>%
+  filter(!is.na(latitude))  
+
+# Import next source of GPS data: RHINoVision Decision Support System
+facilities_gps_3 <- facilities_gps_3 %>%
+  rename(type = clinic_type)
+
+# Import next source of GPS data
+facilities_gps_4 <- read.csv(paste(data_gps_sources_reposit, 
+                                   '20210415 Palu_CSB_last 3.csv',
+                                   sep = "/"), 
+                             header=TRUE) %>%
+  rename(district_name = District, clinic_name = Health.center.names) %>%
+  select(district_name, clinic_name, latitude, longitude) %>%
+  
+  # Drop missing values
+  filter(latitude != 0) %>%
+  filter(longitude != 0) %>%
+  unique() %>%
+  mutate(source = "File 3 (?)", type = NA) %>%
+  select(clinic_name, longitude, latitude, source, type)
+
+facilities_gps_5 <- read_excel(paste(data_gps_sources_reposit, 
+                                     "CHD ET CHU XY 2012.xls", sep = "/")) %>%
+  rename(district_name = "Nom District", 
+         clinic_name = "Nom FS GESIS",
+         latitude = "Y", longitude = "X") %>%
+  select(district_name, clinic_name, latitude, longitude) %>%
+  
+  # Drop missing values
+  filter(latitude != 0) %>%
+  filter(longitude != 0) %>%
+  unique() %>%
+  mutate(source = "File 4 (Consultant)", type = NA) %>%
+  select(clinic_name, longitude, latitude, source, type)
+
+# Import next source of GPS data
+facilities_gps_6 <- read.csv(paste(data_gps_sources_reposit, 
+                                   'CSB GPS points.csv', sep = "/"), 
+                             header=TRUE) %>%
+  rename(district_name = district_n, clinic_name = clinic_nam,
+         latitude = Latitude, longitude = Longitude) %>%
+  select(district_name, clinic_name, latitude, longitude) %>%
+  
+  # Drop missing values
+  filter(latitude != 0) %>%
+  filter(longitude != 0) %>%
+  unique() %>%
+  mutate(source = "File 5 (Chris)", type = NA) %>%
+  select(clinic_name, longitude, latitude, source, type)
+
+# Merge the GPS data sources and reconcile duplicate data
+facilities_gps_any <- facilities_gps_0 %>%
+  
+  # Bind the sources and eliminate any perfect duplicates and missing values
+  rbind(., facilities_gps_1, facilities_gps_2, facilities_gps_3, 
+        facilities_gps_4, facilities_gps_5, facilities_gps_6, facilities_gps_who_0) %>%
+  unique() %>%
+  
+  # Drop any rows where one or more of the coordinates are missing
+  filter(!is.na(longitude)) %>%
+  filter(!is.na(latitude)) %>%
+  arrange(clinic_name) %>%
+  st_as_sf(., coords = c("longitude", "latitude"), 
+           crs = 4326) %>%
+  rename(clinic_type = type) %>%
+  mutate(clinic_name = paste(clinic_type, clinic_name, sep = " "),
+         clinic_name = gsub("NA ","", clinic_name)) %>%
+  gps_source_join_map() %>%
+  clean_clinic_type() %>%
+  clean_clinic_name() %>%
+  clean_catchment_area()
+
+n_facilities(facilities_gps_any)
+
+# Clean up
+rm(facilities_gps_0, facilities_gps_1,  facilities_gps_2, facilities_gps_3, 
+   facilities_gps_4, facilities_gps_5, facilities_gps_6, facilities_gps_who_0,
+   facilities_gps_who, facilities_gps_rhino)
+
+```
+
+To geolocate the remaining facilities, we expanded our spatial inventories with health facility coordinates gathered from local consultants, the Global Healthsites Mapping Project, and other sources to create an expanded database of `r format(as.numeric(n_facilities_any), big.mark = ",")` uniquely identified coordinates. 
+
+<!-- Coordinates by facility type and source are provided below: -->
+
+```{r step_3-table-coordinates-by-type-setup, include = FALSE, results = FALSE, warning = FALSE, message = FALSE, echo = FALSE}
+
+facility_gps_types <- facilities_gps_any %>%
+  st_drop_geometry() %>%
+  mutate(count = 1) %>%
+  group_by(source, clinic_type) %>%
+  mutate(value = sum(count, na.rm = FALSE)) %>%
+  ungroup() %>%
+  select(source, clinic_type, value) %>%
+  unique() %>%
+  arrange(source) %>%
+  pivot_wider(names_from = source) %>%
+  arrange(clinic_type) 
+
+facility_gps_types[is.na(facility_gps_types)] = 0
+
+```
+
+
+```{r step_3-table-coordinates-by-type, include = TRUE, results = TRUE, out.width="90%", warning = FALSE, message = FALSE, echo = FALSE}
+
+
+tab_step_3 <- facility_gps_types %>%
+  mutate(group = ifelse(
+    clinic_type == "CHD" | clinic_type == "CHD1" | clinic_type == "CHD2",
+    "District hospital",
+    ifelse(
+      clinic_type == "CHRR" |
+        clinic_type == "CHU" |
+        clinic_type == "CH",
+      "Regional hospital",
+      ifelse(
+        clinic_type == "CSB" |
+          clinic_type == "CSB1" |
+          clinic_type == "FSP" |
+          clinic_type == "CSB2",
+        "Basic health facility",
+        "Other"
+      )
+    )
+  )) %>%
+  rename('Facility type' = clinic_type) %>%
+    rename('Combo.' = Combination) %>%
+
+    rename('RHINo' = 'RHINoVision Decision Support System') %>%
+
+    rename('Open Street Map' = OpenStreetMap) %>%
+  mutate(Total =  rowSums(across(where(is.numeric))))
+
+tab_step_3 <- tab_step_3 %>%
+  gt(groupname_col = "group") %>%
+  tab_options(table.font.names = "CMU Serif Roman",
+              table.font.size = 11) %>%
+  tab_style(locations = cells_column_labels(),
+            style     = list(cell_text(weight = "bold", size = 9))) %>%
+  summary_rows(
+    groups = TRUE,
+    columns = 2:ncol(tab_step_3),
+    fns = list(Subtotal = "sum"),
+        decimals = 0,
+    sep_mark = ","
+  ) %>%
+  grand_summary_rows(
+    columns =2:ncol(tab_step_3),
+    fns = list('Grand total' = "sum"),    decimals = 0,
+    sep_mark = ","
+  )   %>%
+  fmt(
+    rows = everything(),
+    fns = function(x) ifelse(x == 0, "—", prettyNum(x, big.mark = ","))) %>%
+  cols_width(
+    everything() ~ px(61)
+  )
+# 
+# tab_step_3 %>% gtsave("tab_step_3.png")
+#  
+# knitr::include_graphics("tab_step_3.png")
+
+```
+
+
+```{r step_3-removing-pharmacies, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+facilities_gps_any <- facilities_gps_any %>% filter(clinic_type != "Pharmacy")
+n_gps_facilities_new <- facilities_gps_any %>% nrow()
+
+```
+
+We removed pharmacies from our spatial inventory, as pharmacies were not included in our sample. Removing pharmacies from our expanded spatial inventory resulted in `r format(as.numeric(n_gps_facilities_new), big.mark = ",")` coordinates available for matching. 
+
+Most of the coordinates in this expanded inventory were duplicates (i.e., the same facility will appear in different sources). Importantly, coordinates for the same facility could be slightly different across sources, due to variation in precision and geolocation. 
+
+Using the same approach to uniquely identifying facilities in our sample, we grouped coordinates in our expanded inventory by facility name, type, and geographic information (namely, which commune, district, and region a coordinate fell within). In other words, in order to be grouped together, coordinates would need to be of the same facility type and name, and would need to be located in the same region and in the boundaries of the same district (for hospitals) or commune (for all other facilities). 
+
+```{r step_3-data-grouping, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+# To improve matching, we can identify what region, district, and commune
+# each of our data points falls into. By then grouping on clinic name AND
+# commune/district/region, we can ensure that matched groups actually reflect the 
+# same facility, and not similarly named facilities in different districts.
+# 
+
+# 
+
+facilities_gps_any <- facilities_gps_any %>%
+  map_clean_arrondis() %>%
+  
+  # Due to variations in precision, there may be different GPS coordinates 
+  # for the same facility across different data sources. We will 
+  # smooth this out by taking the centroid of each group of coordinates,
+  # but only if we feel confident that the different points for the same clinic
+  # are close to each other.
+  
+  # First, let's say that points must have the same clinic name, district name, and type
+  # to be considered to be referring to the same clinic
+  group_by(clinic_name_clean, commune_name, district_name, region_name, clinic_type) %>%
+  
+  # For points meeting that criteria, let's gather them into lines (2 points) and polygons (3+ points)
+  summarise() %>%
+  
+  # For polygons, let's draw the smallest possible border around all points that captures each of them
+  st_convex_hull() %>%
+  
+  # And calculate the length and area of the resulting groups
+  mutate(length = as.numeric(st_length(geometry)/1000),
+         area_km = as.numeric(st_area(geometry)/1000000)) %>%
+  
+  # We can identify the type of geometry as follows:
+  mutate(shape_type = ifelse(length == 0 & area_km == 0, 
+                             "point",
+                             ifelse(length != 0 & area_km == 0, 
+                                    "line", "polygon"))) %>%
+                                    
+                                    # 
+                                    # 
+                                    # ifelse(length == 0,
+                                    #        "polygon", "other")))) %>%
+  
+  # Let's apply our thresholds from the PARENT file
+  mutate(retain = ifelse(length == 0 & area_km == 0, 
+                         "Within threshold",
+                         ifelse(length <= length_lim & area_km == 0, 
+                                "Within threshold",
+                                ifelse(length == 0 & area_km <= area_lim,
+                                       "Within threshold", 
+                                       "Above threshold")))) %>%
+  ungroup()
+
+
+n_point <- facilities_gps_any %>% filter(shape_type == "point") %>% nrow()
+n_line <- facilities_gps_any %>% filter(shape_type == "line") %>% nrow()
+n_poly <- facilities_gps_any %>% filter(shape_type == "polygon") %>% nrow()
+
+n_groups <- facilities_gps_any %>% nrow()
+
+
+n_mean_area_polygons <- facilities_gps_any %>% filter(shape_type == "polygon") %>% 
+  st_drop_geometry() %>%
+  select(area_km) %>%
+  mutate(mean = mean(area_km)) %>%
+  select(mean) %>%
+  unique()
+
+n_mean_area_polygons <- n_mean_area_polygons$mean
+
+n_max_area_polygons <- facilities_gps_any %>% filter(shape_type == "polygon") %>% 
+  st_drop_geometry() %>%
+  select(area_km) %>%
+  mutate(max = max(area_km)) %>%
+  select(max) %>%
+  unique()
+n_max_area_polygons <- n_max_area_polygons$max
+
+n_mean_length <- facilities_gps_any %>% filter(shape_type == "line") %>% 
+  st_drop_geometry() %>%
+  select(length) %>%
+  mutate(mean = mean(length)) %>%
+  select(mean) %>%
+  unique()
+
+n_mean_length <- n_mean_length$mean
+
+n_max_length <- facilities_gps_any %>% filter(shape_type == "line") %>% 
+  st_drop_geometry() %>%
+  select(length) %>%
+  mutate(max = max(length)) %>%
+  select(max) %>%
+  unique()
+n_max_length <- n_max_length$max
+
+n_length_retained <- facilities_gps_any %>% filter(shape_type == "line") %>% 
+  filter(retain == "Within threshold") %>% nrow()
+
+```
+
+Grouping resulted in `r format(as.numeric(n_groups), big.mark = ",")` coordinate groups in our expanded inventory. Of these, `r format(as.numeric(n_poly), big.mark = ",")` consisted of three or more coordinates, `r format(as.numeric(n_line), big.mark = ",")` consisted of two coordinates, and `r format(as.numeric(n_point), big.mark = ",")` consisted of a single coordinate.
+
+In order to evaluate whether groups of two coordinates (which we referred to as "line groups") and groups of three or more coordinate ("polygon groups") were internally consistent (i.e., the points within a group were not geographically far apart, suggesting uncertainty in the location of a facility), we calculated the length (for line groups) and area (for polygon groups) of groups with more than one coordinate. 
+
+We applied an arbitrary restriction to line and polygon groups, such that the length or area, respectively, would not exceed a particular threshold. The threshold for length (`r format(as.numeric(length_lim), big.mark = ",")` km.) was selected to be approximately half the distance of one side of a spatial climate resolution tile (~31 km for ERA-5 data). The threshold for area (`r format(as.numeric(area_lim), big.mark = ",")` square km.) was assigned to be the length threshold, squared. Groups that exceeded their respective thresholds were discarded.
+
+```{r step_3-histogram-prep, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+# Here is a histogram of the polygons
+
+panel_a <- facilities_gps_any %>% 
+  filter(shape_type == "polygon") %>%
+  mutate(area = ifelse(area_km > area_lim, area_lim,
+                       ifelse(area_km < 1, 1, 
+                              area_km))) %>%
+  ggplot() +
+  geom_histogram(aes(x=area_km, fill = retain),
+                 bins = 100) +
+  geom_vline(xintercept = area_lim) +
+  labs(x = "Area (km^(2))",
+       title = "Polygons of GPS coordinates, by area",
+       subtitle = "Smaller areas mean greater agreement across data sources",
+       caption = paste0("Line shows threshold limit of ",
+                        prettyNum(area_lim, big.mark = ",", scientific = FALSE),
+                        " km sq."),
+       y = "Count",
+       fill = "") +
+  theme_classic() +
+  theme(axis.title.x = element_markdown(),
+        text = element_text(family = "Source Sans Pro"),
+        legend.position = "bottom") +
+  scale_fill_manual(values = c(col_within_threshold))
+
+# Saving plot
+ggsave(filename = "gps_data_polygons.jpg", plot = last_plot(),
+       path = gpspath_fig,
+       width = 8,
+       height = 7)
+
+panel_a <- facilities_gps_any %>% 
+  filter(shape_type == "polygon") %>%
+  mutate(area = ifelse(area_km > area_lim, area_lim,
+                       ifelse(area_km < 1, 1, 
+                              area_km))) %>%
+  ggplot() +
+  geom_histogram(aes(x=area_km, fill = retain),
+                 bins = 100) +
+  geom_vline(xintercept = area_lim) +
+  labs(x = "Area (km^(2))",
+       title = "Polygons of GPS coordinates, by area",
+       subtitle = "Smaller areas mean greater agreement across data sources",
+       caption = paste0("Line shows threshold limit of ",
+                        prettyNum(area_lim, big.mark = ",", scientific = FALSE),
+                        " km sq."),
+       y = "Count",
+       fill = "") +
+  theme_classic() +
+  theme(axis.title.x = element_markdown(),
+        text = element_text(family = "Source Sans Pro"),
+        legend.position = "none") +
+  scale_fill_manual(values = c(col_within_threshold))
+
+# And here is a histogram of the lines
+
+panel_b <- facilities_gps_any %>% 
+  filter(shape_type == "line") %>%
+  mutate(len = ifelse(length > length_lim, length_lim,
+                      ifelse(length < 1, 1, 
+                             length))) %>%
+  ggplot() +
+  geom_histogram(aes(x=length, fill = retain),
+                 bins = 100) +
+  geom_vline(xintercept = length_lim) +
+  labs(x = "Length (km)",
+       title = "Lines of GPS coordinates, by distance",
+       subtitle = "Smaller lengths mean greater agreement across data sources",
+       caption = paste0("Line shows threshold limit of ",
+                        prettyNum(length_lim, big.mark = ",", scientific = FALSE),
+                        " km"),
+       y = "Count",
+       fill = "") +
+  theme_classic() +
+  theme(axis.title.x = element_markdown(),
+        text = element_text(family = "Source Sans Pro"),
+        legend.position = "bottom") +
+  scale_fill_manual(values = c(col_beyond_threshold, col_within_threshold))
+
+# # Saving plot
+ggsave(filename = "gps_data_lines.jpg", plot = last_plot(),
+       path = gpspath_fig,
+       width = 8,
+       height = 7)
+
+```
+
+<!-- ```{r figure_histograms, fig.height = 6,  include=TRUE, results = TRUE, warning = FALSE, message = FALSE, echo = FALSE} -->
+
+
+<!-- #fig.cap="\\label{figure_histograms}Polygon and line groups, by area and length, respectively."} -->
+
+<!-- ggarrange(panel_a, panel_b, -->
+<!--           nrow = 2,    -->
+<!--           heights  = c(1, 1.5), -->
+<!--           common.legend = FALSE) -->
+
+<!-- ``` -->
+
+Among polygon groups, the mean area was `r format(round(n_mean_area_polygons,2), big.mark = ",")` km sq, with a maximum area of `r format(round(n_max_area_polygons), big.mark = ",")` km sq. At the threshold of `r format(as.numeric(area_lim), big.mark = ",")` square km., all polygon groups fell within the cut-off. Among line groups, the mean distance between coordinates was `r format(round(n_mean_length,2), big.mark = ",")` km., with a maximum distance of `r format(round(n_max_length), big.mark = ",")` kilometers. At the threshold of `r format(as.numeric(length_lim), big.mark = ",")` km.,  `r format(round(n_length_retained), big.mark = ",")` line groups fell within the cut-off (`r round(as.numeric(n_length_retained)/n_line * 100,0)`% of line groups).
+
+```{r step_3-retaining-coordinates-within-threshold, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+facilities_gps_any <- facilities_gps_any %>% 
+  filter(retain == "Within threshold") %>%
+  st_centroid() %>% 
+  select(!c(shape_type, length, area_km, retain)) %>%
+  clean_catchment_area() %>%
+  unique() %>%
+  gps_source_match_prep()
+
+n_gps_facilities <- nrow(facilities_gps_any)
+
+```
+
+After applying the thresholds, we retained `r format(as.numeric(n_gps_facilities), big.mark = ",")` coordinate groups in our expanded inventory.
+
+To identify a single coordinate from each group, we computed the convex hull of polygon groups and selected the centroid of the grouped coordinates. For line groups, we selected the midpoint. For groups with a single member, the coordinates of that sole member were used.
+
+<!-- The figure below displays the expanded spatial inventory, by facility type: -->
+
+```{r figure_avail_gps, include = FALSE, results = FALSE, warning = FALSE, message = FALSE, echo = FALSE}
+
+#fig.cap="\\label{figure_avail_gps}Expanded spatial inventory of health facilities."}
+# Let's visualize the different coordinates we have available.
+
+facilities_gps_any %>%
+ mutate(clinic_type = case_when(
+   str_detect(clinic_type, "CH")
+   ~ "CHD/CHRR/CHU",
+   str_detect(clinic_type, "CS")
+   ~ "CSB/FSP",
+   str_detect(clinic_type, "FS")
+   ~ "CSB/FSP",
+   TRUE ~ "Other")) %>%
+  map_coordinates(c(col_CH, col_CSB, col_other))
+
+```
+
+
+
+```{r step_3-saving-of-figure, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+# Saving plot
+ggsave(filename = "available_gps_coordinates.jpg", plot = last_plot(),
+       path = gpspath_fig,
+       width = 8,
+       height = 7,
+       bg = "white") 
+
+facilities_gps_temp <- facilities_gps_any %>% st_drop_geometry()
+
+
+write.xlsx(facilities_gps_temp, file = paste(gpspath_spread,
+                                              "2_unmatched",
+                                              "gps_facilities_all.xlsx",
+                                              sep = "/"))
+rm(facilities_gps_temp)
+
+```
+
+We then applied the same approximate string matching technique as in Step 1, using the remaining facilities without geolocations in our sample and the expanded spatial inventory. To maximize match accuracy, we applied the approximate string matching technique separately based on the three geographic levels of service, akin to our approach in Step 1. In other words, regional facilities in our sample are only evaluated for possible matches against regional facilities in the expanded spatial inventory, and so one for district-level facilities and for commune-level facilities. 
+
+Visual inspection of closest pairs across the regional, district, and commune level facilities indicated that likely matches had a Levenshtein distance no greater than 3. 
+
+```{r step_3-approximate-string-matches, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+# Commune matching
+
+gps_source = "any_commune"
+approximate_string_match(facilities_all_nogps, facilities_gps_any, option = "district", type = "primary", strip_type = TRUE) 
+approximate_string_match_bind(3)
+
+# District matching
+
+gps_source = "any_district"
+approximate_string_match(facilities_all_nogps, facilities_gps_any , option = "district", type = "district", strip_type = TRUE) 
+approximate_string_match_bind(3)
+
+# Regional matching
+
+gps_source = "any_region"
+approximate_string_match(facilities_all_nogps, facilities_gps_any, option = "region", type = "region", strip_type = TRUE) 
+approximate_string_match_bind(3)
+
+```
+
+Using this approach, `r format(as.numeric(n_matched_facilities_any_region + n_matched_facilities_any_district + n_matched_facilities_any_commune), big.mark = ",")` facilities were matched to coordinate groups in our expanded spatial inventory, including `r format(as.numeric(n_matched_facilities_any_region), big.mark = ",")` regional facilities, `r format(as.numeric(n_matched_facilities_any_district), big.mark = ",")` district-level facilities, and `r format(as.numeric(n_matched_facilities_any_commune), big.mark = ",")` commune-level facilities. In total, matching to our expanded inventory in Step 3 led to `r format(as.numeric(n_matched_facilities_step_3), big.mark = ",")` facilities (`r round(as.numeric(n_matched_facilities_step_3)/n_facilities_new * 100,0)`% of our sample) being geolocated.
+
+**Step 4: Manual matching to coordinates in the expanded spatial inventory**
+
+Despite the use of approximate string matching in Step 3 to link facilities in our sample to coordinates in our expanded spatial inventory, visual inspection and comparison of unmatched facilities to the spatial inventory revealed match failures due to variations in clinic names (e.g., “Notre Dame De Bon Remede Kiranomena” versus “Notre Dame de bon Remède”), clinic types (e.g., FSP and CSB facilities being coded interchangeably), district names (e.g., Toliary-I versus Toliary-II), and commune names (e.g., Toliara I versus Tanambao I). 
+
+We manually reviewed unmatched facilities and identified those with unambiguous matches to the spatial inventory which, for various reasons, failed to match under Step 3. 
+
+
+
+
+``` {r step_4-prepwork, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+step = "step_4"
+gps_source = "any"
+label = "Exact - All sources"
+
+facilities_manual_matches <- read_xlsx(path = paste(data_gps_sources,
+                                                    "manual_matching",
+                                                    "facilities_manual_matches.xlsx",
+                                                    sep = "/")) %>%
+    mutate(commune_name_new = ifelse(is.na(commune_name_new), "", commune_name_new))
+
+# tab_step_4 <-
+
+  facilities_manual_matches %>%
+  select(commune_name, district_name, clinic_name, clinic_type, clinic_type_new,
+         clinic_name_new, district_name_new, commune_name_new, region_name, region_name_new) %>%
+  mutate(clinic_type_new = ifelse(clinic_type_new == clinic_type, " ~ ", clinic_type_new),
+         clinic_name_new = ifelse(clinic_name_new == clinic_name, " ~ ", clinic_name_new),
+         district_name_new = ifelse(district_name_new == district_name, " ~ ", district_name_new),
+         commune_name_new = ifelse(commune_name_new == commune_name, " ~ ", commune_name_new),
+         region_name_new = ifelse(region_name_new == region_name, " ~ ", region_name_new)) %>%
+  na_if(., "") %>%
+  mutate_all(~replace_na(.,"")) %>%
+select(order(colnames(.),
+                      decreasing = FALSE)) %>%
+#   mutate(clinic_name=str_replace_all(clinic_name," ","<br>"),
+# clinic_name_new=str_replace_all(clinic_name_new," ","<br>"),
+# clinic_type=str_replace_all(clinic_type," ","<br>"),
+# clinic_type_new=str_replace_all(clinic_type_new," ","<br>"),
+# commune_name=str_replace_all(commune_name," ","<br>"),
+# commune_name_new=str_replace_all(commune_name_new," ","<br>"),
+# district_name=str_replace_all(district_name," ","<br>"),
+# district_name_new=str_replace_all(district_name_new," ","<br>"),
+# region_name=str_replace_all(region_name," ","<br>"),
+# region_name_new=str_replace_all(region_name_new," ","<br>")) %>%
+    # select(!c(region_name, region_name_new)) %>%
+      select(c(clinic_name, clinic_name_new)) %>%
+
+  rename("Facility name, data" = clinic_name,
+         "Facility name, inventory" = clinic_name_new,
+         # "Facility type, data" = clinic_type,
+         # "Facility type, inventory" = clinic_type_new,
+         # "Commune name, data" = commune_name,
+         # "Commune name, inventory" = commune_name_new,
+         # "District name, data" = district_name,
+         # "District name, inventory" = district_name_new,
+         # "Region name, data" = region_name,
+         # "Region name, inventory" = region_name_new
+
+          )  %>%
+  # kable(longtable = T, booktabs = F, caption = "Manual matches across data and expanded spatial inventory") %>%
+  #   kable_styling(latex_options = "scale_down") %>%
+  #   kable_styling(font_size = 7)
+
+  gt() %>%
+    tab_header(
+      title = md("**Manual matches across data and expanded spatial inventory: facility names**")) %>%
+         tab_options(table.font.names = "Source Sans Pro") %>%
+            tab_style(
+              locations = cells_column_labels(),
+              style     = list(
+                cell_text(weight = "bold"))
+            ) %>%
+      fmt_markdown(columns = everything())
+
+  # %>%
+  #   cols_width(
+  #     starts_with("Facility name") ~ px(70),
+  #           starts_with("Commune name") ~ px(70),
+  #
+  #   everything() ~ px(60)
+  # )
+
+#
+# tab_step_4 %>% gtsave("tab_step_4.png")
+#
+# knitr::include_graphics("tab_step_4.png")
+
+```
+
+
+
+``` {r step_4-prepwork-2, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+
+# tab_step_4 <-
+
+  facilities_manual_matches %>%
+  select(commune_name, district_name, clinic_name, clinic_type, clinic_type_new,
+         clinic_name_new, district_name_new, commune_name_new, region_name, region_name_new) %>%
+  mutate(clinic_type_new = ifelse(clinic_type_new == clinic_type, " ~ ", clinic_type_new),
+         clinic_name_new = ifelse(clinic_name_new == clinic_name, " ~ ", clinic_name_new),
+         district_name_new = ifelse(district_name_new == district_name, " ~ ", district_name_new),
+         commune_name_new = ifelse(commune_name_new == commune_name, " ~ ", commune_name_new),
+         region_name_new = ifelse(region_name_new == region_name, " ~ ", region_name_new)) %>%
+  na_if(., "") %>%
+  mutate_all(~replace_na(.,"")) %>%
+select(order(colnames(.),
+                      decreasing = FALSE)) %>%
+#   mutate(clinic_name=str_replace_all(clinic_name," ","<br>"),
+# clinic_name_new=str_replace_all(clinic_name_new," ","<br>"),
+# clinic_type=str_replace_all(clinic_type," ","<br>"),
+# clinic_type_new=str_replace_all(clinic_type_new," ","<br>"),
+# commune_name=str_replace_all(commune_name," ","<br>"),
+# commune_name_new=str_replace_all(commune_name_new," ","<br>"),
+# district_name=str_replace_all(district_name," ","<br>"),
+# district_name_new=str_replace_all(district_name_new," ","<br>"),
+# region_name=str_replace_all(region_name," ","<br>"),
+# region_name_new=str_replace_all(region_name_new," ","<br>")) %>%
+    # select(!c(region_name, region_name_new)) %>%
+      select(c(clinic_name, clinic_type, clinic_type_new)) %>%
+
+  rename("Facility name, data" = clinic_name,
+         # "Facility name, inventory" = clinic_name_new,
+         "Facility type, data" = clinic_type,
+         "Facility type, inventory" = clinic_type_new,
+         # "Commune name, data" = commune_name,
+         # "Commune name, inventory" = commune_name_new,
+         # "District name, data" = district_name,
+         # "District name, inventory" = district_name_new,
+         # "Region name, data" = region_name,
+         # "Region name, inventory" = region_name_new
+
+          )  %>%
+  # kable(longtable = T, booktabs = F, caption = "Manual matches across data and expanded spatial inventory") %>%
+  #   kable_styling(latex_options = "scale_down") %>%
+  #   kable_styling(font_size = 7)
+
+  gt() %>%
+    tab_header(
+      title = md("**Manual matches across data and expanded spatial inventory: facility types**")) %>%
+         tab_options(table.font.names = "Source Sans Pro") %>%
+            tab_style(
+              locations = cells_column_labels(),
+              style     = list(
+                cell_text(weight = "bold"))
+            ) %>%
+      fmt_markdown(columns = everything())
+
+  # %>%
+  #   cols_width(
+  #     starts_with("Facility name") ~ px(70),
+  #           starts_with("Commune name") ~ px(70),
+  #
+  #   everything() ~ px(60)
+  # )
+
+#
+# tab_step_4 %>% gtsave("tab_step_4.png")
+#
+# knitr::include_graphics("tab_step_4.png")
+
+```
+
+``` {r step_4-prepwork-3, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+
+
+# tab_step_4 <-
+
+  facilities_manual_matches %>%
+  select(commune_name, district_name, clinic_name, clinic_type, clinic_type_new,
+         clinic_name_new, district_name_new, commune_name_new, region_name, region_name_new) %>%
+  mutate(clinic_type_new = ifelse(clinic_type_new == clinic_type, " ~ ", clinic_type_new),
+         clinic_name_new = ifelse(clinic_name_new == clinic_name, " ~ ", clinic_name_new),
+         district_name_new = ifelse(district_name_new == district_name, " ~ ", district_name_new),
+         commune_name_new = ifelse(commune_name_new == commune_name, " ~ ", commune_name_new),
+         region_name_new = ifelse(region_name_new == region_name, " ~ ", region_name_new)) %>%
+  na_if(., "") %>%
+  mutate_all(~replace_na(.,"")) %>%
+select(order(colnames(.),
+                      decreasing = FALSE)) %>%
+#   mutate(clinic_name=str_replace_all(clinic_name," ","<br>"),
+# clinic_name_new=str_replace_all(clinic_name_new," ","<br>"),
+# clinic_type=str_replace_all(clinic_type," ","<br>"),
+# clinic_type_new=str_replace_all(clinic_type_new," ","<br>"),
+# commune_name=str_replace_all(commune_name," ","<br>"),
+# commune_name_new=str_replace_all(commune_name_new," ","<br>"),
+# district_name=str_replace_all(district_name," ","<br>"),
+# district_name_new=str_replace_all(district_name_new," ","<br>"),
+# region_name=str_replace_all(region_name," ","<br>"),
+# region_name_new=str_replace_all(region_name_new," ","<br>")) %>%
+    # select(!c(region_name, region_name_new)) %>%
+      select(c(clinic_name, district_name, district_name_new)) %>%
+
+  rename("Facility name, data" = clinic_name,
+         # "Facility name, inventory" = clinic_name_new,
+         # "Facility type, data" = clinic_type,
+         # "Facility type, inventory" = clinic_type_new,
+         # "Commune name, data" = commune_name,
+         # "Commune name, inventory" = commune_name_new,
+         "District name, data" = district_name,
+         "District name, inventory" = district_name_new,
+         # "Region name, data" = region_name,
+         # "Region name, inventory" = region_name_new
+
+          )  %>%
+  # kable(longtable = T, booktabs = F, caption = "Manual matches across data and expanded spatial inventory") %>%
+  #   kable_styling(latex_options = "scale_down") %>%
+  #   kable_styling(font_size = 7)
+
+  gt() %>%
+    tab_header(
+      title = md("**Manual matches across data and expanded spatial inventory: facility districts**")) %>%
+         tab_options(table.font.names = "Source Sans Pro") %>%
+            tab_style(
+              locations = cells_column_labels(),
+              style     = list(
+                cell_text(weight = "bold"))
+            ) %>%
+      fmt_markdown(columns = everything())
+
+  # %>%
+  #   cols_width(
+  #     starts_with("Facility name") ~ px(70),
+  #           starts_with("Commune name") ~ px(70),
+  #
+  #   everything() ~ px(60)
+  # )
+
+#
+# tab_step_4 %>% gtsave("tab_step_4.png")
+#
+# knitr::include_graphics("tab_step_4.png")
+
+```
+
+``` {r step_4-prepwork-4, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+
+
+# tab_step_4 <-
+
+  facilities_manual_matches %>%
+  select(commune_name, district_name, clinic_name, clinic_type, clinic_type_new,
+         clinic_name_new, district_name_new, commune_name_new, region_name, region_name_new) %>%
+  mutate(clinic_type_new = ifelse(clinic_type_new == clinic_type, " ~ ", clinic_type_new),
+         clinic_name_new = ifelse(clinic_name_new == clinic_name, " ~ ", clinic_name_new),
+         district_name_new = ifelse(district_name_new == district_name, " ~ ", district_name_new),
+         commune_name_new = ifelse(commune_name_new == commune_name, " ~ ", commune_name_new),
+         region_name_new = ifelse(region_name_new == region_name, " ~ ", region_name_new)) %>%
+  na_if(., "") %>%
+  mutate_all(~replace_na(.,"")) %>%
+select(order(colnames(.),
+                      decreasing = FALSE)) %>%
+#   mutate(clinic_name=str_replace_all(clinic_name," ","<br>"),
+# clinic_name_new=str_replace_all(clinic_name_new," ","<br>"),
+# clinic_type=str_replace_all(clinic_type," ","<br>"),
+# clinic_type_new=str_replace_all(clinic_type_new," ","<br>"),
+# commune_name=str_replace_all(commune_name," ","<br>"),
+# commune_name_new=str_replace_all(commune_name_new," ","<br>"),
+# district_name=str_replace_all(district_name," ","<br>"),
+# district_name_new=str_replace_all(district_name_new," ","<br>"),
+# region_name=str_replace_all(region_name," ","<br>"),
+# region_name_new=str_replace_all(region_name_new," ","<br>")) %>%
+    # select(!c(region_name, region_name_new)) %>%
+      select(c(clinic_name, commune_name, commune_name_new)) %>%
+
+  rename("Facility name, data" = clinic_name,
+         # "Facility name, inventory" = clinic_name_new,
+         # "Facility type, data" = clinic_type,
+         # "Facility type, inventory" = clinic_type_new,
+         "Commune name, data" = commune_name,
+         "Commune name, inventory" = commune_name_new,
+         # "District name, data" = district_name,
+         # "District name, inventory" = district_name_new,
+         # "Region name, data" = region_name,
+         # "Region name, inventory" = region_name_new
+
+          )  %>%
+  # kable(longtable = T, booktabs = F, caption = "Manual matches across data and expanded spatial inventory") %>%
+  #   kable_styling(latex_options = "scale_down") %>%
+  #   kable_styling(font_size = 7)
+
+  gt() %>%
+    tab_header(
+      title = md("**Manual matches across data and expanded spatial inventory: facility communes**")) %>%
+         tab_options(table.font.names = "Source Sans Pro") %>%
+            tab_style(
+              locations = cells_column_labels(),
+              style     = list(
+                cell_text(weight = "bold"))
+            ) %>%
+      fmt_markdown(columns = everything())
+
+  # %>%
+  #   cols_width(
+  #     starts_with("Facility name") ~ px(70),
+  #           starts_with("Commune name") ~ px(70),
+  #
+  #   everything() ~ px(60)
+  # )
+
+#
+# tab_step_4 %>% gtsave("tab_step_4.png")
+#
+# knitr::include_graphics("tab_step_4.png")
+
+```
+
+``` {r step_4-data-cleaning, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+facilities_manual_matches_temp <- facilities_gps_any %>%
+  rename(clinic_name_new = clinic_name_clean,
+         clinic_type_new = clinic_type,
+         clinic_type_clean_new = clinic_type_clean,
+         district_name_new = district_name,
+         commune_name_new = commune_name,
+         region_name_new = region_name) %>%
+  mutate(commune_name_new = ifelse(is.na(commune_name_new), "", commune_name_new)) %>%
+  inner_join(., facilities_manual_matches, by = c("clinic_type_new", "clinic_name_new", "region_name_new", "district_name_new", "commune_name_new")) %>%
+  select(geometry, commune_name,  region_name, clinic_name_full) %>%
+  rename(clinic_name = clinic_name_full) %>%
+  inner_join(., facilities_all_nogps, by = c("commune_name", "region_name", "clinic_name")) %>%
+  mutate(source = label)
+
+n_manual_matches <- facilities_manual_matches_temp %>% nrow()
+
+facilities_all_gps <- rbind(facilities_all_gps,facilities_manual_matches_temp) %>% unique()
+
+n_matched_facilities_step_3 <- facilities_all_gps %>% nrow()
+
+with_gps <- facilities_all_gps %>% select(facility_ID) %>% unique()
+with_gps <- as.vector(with_gps$facility_ID)
+
+facilities_all_nogps <- facilities_all_nogps %>%
+  filter(!facility_ID %in% with_gps) %>%
+  unique()
+
+rm(facilities_manual_matches_temp, facilities_manual_matches)
+
+```
+
+Manual matching allowed for an additional `r format(as.numeric(n_manual_matches), big.mark = ",")` facilities in our sample being linked to coordinates in our expanded spatial inventory. In total, matching to our expanded inventory in Step 4 led to `r format(as.numeric(n_matched_facilities_step_3), big.mark = ",")` facilities (`r round(as.numeric(n_matched_facilities_step_3)/n_facilities_new * 100,0)`% of our sample) being geolocated.
+
+**Step 5: Using commune and village centroids as proxies for facility locations**
+
+Among commune-level facilities, there are two potential catchment areas: communes and *fokontany* (villages). Many CSB facilities are named after the village they are located in; this provided us with additional information that could be helpful in geolocation.
+
+```{r step_5-setup, , warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+step = "step_5"
+gps_source = "centroid"
+label = "Centroid"
+
+```
+
+While it would be ideal to obtain precise locations for each facility in our sample, for the purposes of our analysis, an approximate location would be sufficient, given the spatial resolution of the climate data we used. The spatial resolution of ERA-5 and ESA-CCI data is approximately 30 km., meaning that all coordinates within a spatial tile of 30 km. sq. will have the same time series for a given variable. Furthermore, neighboring tiles are unlikely to have extraordinarily different time series, underscoring that close approximate locations would likely result in minimal impact to the analysis versus exact coordinates.
+
+For commune-level facilities, knowing the catchment area may therefore be just as informative as knowing the facility's precise location if the catchment area was sufficiently small. Determining a cut-off was, again, arbitrary; to adopt a conservative threshold, we considered a catchment area small if its area was  no greater than `r format(as.numeric(area_lim), big.mark = ",")` square km, which corresponded to approximately `r round(as.numeric(area_lim)/(30*30) * 100,0)`% of the area of a climate data spatial resolution tile (Figure \ref{figure_communes_fokontany}).
+
+
+```{r figure_communes_fokontany, include = TRUE, results = TRUE, warning = FALSE, message = FALSE, echo = FALSE, fig.width = 9, fig.height = 8.5, fig.align='center', out.width = '95%',  fig.scap="Communes and fokontany in Madagascar, by area.", out.extra='',  fig.cap="\\label{figure_communes_fokontany}Communes and fokontany in Madagascar, by area. Units colored in teal are within the 225 square kilometer threshold for use in Step 5 of the matching process."}
+
+#fig.cap="\\label{figure_communes_fokontany}Communes and fokontany, by area."}
+
+# Map where area is binary (smaller than value of commune_lim km sq., vs larger)
+
+map_a <- map_mdg_3 %>%
+  mutate(area_km = as.numeric(st_area(geometry)/1000000)) %>%
+  mutate(area_km_1 = ifelse(area_km <= commune_lim,
+                            paste0("<= ",
+                                   prettyNum(commune_lim, big.mark = ",", scientific = FALSE),
+                                   " km sq."),
+                            paste0("> ",
+                                   prettyNum(commune_lim, big.mark = ",", scientific = FALSE),
+                                   " km sq.")))%>%
+  ggplot(aes(geometry = geometry))  +
+  geom_sf(size = 0.2,
+          aes(fill = area_km_1),
+          color = col_grey_light) +
+  geom_sf(data = map_mdg_2,
+          size = 0.2,
+          color = col_grey_med,
+          fill = NA) +
+  geom_sf(data = map_mdg_1,
+          size = 0.2,
+          color = col_black,
+          fill = NA) +
+  theme_void() +
+  theme(text = element_text(family = "Source Sans Pro")) +
+  labs(fill = "Area (km sq.)",
+       title = "Communes",
+       subtitle = "(second smallest admin. unit in Madagascar)") +
+  scale_fill_manual(values = c(col_within_threshold, col_grey_lightest))
+
+
+# Saving plot
+ggsave(filename = "commune_size_binary.jpg", plot = last_plot(),
+       path = gpspath_fig,
+       width = 8,
+       height = 7,
+       bg = "white")
+
+
+map_b <- map_mdg_4 %>%
+  mutate(area_km = as.numeric(st_area(geometry)/1000000)) %>%
+  mutate(area_km_1 = ifelse(area_km <= fokontany_lim,
+                            paste0("<= ",
+                                   prettyNum(fokontany_lim, big.mark = ",", scientific = FALSE),
+                                   " km sq."),
+                            paste0("> ",
+                                   prettyNum(fokontany_lim, big.mark = ",", scientific = FALSE),
+                                   " km sq.")))%>%
+  ggplot(aes(geometry = geometry))  +
+  
+  
+  geom_sf(size = 0.2,
+          aes(fill = area_km_1),
+          color = col_grey_lightest) +
+    geom_sf(data = map_mdg_3,
+          size = 0.2,
+          color = col_grey_light,
+          fill = NA) +
+  geom_sf(data = map_mdg_2,
+          size = 0.2,
+          color = col_grey_med,
+          fill = NA) +
+  geom_sf(data = map_mdg_1,
+          size = 0.2,
+          color = col_black,
+          fill = NA) +
+  theme_void() +
+  theme(text = element_text(family = "Source Sans Pro")) +
+  labs(fill = "Area (km sq.)",
+       title = "Fokontany",
+       subtitle = "(smallest admin. unit in Madagascar)") +
+  scale_fill_manual(values = c(col_within_threshold, col_grey_lightest))
+
+
+# Saving plot
+ggsave(filename = "fokontany_size_binary.jpg", plot = last_plot(),
+       path = gpspath_fig,
+       width = 8,
+       height = 7,
+       bg = "white")
+
+ggarrange(map_a, map_b, ncol = 2, common.legend = TRUE, legend = "bottom")
+
+```
+
+To exploit all available information for geolocation, we first attempted to match commune-level facilities to known *fokontany* based on the facility name and catchment area. We used approximate string matching to link facilities named for their locations in our sample to known villages; if the village area was smaller than our threshold, the centroid of the village was used as a proxy for the facility location. We then applied the same approach to unmatched commune-level facilities to known communes.
+
+```{r step_5-approximate-matches, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+gps_source = "fokontany"
+approximate_string_match(facilities_all_nogps, map_mdg_4 , option = "none", type = "centroid_fokontany") # DELETE
+approximate_string_match_bind_centroid(1)
+
+gps_source = "commune"
+approximate_string_match(facilities_all_nogps, map_mdg_3 , option = "none", type = "centroid_commune") # DELETE
+approximate_string_match_bind_centroid(1)
+
+```
+
+Visual inspection of village and commune matches indicated that likely matches had a Levenshtein distance no greater than 1. Using approximate string matching, we linked  `r format(as.numeric(n_adist_fokontany_0), big.mark = ",")` facilities to *fokontany* with identical string matches and  `r format(as.numeric(n_adist_fokontany_1), big.mark = ",")` facilities with near identical matches. After applying our threshold,  `r format(as.numeric(n_matched_facilities_fokontany), big.mark = ",")` facilities in our sample were matched to *fokontany* centroids. We were then able to link `r format(as.numeric(n_adist_commune_0), big.mark = ",")` facilities to communes with identical string matches and  `r format(as.numeric(n_adist_commune_1), big.mark = ",")` facilities with near identical matches. After applying our threshold,  `r format(as.numeric(n_matched_facilities_commune), big.mark = ",")` facilities in our sample were matched to commune centroids.
+
+Altogether, matching to centroids of communes and *fokontany* in Step 5 led to `r format(as.numeric(n_matched_facilities_step_5), big.mark = ",")` facilities (`r round(as.numeric(n_matched_facilities_step_5)/n_facilities_new * 100,0)`% of our sample) being geolocated.
+
+\newpage
+
+**Step 6: Targeted searches**
+
+
+```{r step_6-loading-data, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+step = "step_6"
+gps_source = "searches"
+label = "Searches"
+
+# From this list, some of the facilities have GPS coordinates that can be 
+# found from Google and other sources
+
+# CHD facilities from Symphonia    
+facilities_chd <- read.xlsx(paste(data_gps_sources_searches, 'CHDD GPS points.xlsx', sep = "/")) %>%
+  rename(clinic_name = clinic_nam) %>%
+  select(clinic_name, clinic_typ,	region_nam,	district_n, Latitude, Longitude) %>%
+  unique() %>%
+  mutate(longitude = as.numeric(Longitude),
+         latitude = as.numeric(Latitude)) %>%
+  rename(clinic_type = clinic_typ, region_name = region_nam, district_name = district_n) %>%
+  select(clinic_type, clinic_name,  region_name, district_name, latitude, longitude) %>%
+  unique() %>%
+  st_as_sf(coords = c("longitude", "latitude"), 
+           crs = 4326) %>%
+    mutate(gps_type = "Search") %>%
+  mutate(full_name = paste(clinic_type, clinic_name, region_name, district_name)) %>%
+  mutate(commune_name = "")
+
+# Facilities from Google searching
+facilities_gps_search_1 <- read.xlsx(paste(data_gps_sources_searches, 'gps_search.xlsx', sep = "/")) %>%
+  filter(location != "") %>%
+  select(!c(source, X1)) %>%
+  separate(location, c("latitude", "longitude"), sep = ',') %>%
+  mutate(longitude = as.numeric(longitude),
+         latitude = as.numeric(latitude)) %>%
+  unique() %>%
+  st_as_sf(coords = c("longitude", "latitude"), 
+           crs = 4326) %>%
+  select(clinic_name, clinic_type, district_name,  geometry) %>%
+  mutate(gps_type = "Search") %>%
+  mutate(full_name = paste(clinic_type, clinic_name, district_name, sep = " ")) %>%
+  mutate(region_name = "", commune_name = "")
+
+# Facility from additional searches
+facilities_gps_search_2 <- read.xlsx(paste(data_gps_sources_searches, 'no_gps_facilities_coordinates.xlsx', sep = "/")) %>%
+  filter(LAT != "" | LONG != "") %>%
+  select(!c(clinic_name_w_type, ID)) %>%
+  mutate(longitude = as.numeric(LONG)/1000000,
+         latitude = as.numeric(LAT)/1000000) %>%
+  select(!c(LONG, LAT)) %>%
+  unique() %>%
+  st_as_sf(coords = c("longitude", "latitude"), 
+           crs = 4326) %>%
+  select(clinic_name, clinic_type, district_name, commune_name, region_name, geometry) %>%
+  mutate(gps_type = "Search") %>%
+  mutate(full_name = paste(clinic_type, clinic_name,district_name, sep = " ")) 
+
+# Facility from additional searches
+facilities_gps_search_3 <- read.xlsx(paste(data_gps_sources_searches, 'no_gps_facilities_coordinates_2.xlsx', sep = "/")) %>%
+  mutate(location = gsub("[\\(\\)]",          # Extract characters within parentheses
+                   "",
+                   regmatches(location,
+                              gregexpr("\\(.*?\\)",
+                                       location)))) %>%
+  separate(col = location, into = c("longitude", "latitude"), sep = ",") %>%
+  st_as_sf(coords = c("longitude", "latitude"), 
+           crs = 4326) %>%
+  select(clinic_name, clinic_type, district_name, commune_name, region_name, geometry) %>%
+  mutate(gps_type = "Search") %>%
+  mutate(full_name = paste(clinic_type, clinic_name,district_name, sep = " ")) 
+
+facilities_gps_searches <- rbind(facilities_chd, facilities_gps_search_1, facilities_gps_search_2, facilities_gps_search_3) %>%
+  rename(source = gps_type) %>%
+  select(!full_name) %>%
+  map_clean_arrondis() %>%
+  clean_clinic_name() %>%
+  clean_catchment_area() %>%
+  select(clinic_name_clean, region_name, district_name, clinic_type_clean, geometry, source) %>%
+  group_by(clinic_name_clean, region_name, district_name, clinic_type_clean) %>%
+  summarise() %>%
+  st_convex_hull() %>%
+  st_centroid() %>%
+  unique() %>%
+  mutate(region_name = ifelse(region_name == "", NA, region_name),
+         district_name = ifelse(district_name == "", NA, district_name),
+         source = label) %>%
+  inner_join(., facilities_all_nogps, by = c("clinic_name_clean", "region_name", "district_name", "clinic_type_clean"))
+
+duplicates <-
+    facilities_gps_searches$facility_ID[duplicated(facilities_gps_searches$facility_ID)]
+  
+  facilities_gps_searches <- facilities_gps_searches %>%
+    filter(!facility_ID %in% duplicates) %>%
+    select(facility_ID, geometry, source) %>%
+    inner_join(facilities_all)
+  
+
+facilities_all_gps<-rbind(facilities_all_gps, facilities_gps_searches) %>% unique()
+
+
+clinic_name <- c("FSP Antavy", "CSB1 Andranomanjaka", "FSP Privé Manarenja Doany",
+                  "CSB2 Tanandava", "HP Sambaina", "HP RAPHA",
+                  "HP Clinique Médico-chirurcical Fénérivé-Est")
+longitude <- c(45.5667, 46.8122, 46.6536, 43.74806, 47.136799713867624,
+                   47.087107305696314, 49.419187619869184)
+
+latitude <- c(-25.5167, -19.3062, -15.8393, -21.70162, -19.618509327798684,
+                  -21.451742175693784, -17.382414260993205)
+facilities_all_gps_temp <- as.data.frame(cbind(clinic_name, longitude, latitude)) %>%
+  st_as_sf(coords = c("longitude", "latitude"), 
+           crs = 4326) %>%
+  mutate(source = label) %>%
+  inner_join(facilities_all_nogps)
+
+n_targeted_searches_1 <- facilities_gps_searches %>% nrow()
+
+n_targeted_searches_2 <- facilities_all_gps_temp %>% nrow()
+
+
+facilities_all_gps<-rbind(facilities_all_gps, facilities_all_gps_temp) %>% unique()
+
+
+n_matched_facilities_step_6 <- facilities_all_gps %>% nrow()
+
+with_gps <- facilities_all_gps %>% select(facility_ID) %>% unique()
+with_gps <- as.vector(with_gps$facility_ID)
+
+facilities_all_nogps <- facilities_all %>%
+  filter(!facility_ID %in% with_gps) %>%
+  unique()
+
+rm(facilities_chd, facilities_gps_search_1, facilities_gps_search_2)
+
+
+```
+
+We then conducted targeted searches to identify coordinates for unmatched facilities from Google Maps, Mapcarta, and other sources. We identified coordinates for `r format(as.numeric(n_targeted_searches_1 + n_targeted_searches_2), big.mark = ",")` unmatched facilities.
+
+Combined with the previous steps, targeted searches led to `r format(as.numeric(n_matched_facilities_step_6), big.mark = ",")` facilities (`r round(as.numeric(n_matched_facilities_step_6)/n_facilities_new * 100,1)`% of our sample) being geolocated.
+
+<!-- A visualization of matches across all steps is provided below: -->
+
+```{r step_6-final-prep, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE, results=FALSE}
+
+  # Let's create a map of facilities with GPS data, 
+  # by GPS type (exact, centroid, or search)
+  
+facilities_all_gps %>%
+  ggplot(aes(geometry=geometry)) +
+  geom_sf(data = map_mdg_3_un,
+          size = 0.2,
+          color = col_grey_light,
+          fill = NA) +
+  geom_sf(data = map_mdg_2_un,
+          size = 0.2,
+          color = col_grey_med,
+          fill = NA) +
+  geom_sf(data = map_mdg_1_un,
+          size = 0.2,
+          color = col_black,
+          fill = NA) +
+  # geom_sf_text(data = map_mdg_1_un, aes(label = ADM1_EN),
+  #              size = 2, color = col_grey_light) +
+  geom_sf(alpha = 0.5, aes(color = source)) +
+  theme_void() +
+  theme(text = element_text(family = "Source Sans Pro")) +
+  scale_color_manual(values = c(col_centroid,
+                                col_exact_all,
+                                col_exact_rhino,
+                                col_exact_val,
+                                col_search),
+                     name = "GPS type") +
+  labs(title = "Map of facilities in database, by GPS coordinate source")
+
+# Saving plot
+ggsave(filename = "facilities_gps_by_source.jpg", plot = last_plot(),
+       path = gpspath_fig,
+       width = 8,
+       height = 7,
+       bg = "white")
+
+facilities_all_gps %>%
+  mutate(type_2 = clinic_type) %>%
+  mutate(type_2 = gsub("CSBU", "CSB", type_2),
+         type_2 = gsub("HP", "CH", type_2),
+         type_2 = gsub("FSP", "Other/Unknown", type_2),
+         type_2 = gsub("Pharmacy", "Other/Unknown", type_2),
+         type_2 = case_when(
+           str_detect(type_2, "CH") 
+           ~ "CHD/CHRR/CHU",
+           str_detect(type_2, "CSB") 
+           ~ "CSB",
+           TRUE ~ type_2)) %>%
+  ggplot(aes(geometry=geometry)) +
+  geom_sf(data = map_mdg_3_un,
+          size = 0.2,
+          color = col_grey_light,
+          fill = NA) +
+  geom_sf(data = map_mdg_2_un,
+          size = 0.2,
+          color = col_grey_med,
+          fill = NA) +
+  geom_sf(data = map_mdg_1_un,
+          size = 0.2,
+          color = col_black,
+          fill = NA) +
+  # geom_sf_text(data = map_mdg_1_un, aes(label = ADM1_EN),
+  #              size = 2, color = col_grey_light) +
+  geom_sf(alpha = 0.5, aes(color = type_2)) +
+  theme_void() +
+  theme(text = element_text(family = "Source Sans Pro")) +
+  scale_color_manual(values = c(col_CH, col_CSB, col_other),
+                     name = "Clinic type") +
+  labs(title = "Map of facilities in database, by type",
+       color = "Clinic type")
+
+# Saving plot
+ggsave(filename = "facilities_gps_by_type.jpg", plot = last_plot(),
+       path = gpspath_fig,
+       width = 8,
+       height = 7,
+       bg = "white")
+```
+
+```{r step_6-final, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE, results=FALSE}
+
+facilities_all_gps %>%
+  ggplot(aes(geometry=geometry)) +
+  geom_sf(data = map_mdg_3_un,
+          size = 0.2,
+          color = col_grey_light,
+          fill = NA) +
+  geom_sf(data = map_mdg_2_un,
+          size = 0.2,
+          color = col_grey_med,
+          fill = NA) +
+  geom_sf(data = map_mdg_1_un,
+          size = 0.2,
+          color = col_black,
+          fill = NA) +
+  # geom_sf_text(data = map_mdg_1_un, aes(label = ADM1_EN),
+  #              size = 2, color = col_grey_light) +
+  geom_sf(alpha = 0.5, aes(color = source)) +
+  theme_void() +
+  theme(text = element_text(family = "Source Sans Pro")) +
+  scale_color_manual(values = c(col_centroid,
+                                col_exact_all,
+                                col_exact_rhino,
+                                col_exact_val,
+                                col_search),
+                     name = "GPS type") 
+
+# facilities_all_gps %>%
+#   mutate(type_2 = clinic_type) %>%
+#   mutate(type_2 = gsub("CSBU", "CSB", type_2),
+#          type_2 = gsub("HP", "CH", type_2),
+#          type_2 = gsub("FSP", "Other/Unknown", type_2),
+#          type_2 = gsub("Pharmacy", "Other/Unknown", type_2),
+#          type_2 = case_when(
+#            str_detect(type_2, "CH") 
+#            ~ "CHD/CHRR/CHU",
+#            str_detect(type_2, "CSB") 
+#            ~ "CSB",
+#            TRUE ~ type_2)) %>%
+#   ggplot(aes(geometry=geometry)) +
+#   geom_sf(data = map_mdg_3_un,
+#           size = 0.2,
+#           color = col_grey_light,
+#           fill = NA) +
+#   geom_sf(data = map_mdg_2_un,
+#           size = 0.2,
+#           color = col_grey_med,
+#           fill = NA) +
+#   geom_sf(data = map_mdg_1_un,
+#           size = 0.2,
+#           color = col_black,
+#           fill = NA) +
+#   # geom_sf_text(data = map_mdg_1_un, aes(label = ADM1_EN),
+#   #              size = 2, color = col_grey_light) +
+#   geom_sf(alpha = 0.5, aes(color = type_2)) +
+#   theme_void() +
+#   theme(text = element_text(family = "Source Sans Pro")) +
+#   scale_color_manual(values = c(col_CH, col_CSB, col_other),
+#                      name = "Clinic type") +
+#   labs(#title = "Map of facilities in database, by type",
+#        color = "Clinic type")
+
+```
+
+\paragraph*{Validation}
+
+\addcontentsline{toc}{paragraph}{Validation}
+
+```{r validation_prep , warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+# facilities_sample <- facilities_all_gps %>%  sample_frac(sample_fraction)
+facilities_sample <- read_excel(paste(gpspath_spread,
+                                              "3_validation",
+                                              "validation_sample - coordinates.xlsx",
+                                              sep = "/")) %>%
+  select(!c(Longitude, Latitude, Longitude_search, Latitude_search, Source)) %>%
+  rename(clinic_name = "Clinic name",
+         region_name = Region,
+         district_name= District,
+         commune_name = Commune) %>%
+  inner_join(., facilities_all_gps, by = c("clinic_name", "region_name", "district_name", "commune_name")) %>%
+  st_as_sf() %>%
+  mutate(Longitude = sf::st_coordinates(.)[,1],
+
+                          Latitude = sf::st_coordinates(.)[,2]) %>%
+   st_drop_geometry()
+
+n_facilities_sample <- facilities_sample %>% nrow()
+
+```
+
+To verify the accuracy of the geolocating process, we randomly selected `r round(as.numeric(sample_fraction * 100,0))`% of our sample of geolocated facilities (n = `r format(as.numeric(n_facilities_sample), big.mark = ",")`) and independently identified coordinates for each facility. We then compared these coordinates to those identified from our geolocating process. We then calculated the physical distance between the independently identified coordinates and the coordinates identified from our geolocating process for each facility.
+
+Table S2.10 provides the list of facilities in the validation sample.
+
+\newpage
+
+\begin{spacing}{1}
+
+\addcontentsline{lot}{table}{Table S2.10: Sample of facilities for validation.}
+
+
+```{r validation_start, warning = FALSE, message = FALSE, echo = FALSE, include = TRUE, results=TRUE}
+
+# facilities_sample <- facilities_sample %>%
+#   select(clinic_name_full,  region_name, district_name, commune_name, geometry) %>%
+#   st_as_sf() %>%
+#       mutate(Longitude = sf::st_coordinates(.)[,1],
+#                 Latitude = sf::st_coordinates(.)[,2]) %>%
+#   st_drop_geometry() %>%
+#   rename("Clinic name" = clinic_name_full,
+#          "Region" = region_name,
+#          "District" = district_name,
+#          "Commune" = commune_name)
+# 
+# write.xlsx(facilities_sample, file = paste(gpspath_spread,
+#                                               "3_validation",
+#                                               "validation_sample.xlsx",
+#                                               sep = "/"))
+
+
+tab_2 <- facilities_sample %>%    
+  # rename(name = clinic_name) %>%
+    #     mutate(name=str_replace_all(name," ","<br>")) %>% 
+    #   mutate(region_name=str_replace_all(region_name," ","<br>")) %>% 
+    # 
+    # mutate(district_name=str_replace_all(district_name," ","<br>")) %>% 
+    # mutate(commune_name=str_replace_all(commune_name," ","<br>")) %>% 
+
+  select(!c(district_name, commune_name, clinic_name, clinic_type,
+            clinic_type_clean, source, facility_ID)) %>%
+    rename("Clinic name" = clinic_name_clean,
+           Region = region_name) %>%
+  mutate(Latitude = round(Latitude, 2),
+         Longitude = round(Longitude,2)) %>%
+  arrange(Region) %>%
+  gt() %>%
+    gt_color_rows(Longitude, palette = "ggsci::blue_material") %>%
+      gt_color_rows(Latitude) %>%
+    tab_header(
+      title = md("**Table S2.10: Sample of facilities for validation**")) %>%
+  tab_options(table.font.names = "CMU Serif Roman") %>%
+  tab_style(locations = cells_column_labels(),
+            style     = list(cell_text(weight = "bold"))) %>%
+      fmt_markdown(columns = everything())
+
+tab_2
+# tab_2 %>% gtsave("tab_2.png")
+# 
+# knitr::include_graphics("tab_2.png")
+
+
+```
+
+
+\end{spacing}
+
+
+```{r validation-cross, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+facilities_sample <- facilities_sample %>%
+  select(clinic_name, region_name, district_name, commune_name,
+         Latitude, Longitude) %>%
+  rename(Region = region_name, District = district_name, Commune = commune_name)
+
+facilities_sample_matches <- read_excel(paste(gpspath_spread,
+                                              "3_validation",
+                                              "validation_sample - coordinates.xlsx",
+                                              sep = "/")) %>%
+  select(!c(Longitude, Latitude)) %>%
+  rename(clinic_name = "Clinic name") %>%
+  inner_join(., facilities_sample) %>%
+  
+  # First, let's say that points must have the same clinic name, district name, and type
+  # to be considered to be referring to the same clinic
+  mutate(old = paste0(Longitude, " ", Latitude),
+         new = paste0(Longitude_search," ", Latitude_search)) %>%
+  # select(!c(Longitude, Latitude, "Longitude, search", "Latitude, search")) %>%
+  pivot_longer(cols = c("old", "new"), values_to = "geometry", names_to = "type" ) %>%
+  separate(   col = geometry,
+    sep = " ",
+    into = c("long", "lat")) %>%
+  st_as_sf(., coords = c("long", "lat"), 
+           crs = 4326) %>%
+  
+  group_by(clinic_name) %>%
+  
+  # For points meeting that criteria, let's gather them into lines (2 points) and polygons (3+ points)
+  summarise() %>%
+  
+  # For polygons, let's draw the smallest possible border around all points that captures each of them
+  st_convex_hull() %>%
+  
+  # And calculate the length and area of the resulting groups
+  mutate(length = as.numeric(st_length(geometry)/1000)) %>%
+  
+  select(clinic_name, length) %>%
+  arrange(length)
+
+validation_mean_dist <- mean(facilities_sample_matches$length)
+validation_max_dist <- max(facilities_sample_matches$length)
+
+```
+\vspace{24 pt}
+
+Comparing the geolocated coordinates to validated coordinates for each facility, the mean distance between coordinates in the validation sample was `r format(round(validation_mean_dist,2), big.mark = ",")` km., with a maximum distance of approximately `r format(round(validation_max_dist, 1), big.mark = ",")` kilometers. The distance between geolocated and validated coordinates for each of the facilities in the validation sample is reported in Table S2.11.
+
+\begin{spacing}{1}
+
+\addcontentsline{lot}{table}{Table S2.11: Distance between geolocated and validated coordinates.}
+
+```{r validation_table, warning = FALSE, message = FALSE, echo = FALSE, include = TRUE, results=TRUE}
+      
+ facilities_sample_matches %>%         
+  st_drop_geometry() %>%
+  mutate(length = round(length, 1)) %>%
+  rename('Facility name' = clinic_name,
+         'Distance (km)' = length) %>%
+    gt() %>%
+    tab_header(
+      title = md("**Table S2.11: Distance between geolocated and validated coordinates**")) %>%
+  tab_options(table.font.names = "CMU Serif Roman") %>%
+  tab_style(locations = cells_column_labels(),
+            style     = list(cell_text(weight = "bold"))) %>%
+      fmt_markdown(columns = everything())
+
+```
+\end{spacing}
+
+\vspace{24 pt}
+
+From this analysis, we drew strong confidence in the accuracy of our geolocating process and proceeded to obtain climate data for the identified coordinates in our sample. 
+
+\newpage
+
+**Glossary**
+
+Translations:
+
+* *Andrefana*: west (Malagasy)
+* *Atsimo*: south (Malagasy)
+* *Atsinanana*: east (Malagasy)
+* *Avaratra*: north (Malagasy)
+* *Est*: west (French)
+* *Haute*: high (French)
+* *Nord*: north (French)
+* *Ouest*: west (French)
+* *Sud*: south (French)
+* *Vaovao*: new (Malagasy)
+
+Acronyms:
+
+* *CMC*: *Clinique Médico-Chirurgicale* (French), medical-surgical clinic
+* *EKAR*: *Eglizy Katôlika Apôstôlika Rômanina* (Malagasy), the Roman Catholic Church
+* *FJKM*:  *Fiangonan'i Jesoa Kristy eto Madagasikara* (Malagasy), the Church of Jesus Christ in Madagascar 
+* *MSI*: MSI Reproductive Choices, formerly Marie Stopes International
+* *SALFA*: *Sampanasa Loterana momba ny Fahasalamana* (Malagasy), the health care program of the Malagasy Lutheran Church 
+
+\newpage
+
+
+```{r final_housekeeping, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+
+value <- c(n_facilities_who, n_facilities_rhino, n_gps_facilities_new, validation_mean_dist, validation_max_dist)
+
+variable <- c("n_facilities_who",
+              "n_facilities_rhino",
+              "n_gps_facilities_new",
+              "validation_mean_dist",
+              "validation_max_dist")
+
+gps_outputs <- as.data.frame(cbind(variable, value))
+
+save(gps_outputs,
+     file = paste(gpspath_spread,"1_matched",
+                  "gps_outputs.Rdata", sep = "/"))
+
+save(facilities_all_gps,
+       file = paste(gpspath_spread,"1_matched",
+                    "gps_facilities.Rdata", sep = "/"))
+
+# st_write(facilities_all_gps,
+#          paste(gpspath,"3_shapefiles","data_gps.shp", sep = "/"))
+
+write.xlsx(facilities_all_nogps, file = paste(gpspath_spread,
+                                              "2_unmatched",
+                                              "no_gps_facilities_supplement_2.xlsx",
+                                              sep = "/"))
+
+facilities_all_gps_temp <- facilities_all_gps %>%
+  st_as_sf()%>%
+  unique() %>%
+  mutate(longitude = sf::st_coordinates(.)[,1],
+         latitude = sf::st_coordinates(.)[,2]) %>%
+  st_drop_geometry() %>%
+  arrange(facility_ID) %>%
+  rename(clinic_code = facility_ID) %>%
+  relocate(longitude, .after = latitude)
+
+write.csv(facilities_all_gps_temp, 
+     file = paste(gpspath_spread,"1_matched", 
+                  "gps_facilities.csv", sep = "/"))
+
+
+# Record end of code time
+end <- proc.time()
+end <- as.numeric(end["elapsed"])
+
+pb_text <- paste0("This section of R code ran in ", 
+       round((end-start)/60,0),
+       " minutes.")
+
+ifelse(require("RPushbullet") == TRUE, 
+       pbPost("note", "GSP data compiled", pb_text),
+       "")
+
+
+# st_write(facilities_all_gps,
+#          paste(gpspath,"3_shapefiles","data_gps.shp", sep = "/"))
+
+# LEGACY CODE
+
+  
+  # region_names_data <- facilities_all %>% select(region_name) %>% unique()
+  # region_names_standard <- map_mdg_1 %>% st_drop_geometry() %>%select(REGION_NAM) %>% unique() %>% arrange(REGION_NAM)
+  #
+  # region_crosswalk <- cbind(region_names_data, region_names_standard) %>%
+  #   mutate(crosswalk = region_name == REGION_NAM)
+  #
+  #
+  #  facilities_all <- facilities_all %>%
+  #   mutate(region_name = case_when(
+  #     str_detect(region_name, "Amoron'i Mania") ~ "Amoron I Mania",
+#     TRUE ~ region_name))
+#
+# district_names_data <- facilities_all %>% select(region_name, district_name) %>% unique()  %>% arrange(region_name, district_name) %>%
+#    filter(!is.na(district_name)) %>% mutate(flag1 = 1)
+# district_names_standard <- map_mdg_2 %>% st_drop_geometry() %>%select(REGION_NAM, DISTRICT_N) %>%
+#     mutate(DISTRICT_N = case_when(
+#     str_detect(DISTRICT_N, "Arrondissement") ~ "Antananarivo Renivohitra",
+#     TRUE ~ DISTRICT_N)) %>%
+#   unique() %>%
+#   arrange(REGION_NAM, DISTRICT_N) %>% mutate(flag2 = 1) %>%
+#   rename(region_name = REGION_NAM, district_name = DISTRICT_N)
+#
+#   district_crosswalk <- full_join(district_names_data, district_names_standard, keep = TRUE)
+  
+# 
+# %>%
+#      mutate(district_name = ifelse(commune_name != "Andrainjato Avaratra" & 
+#                                      commune_name != "Andrainjato Sud" &
+#                                      commune_name != "Manolafaka" &
+#                                      commune_name != "Lalazana" &
+#                                      commune_name != "Tanana Ambany" &
+#                                      commune_name != "Tanana Ambony" &
+#                                      commune_name != "Vatosola" &
+#                                      district_name =="Fianarantsoa I",
+#                                   "Lalangina",
+#                                   district_name ))
+
+# commune_names_data <- facilities_all %>% select(region_name, district_name, commune_name) %>% unique()  %>% arrange(region_name, district_name, commune_name) %>%
+#    filter(!is.na(district_name)) %>% filter(!is.na(commune_name)) %>% mutate(flag1 = 1) %>%
+#    mutate(full_name = paste(region_name, district_name, commune_name, sep = "-"))
+# 
+# commune_names_standard <- map_mdg_3 %>% st_drop_geometry() %>%select(COMMUNE_NA, REGION_NAM, DISTRICT_N) %>%
+#     mutate(DISTRICT_N = case_when(
+#     str_detect(DISTRICT_N, "Arrondissement") ~ "Antananarivo Renivohitra",
+#     TRUE ~ DISTRICT_N)) %>%
+#   unique() %>%
+#   arrange(REGION_NAM, DISTRICT_N, COMMUNE_NA) %>% mutate(flag2 = 1) %>%
+#   rename(region_name = REGION_NAM, district_name = DISTRICT_N, commune_name = COMMUNE_NA) %>%
+#   mutate(full_name = paste(region_name, district_name, commune_name, sep = "-")) %>%
+#   relocate(commune_name, .after = district_name)
+# 
+# 
+# perfect_matches <- commune_names_standard %>% select(full_name) 
+# perfect_matches <- perfect_matches$full_name
+# 
+# commune_names_data_fix <- commune_names_data %>% filter(!full_name %in% perfect_matches)
+
+```
+
+
+

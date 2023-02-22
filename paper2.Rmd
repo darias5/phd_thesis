@@ -2,7 +2,240 @@
 
 ```{r loading_libraries}
 
-source("C:/Users/danie/Dropbox (Harvard University)/madagascar_mh/code/0_a_packages_and_paremeters_do_file.R")
+
+# Loading libraries
+# library(MASS) # We load this and then detach it just to clear the package
+# library(margins) # We load this and then detach it just to clear the package
+# library(lme4) # We load this and then detach it just to clear the package
+# detach("package:lme4", unload=TRUE) # Needed to use dplyr's select function
+# detach("package:margins", unload=TRUE) # Needed to use dplyr's select function
+# detach("package:MASS", unload=TRUE) # Needed to use dplyr's select function
+library(readxl)
+library(readr)
+library(dplyr)
+library(zoo)
+library(tidyr)
+library(psych)
+library(ggplot2)
+library(RColorBrewer)
+library(sp)
+library(broom)
+library(sf)
+library(scales)
+library(viridis)
+library(data.table)
+library(ggpubr)
+library(ggmap)
+library(maps)
+library(mapdata)
+library(ggrepel)
+library(table1)
+library(stringr) 
+library(stringi)
+library(fixest)
+library(stats)
+library(lubridate)
+library(forecast)
+library(gtools)
+# library(devtools)
+library(reticulate)
+library(stargazer)
+library(lwgeom)
+if (!require("ggsflabel")) devtools::install_github("yutannihilation/ggsflabel")
+library(openxlsx)
+library(gganimate)
+library(transformr)
+library(huxtable)
+library(ggtext)
+library(margins)
+library(ncdf4) # package for netcdf manipulation
+library(magrittr)
+library(lmtest)
+library(sandwich)
+library(rgee)
+library(gt)
+library(knitr)
+library(webshot2)
+library(sysfonts)
+library(showtext)
+font_add_google("Source Sans Pro")
+library(gridExtra)
+library(tibble)
+showtext_auto() 
+showtext_opts(dpi = 300)  
+# library(googledrive)
+# drive_auth(email = TRUE)
+library(rmdHelpers)
+library(gtExtras)
+library(kableExtra)
+library(DescTools)
+library(rvest)
+library(httr)
+library(polite)
+library(janitor)
+library(cowplot)
+library(ggridges)
+# library(ggsn)
+
+# library(glmmTMB)
+
+# Setting directories - change these to your local directory
+path <- 'C:/Users/danie/Dropbox (Harvard University)/madagascar_mh'
+code <- paste(path,'code', sep = "/")
+path_python  = "C:/Users/danie/AppData/Local/Programs/Python/Python310/python.exe"
+
+# Data
+datasource <- paste('C:/Users/danie/Dropbox (Harvard University)/data',
+                    sep = "/") # The complete data set is not uploaded to 
+# Github. Ask golden@hsph.harvard.edu for access. 
+datapath <- paste(path,'data', sep = "/")
+datapath_reference  <- paste(datapath,'0_reference', sep = "/")
+data_mh_chd  <- paste(datapath,'1_mental_health', sep = "/")
+data_mh_csb <- data_mh_chd  
+data_mh_chu_chrr <- paste(data_mh_chd,'pathologies neuropsychiatriques CHU CHRR', sep = "/")
+data_gps <- paste(datapath,'2_gps', sep = "/")
+data_gps_sources <- paste(data_gps,'gps_sources', sep = "/")
+data_gps_sources_searches <- paste(data_gps_sources,'searches', sep = "/")
+data_gps_sources_reposit <- paste(data_gps_sources,'repositories', sep = "/")
+data_climate_path  <- paste(datapath,'3_climate', sep = "/")
+data_climate_era  <- paste(data_climate_path,'ERA5', sep = "/")
+data_climate_esa  <- paste(data_climate_path,'ESA_CCI', sep = "/")
+
+# Results
+resultspath <- paste(path,'results', sep = "/")
+mh_path <- paste(resultspath,'1_mental_health', sep = "/")
+gpspath <- paste(resultspath,'2_gps', sep = "/")
+gpspath_admin_names <- paste(gpspath,'0_reference', sep = "/")
+gpspath_fig <-  paste(gpspath,'1_figures', sep = "/")
+gpspath_spread <-  paste(gpspath,'2_spreadsheets', sep = "/")
+gpspath_spread_fuzzy <-  paste(gpspath_spread,'3_fuzzy_matching', sep = "/")
+analysispath <- paste(resultspath,'4_analysis', sep = "/")
+analysis_figures <- paste(analysispath,'1_figures', sep = "/")
+analysis_models <- paste(analysispath,'3_models', sep = "/")
+
+
+# Shapefiles
+mappath <- paste(path,'shapefiles', sep = "/")
+mappath_MOH <- paste(mappath,'MOH', sep = "/")
+mappath_OCHA <- paste(mappath,'OCHA', sep = "/")
+
+# Color palette 
+col_light = "cyan4"
+col_dark = "cyan3"
+col_bright = "coral"
+col_black = "black"
+col_grey_dark = "grey20"
+col_grey_med = "grey40"
+col_grey_light = "grey80"
+col_grey_lightest = "grey85"
+col_soilmoisture = col_dark
+col_temperature = col_light
+col_interaction = col_bright
+col_cyclone = "steelblue2"
+  
+pal <- c("lightskyblue2", "steelblue2", "dodgerblue2", "dodgerblue3", "dodgerblue4", "darkblue")
+
+col_within_threshold = "cyan3"
+col_beyond_threshold = "coral"
+
+col_centroid <- "grey20"
+col_exact_all <- "cyan2"
+col_exact_rhino <- "cyan3"
+col_exact_val <- "cyan4"
+col_search <- "coral"
+
+col_CH <- "coral"
+col_CHD <- "coral1"
+col_CHR <- "coral3"
+col_CSB <- "steelblue2"
+col_CSB1 <- "steelblue1"
+col_CSB2 <- "steelblue3"
+col_other <-  "grey20"
+
+col_model_main <- "#F3AB00"
+col_model_other <- col_grey_med
+col_spec_yes <-  "#73BDBF"
+col_spec_no <-  "white"
+
+col_cases <- "chartreuse3"
+col_no_cases <- "deeppink3"
+
+col_eco_rainforest <-"#32A42F"
+col_eco_highlands <- "#B9CF19"
+col_eco_arid <- "#FEEE19"
+col_eco_drydecid <- "#FCAF3E"
+
+# Thresholds
+# These are cut off values that will be used in the GPS do file
+
+length_lim <- 15  # The maximum distance allowed when the same facility has
+# two GPS coordinates in the data sources for the center of
+# those two coordinates to be used as the facility's location.
+# Note: the selection of 15 is arbitrarily conservative. Spatial resolution of 
+# climate data is typically ~ 30km x 30 km
+
+
+area_lim <- length_lim*length_lim
+
+# The maximum area of the convex hull allowed when the same facility has
+# 3+ GPS coordinates in the data sources for the centroid of
+# that convex hull to be used as the facility's location
+
+fokontany_lim <- area_lim    # A small fokotanty is one that is ____ km ^2 or smaller
+
+commune_lim <- area_lim    # A small commune is one that is ____ km ^2 or smaller
+
+# Lags: specify how many lags you want for the explanatory variables (e.g., soil moisture, temp)
+
+lags_number <- 18
+
+# Climate data start and end date
+start_date <- as.Date("2010-01-01")
+end_date <- as.Date("2020-07-01")
+
+start_date_climate <- start_date - lags_number*31 #This ensures there is data for the lagged exposure
+end_date_climate <- end_date
+
+# ESA CCI trim dates
+date1 <- 200801
+date2 <- 202112
+
+# Seed and sampling fraction
+set.seed(1960) # Madgascar's year of independence
+sample_fraction = .01
+
+
+######################
+##      MAPS        ##
+######################
+#   
+# # There are two map options available. One set of shapefiles were available
+# # from humdata.org, while the other set was provided by the MOH.
+#   
+# # Loading high-resolution maps of St. Lucia (from data.humdata.org)
+map_mdg_0_un <- st_read(paste0(mappath_OCHA,"/",
+                               "mdg_admbnda_adm0_BNGRC_OCHA_20181031.shp"))
+map_mdg_1_un <- st_read(paste0(mappath_OCHA,"/",
+                               "mdg_admbnda_adm1_BNGRC_OCHA_20181031.shp"))
+map_mdg_2_un <- st_read(paste0(mappath_OCHA,"/",
+                               "mdg_admbnda_adm2_BNGRC_OCHA_20181031.shp"))
+map_mdg_3_un <- st_read(paste0(mappath_OCHA,"/",
+                               "mdg_admbnda_adm3_BNGRC_OCHA_20181031.shp"))
+loaded_maps_un <- 1
+
+
+
+# Load in data from MOH
+map_mdg_0 <- st_read(paste0(mappath_MOH,"/",
+                            "adm0_mada_utm38S.shp"))
+map_mdg_1 <- st_read(paste0(mappath_MOH,"/",
+                            "adm1_mada_utm38S.shp"))
+map_mdg_2 <- st_read(paste0(mappath_MOH,"/",
+                            "adm2_mada_utm38S.shp"))
+map_mdg_3 <- st_read(paste0(mappath_MOH,"/",
+                            "adm3_mada_utm38S.shp"))
+map_mdg_4 <- st_read(paste0(mappath_MOH,"/",
+                            "adm4_mada_utm38S.shp"))
 
 ```
 
@@ -23,7 +256,7 @@ load(file = paste(gpspath_spread,"1_matched",
                   "gps_facilities.Rdata", sep = "/"))
 
 load(file = paste(resultspath,"3_climate", 
-                  "climate_facilities.Rdata", sep = "/"))
+                  "climate_facilities_subset.Rdata", sep = "/"))
 
 load(file = paste(resultspath,"3_climate", 
                   "cyclone_data.Rdata", sep = "/"))
@@ -102,18 +335,18 @@ earliest_climate_date <- format(as.yearmon(earliest_climate_date), "%B %Y")
 latest_climate_date <- as.yearmon(end_date_climate)
 latest_climate_date <- format(as.yearmon(latest_climate_date), "%B %Y")
 
-n_facilities_sm <- data_climate %>% 
+n_facilities_sm <- data_climate_subset %>% 
   filter(date == "Jan 2010") %>%
-  dplyr::select(sm_monthly, facility_ID) %>%
-  filter(!is.na(sm_monthly)) %>%
+  dplyr::select(sm_mean, facility_ID) %>%
+  filter(!is.na(sm_mean)) %>%
   dplyr::select(facility_ID) %>%
   unique() %>%
   nrow()
 
-n_facilities_sm_missing <- data_climate %>% 
+n_facilities_sm_missing <- data_climate_subset %>% 
   filter(date == "Jan 2010") %>%
-  dplyr::select(sm_monthly, facility_ID) %>%
-  filter(is.na(sm_monthly)) %>%
+  dplyr::select(sm_mean, facility_ID) %>%
+  filter(is.na(sm_mean)) %>%
   dplyr::select(facility_ID) %>%
   unique() %>%
   nrow()
@@ -385,13 +618,13 @@ Among facilities reporting any mental health data between 2010 and 2020, data we
 
 Exploratory data analysis indicated that the classification and reporting of counts of mental disorders in GESIS varied across types of facilities in their level of detail. Among CHD facilities, incidence of mental disorders was aggregated with neurological disorders (coded as “neuro psychiatric disorders”), while CHRR and CHU facilities reported more detailed counts of specific mental disorders, such as depression, personality disorders, and schizophrenia. Across all facilities, disaggregated data was reported by age group but not by sex. Among CSB facilities, incidences of mental disorders were reported by age group under “mental illnesses and psychic disorders” until June 2015, when reporting was reclassified to “mental disorders,” and disaggregated data was reported by both age and sex.
 
-To address heterogeneity in reporting, our analysis aggregated any monthly incidence of mental or neurological disorders reported by a facility, irrespective of age and sex, into a summary outcome measure. To address outliers, monthly observations of the outcome were arranged separately for each facility into a unique time series. The nonparametric Friedman’s super smoother regression estimator[@friedmanVariableSpanScatterplot1984] was applied to each time series to identify outlier observations and replace them through linear interpolation.[@hyndmanAutomaticTimeSeries2008] By considering outliers on a facility-by-facility basis, the data cleaning approach preserved extreme values that may reflect true variances in incidence (for example, incidences reported by a large, regional reference hospital) while addressing potential errors in data entry. (Additional detail on the data cleaning process is available in the Supplementary appendix.) 
+To address heterogeneity in reporting, our analysis aggregated any monthly incidence of mental or neurological disorders reported by a facility, irrespective of age and sex, into a summary outcome measure. To address outliers, monthly observations of the outcome were arranged separately for each facility into a unique time series. The nonparametric Friedman’s super smoother regression estimator[@friedmanVariableSpanScatterplot1984] was applied to each time series to identify outlier observations and replace them through linear interpolation.[@hyndmanAutomaticTimeSeries2008] By considering outliers on a facility-by-facility basis, the data cleaning approach preserved extreme values that may reflect true variances in incidence (for example, incidences reported by a large, regional reference hospital) while addressing potential errors in data entry. (Additional detail on the data cleaning process is available in Appendix 2.1) 
 
 #### Geospatial data 
 
 To retrieve spatial climate data for the facilities in our sample, it was first necessary to geocode facilities to obtain their latitude and longitude. Facility data from GESIS included limited geospatial information. While exact facility coordinates were not available, information on the relevant administrative unit served by a facility was included in the data (e.g., regions for CHRRs, districts for CHDs, and communes for CSBs). These data informed a stepwise matching process to locate facilities in our sample. 
 
-First, region, district, and commune names in our sample were standardized against reference shapefiles to address variations in translation, abbreviation, transposition, accent marks, spacing, hyphenation, and spelling. (A summary of the standardized names is provided in the Supplementary appendix.) Next, facility names, types, and associated administrative units were used to match facilities to a validated spatial inventory of health facilities in Sub-Saharan Africa,[@mainaSpatialDatabaseHealth2019] of which `r format(as.numeric(n_facilities_who), big.mark = ",")` coordinates were provided for public facilities in Madagascar. In order to systematically match facilities in our sample to facilities in the spatial inventory, we implemented approximate string matching, which allowed for facility names and administrative units to be matched approximately, rather than exactly, to corresponding patterns in the validated spatial inventory. Applying this matching technique, `r format(as.numeric(n_matched_facilities), big.mark = ",")` facilities (`r round(as.numeric(n_matched_facilities)/num_facilities * 100,0)`%) in our sample were matched to validated coordinates. 
+First, region, district, and commune names in our sample were standardized against reference shapefiles to address variations in translation, abbreviation, transposition, accent marks, spacing, hyphenation, and spelling. (A summary of the standardized names is provided in Appendix 2.2.) Next, facility names, types, and associated administrative units were used to match facilities to a validated spatial inventory of health facilities in Sub-Saharan Africa,[@mainaSpatialDatabaseHealth2019] of which `r format(as.numeric(n_facilities_who), big.mark = ",")` coordinates were provided for public facilities in Madagascar. In order to systematically match facilities in our sample to facilities in the spatial inventory, we implemented approximate string matching, which allowed for facility names and administrative units to be matched approximately, rather than exactly, to corresponding patterns in the validated spatial inventory. Applying this matching technique, `r format(as.numeric(n_matched_facilities), big.mark = ",")` facilities (`r round(as.numeric(n_matched_facilities)/num_facilities * 100,0)`%) in our sample were matched to validated coordinates. 
 
 Among the remaining facilities, an additional `r format(as.numeric(n_matched_facilities_RHINO), big.mark = ",")` primary facilities were matched to coordinates from a spatial inventory of `r format(as.numeric(n_facilities_rhino), big.mark = ",")` coordinates obtained from the Routine Health Information Network (RHINO),[@rhinovisiondecisionsupportsystemMadagascarDecisionSupport] which supports an open source database of health facility data in conjunction with the United States Agency for International Development, the government of Madagascar, and other stakeholders. 
 
@@ -399,7 +632,7 @@ To geolocate the remaining facilities, our existing inventories were combined wi
 
 An additional `r format(as.numeric(n_centroid), big.mark = ",")` facilities were matched to the centroid of their relevant administrative unit in cases where the unit was less than or equal to `r min(commune_lim, fokontany_lim)` square kilometers, as these administrative units are quite small relative to the spatial resolution of gridded climate data (approximately 900 km²). Among the remaining facilities, geolocations were manually identified for `r format(n_gps_facilities_searches, big.mark = ",")` facilities using targeted searches, resulting in `r format(as.numeric(n_matched_facilities) + as.numeric(n_matched_facilities_RHINO) + as.numeric(n_centroid) + as.numeric(n_gps_facilities_fuzzy) + as.numeric(n_gps_facilities_searches), big.mark = ",")` of the `r format(num_facilities, big.mark = ",")` facilities (`r round((as.numeric(n_matched_facilities) + as.numeric(n_matched_facilities_RHINO) + as.numeric(n_centroid) + as.numeric(n_gps_facilities_fuzzy) + as.numeric(n_gps_facilities_searches))/as.numeric(num_facilities) * 100,0)`%) in the sample being geolocated. 
 
-To gauge the accuracy of the geolocating process, a subset of 1% of geolocated facilities was selected for validation against manually identified coordinates. Comparing the geolocated coordinates to validated coordinates for each facility, the mean distance between coordinates in the validation sample was `r format(round(as.numeric(validation_mean_dist),2), big.mark = ",")` km., with a maximum distance of approximately `r format(round(as.numeric(validation_max_dist), 1), big.mark = ",")` kilometers, indicating high accuracy in the geolocated process relative to the spatial resolution of climate data. Additional detail on the geolocating and validation process is available in the Supplementary appendix.
+To gauge the accuracy of the geolocating process, a subset of 1% of geolocated facilities was selected for validation against manually identified coordinates. Comparing the geolocated coordinates to validated coordinates for each facility, the mean distance between coordinates in the validation sample was `r format(round(as.numeric(validation_mean_dist),2), big.mark = ",")` km., with a maximum distance of approximately `r format(round(as.numeric(validation_max_dist), 1), big.mark = ",")` kilometers, indicating high accuracy in the geolocated process relative to the spatial resolution of climate data. Additional detail on the geolocating and validation process is available in Appendix 2.2.
 
 #### Climate data 
 
@@ -424,6 +657,7 @@ All analyses were completed using R (version 4.2.1).[@rcoreteamLanguageEnvironme
 Exploratory data analysis highlighted that the variance of monthly facility-level counts of incident mental disorders highly exceeded the mean; consequently, our statistical analysis utilized negative binomial (NB) regression, which is recommended in the case of over-dispersed count data.
 
 Our primary analysis involved conducting four models to estimate the association between facility-level counts of incident mental disorders and climate conditions. Model 1 used temperature as the principal predictor of counts of incident mental disorders. Model 2 only used soil moisture as a predictor. Model 3 used both temperature and soil moisture independently as predictors, while Model 4—our preferred model—introduced an interaction term between the two. 
+
 Duration of cyclone activity was included in all models using our count indicator of exposure. In all models, we included fixed effects for Madagascar’s twenty-two regions to account for geographic differences in climate patterns and case reporting. We further included month and year fixed effects to account for seasonality and time-varying omitted variables. 
 
 In addition, to aid in the interpretation of results, our analysis further reported the average marginal effect of each model predictor. Marginal effects clarify the effect of a per-unit change in a continuous explanatory variable (e.g., temperature) on an outcome where the regression model involves interaction. (In models without interaction or higher-order terms, the slope coefficient from the model will equal the marginal effect.) In addition to estimating the average marginal effects of our temperature, soil moisture, and cyclone variables, we further calculated the marginal effect and predicted values of the outcome for each unit of climate exposure across the three variables of interest.
@@ -661,12 +895,11 @@ ggsave(filename = paste0("figure_1.jpg"),
 
 ```{r figure_gps_climate, include = TRUE, echo = FALSE, warnings = FALSE, fig.scap="Spatial distribution of climate conditions across clinics and seasons in Madagascar.", out.extra='', fig.cap="\\label{figure_gps_climate}Spatial distribution of climate conditions across clinics and seasons in Madagascar. Mean monthly temperature (top) is measured in degrees Celcius and mean soil moisture is measured in percent saturation (below).", fig.width = 6, fig.height = 7.5, fig.align='center', out.width = '90%'}
 
-panel_a <- data_climate %>%
-  filter(statistic == e) %>%
-  dplyr::select(date, facility_ID, temp_monthly) %>%
+panel_a <- data_climate_subset %>%
+  dplyr::select(date, facility_ID, mean_2m_air_temperature) %>%
   unique() %>%
   inner_join(., facilities_all_gps) %>%
-  dplyr::select(date, geometry, facility_ID, temp_monthly) %>%
+  dplyr::select(date, geometry, facility_ID, mean_2m_air_temperature) %>%
   filter(date == "Jan 2015" | date == "June 2015" ) %>%
   mutate(date_2 = ifelse(date == "Jan 2015", "January 2015", "June 2015")) %>%
   filter(!is.na(date_2)) %>%
@@ -686,7 +919,7 @@ panel_a <- data_climate %>%
   # geom_sf_text(data = map_mdg_1_un, aes(label = ADM1_EN),
   #              size = 2, color = col_grey_lightest) +
   # geom_sf(alpha = 0.1, size = 5, aes(color = temp_monthly)) +
-  geom_sf(alpha = 0.9, size = .7, aes(color = temp_monthly)) +
+  geom_sf(alpha = 0.9, size = .7, aes(color = mean_2m_air_temperature)) +
   theme_void() +
   # scale_alpha(range = c(0,1)) +
   scale_color_viridis(option = "magma") +
@@ -696,12 +929,11 @@ panel_a <- data_climate %>%
                                         fill="white")) +
   facet_wrap(~date_2)
 
-panel_b <-  data_climate %>%
-  filter(statistic == e) %>%
-  dplyr::select(date, facility_ID, sm_monthly) %>%
+panel_b <-  data_climate_subset %>%
+  dplyr::select(date, facility_ID, sm_mean) %>%
   unique() %>%
   inner_join(., facilities_all_gps) %>%
-  dplyr::select(date, geometry, facility_ID, sm_monthly) %>%
+  dplyr::select(date, geometry, facility_ID, sm_mean) %>%
   filter(date == "Jan 2015" | date == "June 2015" ) %>%
   mutate(date_2 = ifelse(date == "Jan 2015", "January 2015", "June 2015")) %>%
   filter(!is.na(date_2)) %>%
@@ -721,7 +953,7 @@ panel_b <-  data_climate %>%
   # geom_sf_text(data = map_mdg_1_un, aes(label = ADM1_EN),
   #              size = 2, color = col_grey_lightest) +
   # geom_sf(alpha = 0.1, size = 5, aes(color = temp_monthly)) +
-  geom_sf(alpha = 0.9, size = .9, aes(color = sm_monthly)) +
+  geom_sf(alpha = 0.9, size = .9, aes(color = sm_mean)) +
   theme_void() +
   # scale_alpha(range = c(0,1)) +
   scale_color_viridis(option = "mako", direction = -1) +
@@ -746,12 +978,12 @@ ggsave(filename = paste0("figure_2.jpg"),
 ```{r figure_climate_distribution, include = TRUE, echo=FALSE, warnings = FALSE, fig.scap="Distribution of temperature and soil moisture across all month-years and all clinics.", out.extra='', fig.cap="\\label{figure_climate_distribution}Distribution of A) temperature and B) soil moisture across all month-years and all clinics.", fig.width = 6, fig.height = 7.5, fig.align='center', out.width = '90%'}
 
 
-panel_a <- data_climate %>%
+panel_a <- data_climate_subset %>%
   mutate(date = as.yearmon(date),
          year = as.factor(year(date)),
          month = month(date)) %>%
   filter(year != "2022") %>%
-  ggplot(aes(x=temp_monthly, y = year, fill = stat(x))) +
+  ggplot(aes(x=mean_2m_air_temperature, y = year, fill = stat(x))) +
   geom_density_ridges_gradient() +
   labs(x = "Temperature ( ̊ C)",
        title = "A:",
@@ -761,12 +993,12 @@ panel_a <- data_climate %>%
         legend.position = "") +
   scale_fill_viridis(option = "magma")
 
-panel_b <- data_climate %>%
+panel_b <- data_climate_subset %>%
   mutate(date = as.yearmon(date),
          year = as.factor(year(date)),
          month = month(date)) %>%
   filter(year != "2022") %>%
-  ggplot(aes(x=sm_monthly, y = year, fill = stat(x))) +
+  ggplot(aes(x=sm_mean, y = year, fill = stat(x))) +
   geom_density_ridges_gradient() +
   labs(x = "Soil moisture (%)",
        title = "B:",
@@ -776,7 +1008,7 @@ panel_b <- data_climate %>%
         legend.position = "") +
   scale_fill_viridis(option = "mako", direction = -1)
 
-# panel_a <- data_climate %>%
+# panel_a <- data_climate_subset %>%
 #   mutate(date = as.yearmon(date),
 #          year = as.factor(year(date)),
 #          month = month(date)) %>%
@@ -793,7 +1025,7 @@ panel_b <- data_climate %>%
 #   scale_color_viridis(discrete = TRUE, option = "magma") +
 #   scale_fill_viridis(discrete = TRUE, option = "magma")
 #
-# panel_b <- data_climate %>%
+# panel_b <- data_climate_subset %>%
 #   mutate(date = as.yearmon(date),
 #          year = as.factor(year(date)),
 #          month = month(date)) %>%
@@ -1206,6 +1438,11 @@ Examining lagged effects showed potential temporal associations between soil moi
 
 ### Subgroup analysis
 
+Results from our subgroup analysis showed evidence of potential effect heterogeneity by ecoregion (Table 2.3). For temperature, estimates of association were only statistically significant in the highland subhumid forests, where each one-degree Celsius increase in temperature was associated with `r function_dynamic_text_results(section = "regional", coefficient_option = "exposure_temperature", region_option = "2", value = "irr", value_include = "only")` cases reported `r function_dynamic_text_results(section = "regional", coefficient_option = "exposure_temperature", region_option = "2", value = "irr", value_include = TRUE)`. Temperature was associated with a slight increase in temperature in the eastern lowland forests `r function_dynamic_text_results(section = "regional", coefficient_option = "exposure_temperature", region_option = "1", value = "irr", value_include = TRUE)` and the desert and xeric shrublands `r function_dynamic_text_results(section = "regional", coefficient_option = "exposure_temperature", region_option = "1", value = "irr", value_include = TRUE)`, but in neither case was the estimate significant at a level of 0.05. 
+
+\begin{spacing}{1.5}
+
+
 ```{r table_3, include = TRUE, echo=FALSE, warnings = FALSE}
 
 
@@ -1304,9 +1541,10 @@ model_outputs_regional %>%
 
 ```
 
+\end{spacing}
+
 \addcontentsline{lot}{table}{Table 2.3: Subgroup analysis results, summarized by incidence rate ratios (IRRs) and average marginal effects (AME) from Models 1 through 4.}
 
-Results from our subgroup analysis showed evidence of potential effect heterogeneity by ecoregion (Table 2.3). For temperature, estimates of association were only statistically significant in the highland subhumid forests, where each one-degree Celsius increase in temperature was associated with `r function_dynamic_text_results(section = "regional", coefficient_option = "exposure_temperature", region_option = "2", value = "irr", value_include = "only")` cases reported `r function_dynamic_text_results(section = "regional", coefficient_option = "exposure_temperature", region_option = "2", value = "irr", value_include = TRUE)`. Temperature was associated with a slight increase in temperature in the eastern lowland forests `r function_dynamic_text_results(section = "regional", coefficient_option = "exposure_temperature", region_option = "1", value = "irr", value_include = TRUE)` and the desert and xeric shrublands `r function_dynamic_text_results(section = "regional", coefficient_option = "exposure_temperature", region_option = "1", value = "irr", value_include = TRUE)`, but in neither case was the estimate significant at a level of 0.05. 
 
 With respect to soil moisture, while our primary analysis found no evidence of a statistically significant association with reported cases in the full sample, we did find evidence of heterogeneity in our subgroup analysis. Among facilities in the highland subhumid forests, we found that each percentage point increase in soil moisture was associated with `r function_dynamic_text_results(section = "regional", coefficient_option = "exposure_sm", region_option = "2", value = "irr", value_include = "only")` reported cases `r function_dynamic_text_results(section = "regional", coefficient_option = "exposure_sm", region_option = "2", value = "irr", value_include = TRUE)`, with an average marginal effect of `r function_dynamic_text_results(section = "regional", coefficient_option = "exposure_sm", region_option = "2", value = "ame", value_include = "only")` reported cases `r function_dynamic_text_results(section = "regional", coefficient_option = "exposure_sm", region_option = "2", value = "ame", value_include = FALSE)`. Conversely, each percentage point increase in soil moisture in the dry deciduous forests was associated with a `r function_dynamic_text_results(section = "regional", coefficient_option = "exposure_sm", region_option = "4", value = "irr", value_include = "only")` increase in reported cases `r function_dynamic_text_results(section = "regional", coefficient_option = "exposure_sm", region_option = "4", value = "irr", value_include = TRUE)`, with an average marginal effect of `r function_dynamic_text_results(section = "regional", coefficient_option = "exposure_sm", region_option = "4", value = "ame", value_include = "only")` reported cases `r function_dynamic_text_results(section = "regional", coefficient_option = "exposure_sm", region_option = "4", value = "ame", value_include = FALSE)`.
 
@@ -1901,7 +2139,8 @@ All codes used for the analysis in this article are available on GitHub (https:/
 ```{r paper2_cleanup}
 
 
-rm(packages_and_paremeters_on)
+rm(packages_and_paremeters_on, data_climate, data_climate_subset, map_mdg_0, map_mdg_0_un,
+   map_mdg_1, map_mdg_1_un, map_mdg_2, map_mdg_2_un)
 
 
 ```

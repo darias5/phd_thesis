@@ -24,6 +24,17 @@ font_add_google("Source Sans Pro")
 library(gridExtra)
 showtext_auto() 
 showtext_opts(dpi = 300)  
+library(rnaturalearthhires) # install.packages("rnaturalearthhires", repos = "http://packages.ropensci.org", type = "source")
+
+col_light = "#b1f2ff"
+col_white = "white"
+col_black = "black"
+col_grey_dark = "grey20"
+col_grey_med = "grey40"
+col_grey_light = "grey80"
+col_grey_lightest = "grey85"
+pal <- c("lightskyblue2", "steelblue2", "dodgerblue2", "dodgerblue3", "dodgerblue4", "darkblue")
+
 
 # Setting directories - change these to your local directory
 path <- "C:/Users/danie/Dropbox (Harvard University)/Important Files/3. PhD/WQE/WQE II/gmh_econ/"
@@ -552,9 +563,17 @@ data_rev <- data_rev %>% mutate(
 
 
 # Import map data
+# world <- ne_countries(scale = "large", returnclass = "sf")
 world <- ne_countries(scale = "medium", returnclass = "sf")
 world$iso_code <- world$gu_a3
 world$iso_code[world$adm0_a3 == "SDS"] <- "SSD"
+
+world$iso_code[world$adm0_a3 == "SOL"] <- "SOM"
+
+world <- world %>%
+  group_by(iso_code) %>%
+  st_make_valid() %>% 
+            summarize(geometry = st_union(geometry))
 
 # Re-order estimates: original, Vigo, Walker, composite
 
@@ -572,7 +591,7 @@ data_rev$estimate_newlab <- factor(data_rev$estimate_newlab ,      # Reordering 
                                               "PAF method",
                                               "Composite approach"))
 # Merging map and dataframe
-data_rev_map <- full_join(world, data_rev, by = "iso_code") %>% filter(numeric_name == "val")
+data_rev_map <- left_join(world, data_rev, by = "iso_code") %>% filter(numeric_name == "val")
 
 # Clean up
 
@@ -924,7 +943,7 @@ results_sentence1 <- paste0(
   abstract1-results4,
   " million DALYs were attributed to mental disorders, encompassing, in total, over ",
   abstract2,
-  "\\% of global DALYs. Under all three methods, the burden of mental disorders (in DALYs) exhibited a country-income gradient, with mental disorders comprising ",
+  "\\% of global DALYs (Figure 1). Under all three methods, the burden of mental disorders (in DALYs) exhibited a country-income gradient, with mental disorders comprising ",
   ifelse(results5/results6 > 2.4, "over twice", ifelse(results5/results6> 2, "roughly twice", "approximately twice")),
   " the burden of disease in high-income countries compared to low-income countries.")
 
@@ -1065,11 +1084,11 @@ A critical link between mental health and development arises from the economic c
 
 Evaluating the economic burden of mental illness is a critical part in making the investment case for global mental health, informing public health decision-making, and guiding priority-setting and the scale up of much-needed interventions.[@chisholmScalingupTreatmentDepression2016] At the global level, however, the most recent estimate of the economic impact of mental disorders was published in 2011, using burden of disease estimates from 2004.[@bloomGlobalEconomicBurden2011] This study used three distinct approaches to quantify the economic burden of non-communicable diseases (NCDs), including mental illnesses.[@bloomGlobalEconomicBurden2011] The first is a cost-of-illness (COI) analysis, which includes the direct costs of illness as well as the indirect costs (e.g., lost productivity). The second is a value of lost output approach, which estimates the effects of illness on gross domestic product (GDP) due to the depletion of labor and capital. The third builds from value of a statistical life (VSL) approaches and attempts to capture a population’s willingness to pay to reduce morbidity and mortality associated with illness. This expands on the COI and value of lost output approaches, as it puts an economic value on the loss of health itself.
 
-With a third of disability-adjusted life years (DALYs) due to NCDs arising from mental disorders, this landmark paper estimated that the value of losses due to mental disorders was roughly 1.3 trillion USD in 2010 (1.6 trillion USD in 2019) when DALYs were valued at one times GDP per capita.[@bloomGlobalEconomicBurden2011] The authors further projected that these losses would grow to nearly 2.5 trillion USD 2010 (or approximately 3.0 trillion USD in 2019) by 2030. (See Supplementary appendix Tables S1 and S2 for estimates from the other two approaches.) These estimates have been widely cited in calls to action concerning global mental health.[@patelLancetCommissionGlobal2018; @thelancetglobalhealthMentalHealthMatters2020]
+With a third of disability-adjusted life years (DALYs) due to NCDs arising from mental disorders, this landmark paper estimated that the value of losses due to mental disorders was roughly 1.3 trillion USD in 2010 (1.6 trillion USD in 2019) when DALYs were valued at one times GDP per capita.[@bloomGlobalEconomicBurden2011] The authors further projected that these losses would grow to nearly 2.5 trillion USD 2010 (or approximately 3.0 trillion USD in 2019) by 2030. (See Tables S1.1 and S1.2 in Appendix 1 for estimates from the other two approaches.) These estimates have been widely cited in calls to action concerning global mental health.[@patelLancetCommissionGlobal2018; @thelancetglobalhealthMentalHealthMatters2020]
 
 While the estimates presented from this paper remain staggering and salient, new studies estimating the morbidity and mortality associated with mental illness have since become available.[@gbd2019mentaldisorderscollaboratorsGlobalRegionalNational2022; @vigoEstimatingTrueGlobal2016; @walkerMortalityMentalDisorders2015] These studies suggest that previous (and current) estimates of the global burden of mental disorders may be considerably underestimated, which, in turn, has implications for estimating the true economic burden of mental illness.
 
-The most recent estimates of morbidity and mortality due to mental disorders come from the Global Burden of Disease (GBD) 2019 study.[@vosGlobalBurden3692020a] The GBD study provides disease burden estimates using DALYs, years of life lost (YLLs), and years lived with disability (YLDs), which are then aggregated within a hierarchical grouping scheme that classifies causes of disability and death at different levels of mutually exclusive and completely exhaustive categories. (Mental disorders are a Level 2 condition, nested under NCDs; see Table S3.)
+The most recent estimates of morbidity and mortality due to mental disorders come from the Global Burden of Disease (GBD) 2019 study.[@vosGlobalBurden3692020a] The GBD study provides disease burden estimates using DALYs, years of life lost (YLLs), and years lived with disability (YLDs), which are then aggregated within a hierarchical grouping scheme that classifies causes of disability and death at different levels of mutually exclusive and completely exhaustive categories. (Mental disorders are a Level 2 condition, nested under NCDs; see Table S1.3.)
 
 While GBD remains the gold standard for global epidemiologic estimation, the nature of the GBD scheme—in particular, the rationale for grouping certain conditions under mental disorders or not—has been the subject of debate in the literature.[@atunChallengesEstimatingTrue2016; @vigoEstimatingTrueGlobal2016; @whitefordChallengesEstimatingTrue2016] In particular, work by Vigo et al. (2016) published in The Lancet Psychiatry argues for an expanded classification of mental disorders under the GBD classification scheme to account for underestimation of the burden of mental disorders.[@vigoEstimatingTrueGlobal2016] The authors attribute this underestimation to five main causes: 1) the distinction drawn between mental and neurological diseases; 2) the categorization of self-harm and suicide under injuries; 3) the classification of all chronic pain and somatoform disorders under musculoskeletal disorders; 4) the exclusion of personality disorders; and 5) the exclusion of premature mortality due to mental disorders. Using data from the 2013 GBD study, Vigo and colleagues re-allocated the entire burden of dementias, epilepsy, migraine, tension-type headache, and self-harm to mental disorders. In addition, a third of the burden of musculoskeletal disorders without anatomical correlate (i.e., somatoform disorders with prominent pain) was attributed to mental disorders.[@vigoEstimatingTrueGlobal2016] This reallocation attributed 13% of DALYs to mental disorders, a 6 percentage point increase from the GBD estimate of 7%.
 
@@ -1121,7 +1140,7 @@ Consistent with previous approaches, we use GDP per capita (USD 2019) for our ba
 
 The primary focus of this paper concerns structural uncertainty in determining the burden of mental illness, resulting in the evaluation of three different estimation approaches. To address parameter uncertainty within each approach, we apply a three-way sensitivity analysis. First, following a simple intuitive approach, we incorporate the upper and lower uncertainty intervals (UIs) provided by GBD 2019 for YLLs, YLDs, and DALYs to account for parameter uncertainty. Second, we use the upper and lower values of prevalence estimates and of the 95% confidence intervals (CIs) of the pooled relative risk of all-cause mortality from Walker and colleagues in our composite approach.[@walkerMortalityMentalDisorders2015] Third, our lower bound estimates are set to reallocate one sixth of the burden of musculoskeletal disorders proposed by Vigo and colleagues,[@vigoEstimatingTrueGlobal2016] while our upper bound estimates are set to reallocate one half of this burden.
 
-In addition to our base-case economic valuation, we further report our VSL estimates using three times GDP per capita as the value of a DALY. (Alternative valuations using values of $1,000 and $5,000, as well as purchasing power parity (PPP)-adjusted GDP per capita, are reported in Tables S5 and S6 of the Supplementary appendix.)
+In addition to our base-case economic valuation, we further report our VSL estimates using three times GDP per capita as the value of a DALY. (Alternative valuations using values of $1,000 and $5,000, as well as purchasing power parity (PPP)-adjusted GDP per capita, are reported in Tables S1.5 and S1.6 of Appendix 1)
 
 ### Statistical analysis
 
@@ -1155,9 +1174,9 @@ knitr::include_graphics("table1_2.png")
 
 `r results_sentence1`
 
-Rates of DALYs and deaths attributable to mental disorders under the different estimation approaches are presented by GBD region (Figure \ref{figure_gbd_adjusted}). Geographically, the composite approach allocated a large portion of DALYs (to mental disorders) in Eastern Europe, North and Latin America, and sub-Saharan Africa. This is largely driven by the inclusion of premature mortality in the composite approach. Estimates of DALYs by country income group and GBD region are reported in Table 1.2. (Estimates of deaths are reported in Table S4-6.)
+Rates of DALYs and deaths attributable to mental disorders under the different estimation approaches are presented by GBD region (Figure \ref{figure_gbd_adjusted}). Geographically, the composite approach allocated a large portion of DALYs (to mental disorders) in Eastern Europe, North and Latin America, and sub-Saharan Africa. This is largely driven by the inclusion of premature mortality in the composite approach. Estimates of DALYs by country income group and GBD region are reported in Table 1.2. (Estimates of deaths are reported in Table S1.4-1.6.)
 
-Under the three approaches, we calculated the economic value of mental disorder losses (Table 1.3). `r results_sentence2`. Further adjusting for purchasing power parity, the global value of mental illness losses would exceed 7.2 trillion international dollars in 2019 (Table S7).
+Under the three approaches, we calculated the economic value of mental disorder losses (Table 1.3). `r results_sentence2`. Further adjusting for purchasing power parity, the global value of mental illness losses would exceed 7.2 trillion international dollars in 2019 (Table S1.7).
 
 \begin{raggedright}
 
@@ -1168,12 +1187,10 @@ knitr::include_graphics("table1_3.png")
 ```
 \addcontentsline{lot}{table}{Table 1.3: Global economic value associated with premature mortality and morbidity from mental disorders, by estimation approach and value per DALY.}
 
-\end{raggedright}
+\blandscape
 
+```{r figure_dalys_nation, include = TRUE, echo = FALSE, warnings = FALSE, fig.scap="DALYs attributable to mental disorders in 2019, by estimation approach, as a share of all DALYs.", out.extra='', fig.cap=paste0("\\label{figure_dalys_nation}DALYs attributable to mental disorders in 2019, by estimation approach, as a share of all DALYs. ATG: Antigua and Barbuda; DALYs: disability-adjusted life years; FSM: Federated States of Micronesia; LCA: Saint Lucia; TLS: East Timor; TTO: Trinidad and Tobago; VCT: Saint Vincent and the Grenadines."), fig.width = 13.7, fig.height = 7.5, fig.align='center', out.width = '98%'}
 
-```{r figure_gbd_adjusted, include = TRUE, echo=FALSE, warnings = FALSE, fig.scap="DALYs, YLDs, YLLs, and deaths attributable to mental disorders in 2019, by estimation approach, per 100,000 population.", out.extra='', fig.cap=paste("\\label{figure_gbd_adjusted}DALYs, YLDs, YLLs, and deaths attributable to mental disorders in 2019, by estimation approach, per 100,000 population. Values are aggregated by GBD region. DALYs: Disability-adjusted life years; YLDs: years lived with disability; YLLs: years of life lost; GBD: Global Burden of Disease.", sep=" "), fig.width = 11, fig.height = 11, fig.align='center', out.width = '97%'}
-
-# Figure 1
 sf_use_s2(FALSE)
 
 lancet_pal <- c("#5A56A4", 
@@ -1187,10 +1204,502 @@ lancet_pal <- c("#5A56A4",
                 "#D84858",
                 "#9A154C")
 
-j = 1
-i = "ihme_region"
+data_temporary <- data_rev_map %>% 
+  filter(measure_id == 2) %>% 
+  filter(estimate_id == 4) %>%
+  st_drop_geometry() %>%
+  select(iso_code, percent)
+
+world_map <- ne_countries(scale = "large", returnclass = "sf")
+# world <- ne_countries(scale = "medium", returnclass = "sf")
+world_map$iso_code <- world_map$gu_a3
+world_map$iso_code[world_map$adm0_a3 == "SDS"] <- "SSD"
+world_map <- left_join(world_map, data_temporary, by = "iso_code")
+
+# First, we make the main map
+fun_create_map_helper <- function(data){
+  
+  data_temp <- data %>% 
+  mutate(var_cut = cut(percent, 
+                       breaks =c(0,
+                                 6,
+                                 7,
+                                 8, 
+                                 10,
+                                 12,
+                                 15,
+                                 20, 
+                                 25, 
+                                 30,
+                                 35))) 
+  
+  data_temp %>%
+    filter(admin != "Antarctica") %>%
+    # group_by(iso_code) %>%
+    # st_make_valid() %>% 
+    # summarize(geometry = st_union(geometry)) %>%
+    # mutate(var_cut = cut(gdp_md_est/1000000, 
+    #                      breaks =c(0, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100))) %>%
+    ggplot(aes(geometry = geometry, fill = var_cut)) +
+    geom_sf(color = col_grey_dark, linewidth = 0.25) +
+    scale_fill_manual(values=setNames(lancet_pal, levels(data_temp$var_cut))) +
+    
+    # scale_fill_viridis(option = "mako", discrete = TRUE) +
+    theme_void()
+}
+
+fun_create_map <- function(data, x_1 = -180, x_2 = 180, y_1 = -90, y_2 = 90){
+  
+  if(x_1 == -180 &
+     x_2 == 180  & 
+     y_1 == -90  &
+     y_2 == 90 ){
+  
+    fun_create_map_helper(data) +
+    theme(legend.position = "bottom") +
+      labs(fill = "% of DALYs") +
+      guides(fill = guide_legend(override.aes =
+                                   list(size = 0.5),
+                                 nrow = 1, 
+                                 byrow = TRUE))
+  
+  }else{
+
+    # print(paste0("The x limits of this map are c(",
+    #              min(x_1, x_2),", ",
+    #              max(x_1, x_2)," and the y limits are c(",
+    #              min(y_1, y_2), ", ",
+    #              max(y_1, y_2)))
+
+  
+    fun_create_map_helper(data) + theme(legend.position = "",
+            panel.border = element_rect(colour = "black", fill = NA, linewidth=.5))   +
+      xlim(min(x_1, x_2), max(x_1, x_2)) +
+      ylim(min(y_1, y_2), max(y_1, y_2))
+    
+ 
+  }
+  
+}
+
+main_map_upper <- world_map %>%
+  fun_create_map()
+
+
+##### Generate band of countries under neath in blocks
+
+distance <- function(measure, coord1, coord2){
+  
+  if(measure == "width"){
+    a = coord1[2]
+    b = coord2[2]
+    
+  } 
+  
+  if(measure == "height"){
+    a = coord1[1]
+    b = coord2[1]
+    
+    
+  }
+  
+  
+  ifelse(a >= 0 & b >= 0, abs(a - b),
+         ifelse(a < 0 & b < 0, 
+                max(abs(a), abs(b)) - min(abs(a), abs(b)),
+                
+                abs(abs(a) + abs(b))))
+  
+}
+
+
+fun_lower_block <- function(country = "all", y1 = -90, x1 = -180, y2 = 90, x2 = 180, 
+                            ratio_h_over_w = (0.72/.6), padding = 0.15,
+                            nudge = -9, label = country, 
+                            text_size = 8, orientation = 0.5){
+  
+  if(length(country) == 1){
+    
+    if(country == "all")
+    {country = world_map$admin}
+
+    
+  }
+    
+    
+
+  coord1 <- c(y1, x1) 
+  coord2 <- c(y2, x2)
+  
+  
+  
+  
+  # Calculate the width and width of the original rectangle
+  width <- distance("width", coord1 = coord1, coord2 = coord2)
+  height <- distance("height", coord1 = coord1, coord2 = coord2)
+  
+# 
+#   print(paste('Height is ', height,
+#               "and width is ", width))
+
+  
+  # Determine the center point of the rectangle
+  center_lat <- mean(c(coord1[1], coord2[1]))
+  center_lon <- mean(c(coord1[2], coord2[2]))
+  
+  ratio = height/width
+  
+  x1_new = max(x1, x2)
+  x2_new = min(x1, x2)
+  y1_new = max(y1, y2)
+  y2_new = min(y1, y2)
+  
+  # print(paste('Midpoint is ', center_lon,
+  #             ", ", center_lat,
+  #       ". Ratio is ", 
+  #       ratio,
+  #       ". The target is ",
+  #       ratio_h_over_w))
+
+  if (ratio != ratio_h_over_w) {
+    
+    # If our ratio is not on target...
+    
+    if (ratio > ratio_h_over_w) {
+      
+      # and if the height is greater than width, then our figure
+      # is too tall, so we will widen our coordinates...
+      
+      width_new_half = (height / ratio_h_over_w)/2
+      
+      x1_new = center_lon + width_new_half
+      x2_new = center_lon - width_new_half
+      
+      
+    }
+    
+    if (ratio < ratio_h_over_w) {
+      
+      # but if the height is less than width, then
+      height_new_half = ((width * ratio_h_over_w))/2
+      
+      y1_new = center_lat + height_new_half
+      y2_new = center_lat - height_new_half
+      
+    }
+    
+  } else {
+    
+    # print("Ratio is perfect!")
+    
+  }
+  
+  
+  coord1_new <- c(y1_new, x1_new) 
+  coord2_new <- c(y2_new, x2_new)
+  
+  
+  
+  
+  # Calculate the width and width of the original rectangle
+  width <- distance("width", coord1 = coord1_new, coord2 = coord2_new)
+  height <- distance("height", coord1 = coord1_new, coord2 = coord2_new)
+  
+  # print(paste0("New ratio is ", height/width))
+  
+  
+  # print("Making map")
+  
+  map <- world_map %>%
+    filter(admin %in% country) %>%
+    fun_create_map(y_1 = y1_new,  x_1 = x1_new, y_2 = y2_new, x_2 = x2_new) +
+    labs(x = label) +
+    theme(plot.margin = margin(padding, padding, padding, padding, "cm"),
+          panel.border = element_rect(colour = "black", fill = NA, linewidth=.5), 
+          axis.title.x =  element_text(size= text_size,
+                                       margin = margin(t = nudge),
+                                       hjust = orientation),
+          text = element_text(family = "Source Sans Pro")
+          
+    )
+          # ,
+          # aspect.ratio=1)
+  
+  # print(map)
+  
+  return(map)
+  
+}
+
+
+
+## First block: Caribbean
+
+
+
+lower_block_1 <-  fun_lower_block(country = "all",
+                                  23.688123201320412, -86.03651405368969,
+                                  18.26121082729241, -67.8554147013031, 
+                                  label = "Caribbean",
+                                  ratio_h_over_w = 2.5/3.35)
+
+## Second block: Islands in Caribbean
+
+
+
+lower_block_2_1 <- fun_lower_block("Antigua and Barbuda",  17.78141711279741, -62.2022030527118,
+                                   16.79458198479592, -61.39269148570997, label = "ATG")
+
+lower_block_2_2 <- fun_lower_block("Saint Vincent and the Grenadines",
+                                     12.391456412985622, -61.60886995955927,
+                                     13.419487110651687, -60.88102575796276, label = "VCT")
+lower_block_2_3 <- fun_lower_block("Barbados", 13.467115495468354, -59.85117377289456,
+                                     12.990476644508814, -59.33382541849154)
+lower_block_2_4 <- fun_lower_block("Comoros", -11.24866626955447, 43.00637992019884,
+                                     -12.442325445847862, 44.68437738632322)
+lower_block_2_5 <- fun_lower_block("Dominica", 15.680375533672533, -61.55835363143402,
+                                    15.069402810985572, -61.143539270458746)
+lower_block_2_6 <- fun_lower_block("Grenada", 12.54522173412346, -61.87752420403268,
+                                     11.883716350869527, -61.371600190809104)
+lower_block_2_7 <- fun_lower_block("Maldives", -0.7281644242049007, 73.00822457449168,
+                                     -0.5575134138293779, 73.29728811799717)
+lower_block_2_8 <- fun_lower_block("Mauritius", -20.620191444040987, 57.15892632861276, 
+                                     -19.903825092697055, 58.00959028441021)
+lower_block_2_9 <- fun_lower_block("Saint Lucia", 14.16262019208292, -61.164375443799265,
+                                     13.539415451808365, -60.76138414727761, label = "LCA")
+lower_block_2_10 <- fun_lower_block("Trinidad and Tobago",11.332779122191509, -61.96117584168811,
+                                    9.724954484064446, -60.4948421071539, label = "TTO")
+lower_block_2_11 <- fun_lower_block("all", -8.055776256847395, 127.5033419027598, 
+                                      -10.365527592170913, 123.86686747667004, label = "TLS")
+
+lower_block_2_12 <- fun_lower_block("Seychelles", -4.164500664831933, 55.08971811357248,
+                                      -4.87593984585334, 56.013554481127436)
+
+lower_block_2 <- cowplot::plot_grid(lower_block_2_1,
+                                    lower_block_2_2,
+                                    lower_block_2_3,
+                                    lower_block_2_4,
+                                    lower_block_2_5,
+                                    lower_block_2_6,
+                                    lower_block_2_7,
+                                    lower_block_2_8,
+                                    lower_block_2_9,
+                                    lower_block_2_10,
+                                    lower_block_2_11,
+                                    lower_block_2_12,
+                                    rel_heights  = c(1,1,1,1,
+                                                   1,1,1,1,
+                                                   1,1,1,1),
+                                    rel_widths = c(1,1,1,1,
+                                                   1,1,1,1,
+                                                   1,1,1,1),
+                                     # align='h', 
+                                     ncol= 4,
+                                     axis='t') 
+
+# print(lower_block_2)
+
+## Third block: 
+
+lower_block_3_1 <-  fun_lower_block(country = "all",
+                                    label = "West \nAfrica",
+                                    17.55830898122733, -25.766648641326874,
+                                    9.591111921718683, -7.308676054124459,
+                                    ratio_h_over_w = 0.69/0.95,
+                                    nudge = 1) 
+
+
+lower_block_3_2 <-  fun_lower_block(country = "all",
+                                    label = "Persian Gulf",
+                                    31.578724269583038, 46.68534937362107,
+                                    22.201628755387656, 57.91919943035645,
+                                    ratio_h_over_w = 1.34/0.89) 
+
+lower_block_3_3 <-  fun_lower_block(country = "all",
+                                    label = "Eastern \nMediterranean",
+                                    35.84337817700235, 32.93408225309256, 
+                                    29.953432571862056, 36.94230952794229,
+                                    ratio_h_over_w = 0.99/0.82,
+                                    nudge = 1) +  theme(aspect.ratio = 1)
+
+  
+
+lower_block_3_4 <-  fun_lower_block(country = "Malta",
+                                    36.11205138041496, 14.109153467789213,
+                                    35.749543918885365, 14.641990358572649,
+                                    ratio_h_over_w = 0.66/0.82) +  
+  theme(aspect.ratio = 1)
+
+
+lower_block_3_5 <-  fun_lower_block(country = "Singapore",
+                                    1.562021407805435, 103.52835737520651, 
+                                    1.1508368937798996, 104.17655070980254,
+                                    ratio_h_over_w = 0.8/0.82) 
+
+
+lower_block_3a <- cowplot::plot_grid(lower_block_3_1,
+                                     lower_block_3_2,
+                                    
+                                     rel_heights  = c(0.99,1.72),
+                                     rel_widths = c(1,1),
+                                     align='h',
+                                     nrow= 2,
+                                     axis='t') 
+
+lower_block_3b <- cowplot::plot_grid(lower_block_3_3,
+                                     lower_block_3_4,
+                                     lower_block_3_5,
+                                     rel_heights  = c(0.99,
+                                                      0.8,
+                                                      0.8),
+                                     rel_widths = c(1,1,1),
+                                     align='h',
+                                     nrow= 3,
+                                     axis='t') 
+
+lower_block_3 <- cowplot::plot_grid(lower_block_3a,
+                                    lower_block_3b,
+                                    rel_widths =  c(0.89,0.82),
+                                    rel_heights = c(1,1),
+                                    align='h',
+                                    ncol= 2,
+                                    axis='t') 
+
+# print(lower_block_3)
+
+
+
+## Fourth block: Balkans
+
+lower_block_4 <-  fun_lower_block(country = "all",
+                                  51.618805792153864, 32.14547175934774, 
+                                  35.76671479197162, 12.574073798467166, 
+                                  label = "Balkan Peninsula",
+                                  ratio_h_over_w = 2.47/2.75) +
+  theme(aspect.ratio = 1)
+
+# print(lower_block_4)
+
+## Fifth block: Pacific Islands
+lower_block_5_1 <-  fun_lower_block(country = "Marshall Islands",
+                                    7.271576767058141, 170.97346175839462,
+                                    7.0021405106753924, 171.43254628562116,
+                                  label = "Marshall Isl",
+                                  ratio_h_over_w = 0.67/0.72) 
+
+lower_block_5_2 <-  fun_lower_block(country = "Solomon Islands",
+                                    -6.19982314293495, 156.2033043837379,
+                                    -12.305942792508677, 162.7810192195895,
+                                    label = "Solomon Isl",
+                                    ratio_h_over_w = 0.43/0.72) 
+
+lower_block_5_3 <-  fun_lower_block(country = "Vanuatu",
+                                    -12.522849273606965, 164.09680570696634,
+                                    -21.865505295764667, 170.85928793776827,
+                                    ratio_h_over_w = 0.43/0.72) 
+
+lower_block_5_4 <-  fun_lower_block(country = "Fiji",
+                                    -16.016715539187006, 177.43916612705263,
+                                    -19.202928284064122, 180,
+                                    ratio_h_over_w = 0.55/0.72) 
+
+lower_block_5_5 <-  fun_lower_block(country = "Kiribati",
+                                    1.6783742083055109, 172.8245591145513,
+                                    1.2886789414361417, 173.1873840281737,
+                                    ratio_h_over_w = 0.67/0.69) 
+
+lower_block_5_6 <-  fun_lower_block(country = "Federated States of Micronesia",
+                                    7.123620054481302, 157.66021976354537,
+                                    6.527385048863808, 158.46395741107983,
+                                    label = "FSM",
+                                    ratio_h_over_w = 0.43/0.69) 
+
+lower_block_5_7 <-  fun_lower_block(country = "Samoa",
+                                   -13.245725830105162, -173.15052189891833,
+                                   -14.849661425405092, -171.1345307337241,
+                                    ratio_h_over_w = 0.43/0.69) 
+
+lower_block_5_8 <-  fun_lower_block(country = "Tonga",
+                                    -20.999167868460994, -175.48041913403475,
+                                    -21.50983734571705, -174.8335990873945,
+                                    ratio_h_over_w = 0.55/0.69) 
+
+
+lower_block_5a <- cowplot::plot_grid(lower_block_5_1,
+                                     lower_block_5_2,
+                                     lower_block_5_3,
+                                     lower_block_5_4,
+                                    rel_heights  = c(0.67,0.43,
+                                                     0.43, 0.55),
+                                    rel_widths = c(1,1,1,1),
+                                    align='h',
+                                    nrow= 4,
+                                    axis='t') 
+lower_block_5b <- cowplot::plot_grid(lower_block_5_5,
+                                     lower_block_5_6,
+                                     lower_block_5_7,
+                                     lower_block_5_8,
+                                     rel_heights  = c(0.67,0.43,
+                                                      0.43, 0.55),
+                                     rel_widths = c(1,1,1,1),
+                                     align='h',
+                                     nrow= 4,
+                                     axis='t') 
+
+lower_block_5 <- cowplot::plot_grid(lower_block_5a,
+                                    lower_block_5b,
+                                    rel_widths =  c(0.72,0.69),
+                                    rel_heights = c(1,1),
+                                    align='h',
+                                    ncol= 2,
+                                     axis='t') 
+
+# print(lower_block_5)
+
+
+### Joining all blocks together
+
+main_map_lower <- cowplot::plot_grid(lower_block_1,
+                                     lower_block_2,
+                                     lower_block_3,
+                                     lower_block_4,
+                                     lower_block_5,
+                                     rel_widths = c(3.32,
+                                                    3.22,
+                                                    1.92,
+                                                    2.73,
+                                                    1.82),
+                                     rel_heights = c(1,1,1,1,1),
+                                     align='h', 
+                                     ncol=5, 
+                                     axis='t') 
+
+### Joining upper and lower blocks together
+
+main_map_combined <- cowplot::plot_grid(main_map_upper,
+                                        main_map_lower,
+                                        rel_heights = c(5.9, 2.8),
+                                        rel_widths = c(1,1),
+                                        align='v', 
+                                        nrow = 2,
+                                        axis='l')
+main_map_combined
+
+```
+
+\elandscape
+
+\end{raggedright}
+
+
+```{r figure_gbd_adjusted, include = TRUE, echo=FALSE, warnings = FALSE, fig.scap="DALYs, YLDs, YLLs, and deaths attributable to mental disorders in 2019, by estimation approach, per 100,000 population.", out.extra='', fig.cap=paste0("\\label{figure_gbd_adjusted}DALYs, YLDs, YLLs, and deaths attributable to mental disorders in 2019, by estimation approach, per 100,000 population. Values are aggregated by GBD region. DALYs: Disability-adjusted life years; YLDs: years lived with disability; YLLs: years of life lost; GBD: Global Burden of Disease."), fig.width = 11, fig.height = 11, fig.align='center', out.width = '97%'}
+
+# Figure 1
+sf_use_s2(FALSE)
+
 k = "rate_per_100k"
-m = "abs"
+
+j = 1
 
 temp <- data_rev_map %>% 
   filter(measure_id == j) %>% 
@@ -1204,7 +1713,7 @@ deaths <- data_rev_map %>%
   ggplot() +
   geom_sf(mapping = aes(fill = var_cut), color = "grey95", size = 0.001) +
   geom_sf(data = . %>%   group_by(ihme_region) %>% 
-            st_set_precision(1e4) %>%
+            st_make_valid() %>% 
             summarize(geometry = st_union(geometry)), fill = "transparent", color = 'black', size = 0.02) +
   theme(panel.grid.major = element_blank(), 
         panel.background = element_blank(),
@@ -1254,7 +1763,7 @@ dalys <- data_rev_map %>%
   ggplot() +
   geom_sf(mapping = aes(fill = var_cut), color = "grey95", size = 0.001) +
   geom_sf(data = . %>%   group_by(ihme_region) %>% 
-            st_set_precision(1e4) %>%
+            st_make_valid() %>% 
             summarize(geometry = st_union(geometry)), fill = "transparent", color = 'black', size = 0.02) +
   theme(panel.grid.major = element_blank(), 
         panel.background = element_blank(),
@@ -1302,7 +1811,7 @@ ylds <- data_rev_map %>%
   ggplot() +
   geom_sf(mapping = aes(fill = var_cut), color = "grey95", size = 0.001) +
   geom_sf(data = . %>%   group_by(ihme_region) %>% 
-            st_set_precision(1e4) %>%
+            st_make_valid() %>% 
             summarize(geometry = st_union(geometry)), fill = "transparent", color = 'black', size = 0.02) +
   theme(panel.grid.major = element_blank(), 
         panel.background = element_blank(),
@@ -1351,7 +1860,7 @@ ylls <- data_rev_map %>%
   ggplot() +
   geom_sf(mapping = aes(fill = var_cut), color = "grey95", size = 0.001) +
   geom_sf(data = . %>%   group_by(ihme_region) %>% 
-            st_set_precision(1e4) %>%
+            st_make_valid() %>% 
             summarize(geometry = st_union(geometry)), fill = "transparent", color = 'black', size = 0.02) +
   theme(panel.grid.major = element_blank(), 
         panel.background = element_blank(),
@@ -1456,7 +1965,7 @@ ggsave(filename = paste0("Figure_2.png"),
 
 ```
 
-Although economic losses do not represent an actual loss to GDP, a sense of the scale can be gained by expressing the economic consequences with respect to GDP. Figure \ref{figure_cost_by_region} displays the economic burden of disease due to mental disorders under the three estimation approaches by GBD region, as a percent of regional GDP. (Estimates by absolute values per DALY are provided in the Supplementary appendix, along with mapped data visualizing estimates across all values per DALY.) Across approaches, the greatest change in estimated burden occurs in Eastern Europe, Latin America, North America, and Southern sub-Saharan Africa. `r results_sentence3`
+Although economic losses do not represent an actual loss to GDP, a sense of the scale can be gained by expressing the economic consequences with respect to GDP. Figure \ref{figure_cost_by_region} displays the economic burden of disease due to mental disorders under the three estimation approaches by GBD region, as a percent of regional GDP. (Estimates by absolute values per DALY are provided in Appendix 1, along with mapped data visualizing estimates across all values per DALY.) Across approaches, the greatest change in estimated burden occurs in Eastern Europe, Latin America, North America, and Southern sub-Saharan Africa. `r results_sentence3`
 
 ## Discussion
 

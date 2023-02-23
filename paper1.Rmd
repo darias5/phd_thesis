@@ -1503,8 +1503,8 @@ lower_block_2 <- cowplot::plot_grid(lower_block_2_1,
 
 lower_block_3_1 <-  fun_lower_block(country = "all",
                                     label = "West \nAfrica",
-                                    17.55830898122733, -25.766648641326874,
-                                    9.591111921718683, -7.308676054124459,
+                                    15.333951130672313, -20.03959428947879,
+                                    8.941590169786489, -7.402043441729575,
                                     ratio_h_over_w = 0.69/0.95,
                                     nudge = 1) 
 
@@ -1540,8 +1540,8 @@ lower_block_3_5 <-  fun_lower_block(country = "Singapore",
 lower_block_3a <- cowplot::plot_grid(lower_block_3_1,
                                      lower_block_3_2,
                                     
-                                     rel_heights  = c(0.99,1.72),
-                                     rel_widths = c(1,1),
+                                     rel_heights  = c(1.1,1.72),
+                                     rel_widths = c(1.1,1),
                                      align='h',
                                      nrow= 2,
                                      axis='t') 
@@ -1666,9 +1666,9 @@ main_map_lower <- cowplot::plot_grid(lower_block_1,
                                      lower_block_5,
                                      rel_widths = c(3.32,
                                                     3.22,
-                                                    1.92,
+                                                    2,
                                                     2.73,
-                                                    1.82),
+                                                    1.83),
                                      rel_heights = c(1,1,1,1,1),
                                      align='h', 
                                      ncol=5, 
@@ -1678,8 +1678,9 @@ main_map_lower <- cowplot::plot_grid(lower_block_1,
 
 main_map_combined <- cowplot::plot_grid(main_map_upper,
                                         main_map_lower,
-                                        rel_heights = c(5.9, 2.8),
-                                        rel_widths = c(1,1),
+                                        rel_heights = c(5.9, 
+                                                        2.7),
+                                        rel_widths = c(1.2,1),
                                         align='v', 
                                         nrow = 2,
                                         axis='l')
@@ -1697,9 +1698,21 @@ main_map_combined
 # Figure 1
 sf_use_s2(FALSE)
 
-k = "rate_per_100k"
 
+data_temporary <- data_rev_map %>% 
+  filter(estimate_id %in%  c(1,2,4)) %>%
+  st_drop_geometry() 
+
+world_map <- ne_countries(scale = "large", returnclass = "sf")
+# world <- ne_countries(scale = "medium", returnclass = "sf")
+world_map$iso_code <- world_map$gu_a3
+world_map$iso_code[world_map$adm0_a3 == "SDS"] <- "SSD"
+
+data_rev_map <- left_join(world_map, data_temporary, by = "iso_code")
+
+k = "rate_per_100k"
 j = 1
+
 
 temp <- data_rev_map %>% 
   filter(measure_id == j) %>% 

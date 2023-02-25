@@ -3,9 +3,16 @@
 
 \addcontentsline{toc}{section}{Conclusion}
 
+Overview of Paper 1
 
-Iaculis nunc sed augue lacus viverra vitae congue eu consequat. Sodales ut eu sem integer vitae. Pulvinar mattis nunc sed blandit libero volutpat sed cras. Maecenas volutpat blandit aliquam etiam erat velit scelerisque in dictum. Ultricies integer quis auctor elit sed vulputate mi. Ornare suspendisse sed nisi lacus sed viverra tellus in. Quis commodo odio aenean sed adipiscing diam donec. Platea dictumst vestibulum rhoncus est pellentesque elit. Commodo nulla facilisi nullam vehicula ipsum a arcu cursus. Ut faucibus pulvinar elementum integer enim neque volutpat. Diam quis enim lobortis scelerisque fermentum dui.
+Overview of Paper 2
 
-...
+Overview of Paper 3
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lacinia quis vel eros donec ac odio tempor. Urna nec tincidunt praesent semper feugiat nibh. Tortor aliquam nulla facilisi cras fermentum odio eu feugiat. Magna ac placerat vestibulum lectus mauris ultrices eros. Pulvinar proin gravida hendrerit lectus. Nisi scelerisque eu ultrices vitae auctor eu. Quis hendrerit dolor magna eget est lorem ipsum. At consectetur lorem donec massa sapien faucibus et molestie. Feugiat in fermentum posuere urna nec tincidunt praesent. Facilisis gravida neque convallis a cras. Massa id neque aliquam vestibulum morbi blandit. Faucibus purus in massa tempor nec feugiat nisl pretium fusce. Amet facilisis magna etiam tempor orci eu lobortis. Odio tempor orci dapibus ultrices in iaculis nunc sed augue. Nulla aliquet porttitor lacus luctus accumsan tortor posuere ac ut. Sit amet aliquam id diam maecenas. Rhoncus aenean vel elit scelerisque mauris pellentesque pulvinar pellentesque habitant. Urna nunc id cursus metus aliquam.
+Policy implications and future research
+
+Burden may be larger than traditionally conceptualized
+
+Papers also show that mental health is linked to broader contextual challenges (climate change, COVID-19) – resilience/vulnerability, exacerbating existing disparities, but also could be critical to overcoming them…
+
+In the absence of population mental health metrics, innovative uses of health data may be helpful in conducting research, but come with limitations

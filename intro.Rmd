@@ -3,9 +3,22 @@
 
 \addcontentsline{toc}{section}{Introduction}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lacinia quis vel eros donec ac odio tempor. Urna nec tincidunt praesent semper feugiat nibh. Tortor aliquam nulla facilisi cras fermentum odio eu feugiat. Magna ac placerat vestibulum lectus mauris ultrices eros. Pulvinar proin gravida hendrerit lectus. Nisi scelerisque eu ultrices vitae auctor eu. Quis hendrerit dolor magna eget est lorem ipsum. At consectetur lorem donec massa sapien faucibus et molestie. Feugiat in fermentum posuere urna nec tincidunt praesent. Facilisis gravida neque convallis a cras. Massa id neque aliquam vestibulum morbi blandit. Faucibus purus in massa tempor nec feugiat nisl pretium fusce. Amet facilisis magna etiam tempor orci eu lobortis. Odio tempor orci dapibus ultrices in iaculis nunc sed augue. Nulla aliquet porttitor lacus luctus accumsan tortor posuere ac ut. Sit amet aliquam id diam maecenas. Rhoncus aenean vel elit scelerisque mauris pellentesque pulvinar pellentesque habitant. Urna nunc id cursus metus aliquam.
+Overview of the global burden of mental health
 
-...
+Cite key literature – systematic reviews, Lancet series, Vikram’s work, DC3P findings, Walker et al. EMERALD health systems & mental health study, Mental Health Atlas from WHO, GBD for estimates of burden
 
-Iaculis nunc sed augue lacus viverra vitae congue eu consequat. Sodales ut eu sem integer vitae. Pulvinar mattis nunc sed blandit libero volutpat sed cras. Maecenas volutpat blandit aliquam etiam erat velit scelerisque in dictum. Ultricies integer quis auctor elit sed vulputate mi. Ornare suspendisse sed nisi lacus sed viverra tellus in. Quis commodo odio aenean sed adipiscing diam donec. Platea dictumst vestibulum rhoncus est pellentesque elit. Commodo nulla facilisi nullam vehicula ipsum a arcu cursus. Ut faucibus pulvinar elementum integer enim neque volutpat. Diam quis enim lobortis scelerisque fermentum dui.
+Implications of this global burden for health systems
 
+Highlight interconnectedness of mental health and physical health
+
+Links of mental health to financial risk protection / vulnerabilities to poverty
+
+Underscore under-investment in mental health systems, coupled with lack of data on mental health, which constrains research and policy 
+
+Also note that mental health is a truly global issue, impacting HICs and LMICs alike
+
+Overview of Paper 1
+
+Overview of Paper 2
+
+Overview of Paper 3

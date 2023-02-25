@@ -210,169 +210,10 @@ list_mental_health_symptoms <- list_mental_health_symptoms$search
 mental_disorders <- c("anxiety", "depression", "major_depressive_disorder")
 geography <- c("state", "county", "international")
 
-paper3_abstract <- paste0("For searches related to depression, we observe a statistically significant slope change of -0.0304 percentage points per day (p < 0.0001, 99\\% CI: -0.0321– -0.0286) and a level shift of -0.184 (p < 0.0001, 99\\% CI: -0.226– -0.143), above and beyond changes in slope and level observed for searches for headaches. For anxiety, we observe a similar slope change decline of 0.0383 percentage points per day (p < 0.0001, 99\\% CI: -0.0400– -0.0366) and a level shift of -0.339 (p < 0.0001, 99\\% CI: -0.378– -0.299).  We do not observe significant variation of estimates across predominately Democrat or Republican voting states and counties, and our results are robust to alternative specifications of bandwidth, fixed effects, and data cleaning decisions.")
 
 ```
 
-# The impact of COVID-19 vaccine developments on Google COVID-19 search trends for mental health symptoms: a controlled interrupted time series analysis
 
-\begin{centering}
-
-\emph{Daniel Arias, Jessica Cohen, Karestan Koenen, Margaret McConnell, Stéphane Verguet}
-
-\vspace{24pt}
-
-\noindent\rule{8cm}{0.4pt}
-
-\end{centering}
-
-\begin{raggedright}
-
-\vspace*{\fill}
-
-{\bf Background:} A key obstacle to studying the effects of public health responses on population mental health in the US is a lack of daily surveillance data on mental health indicators. A potential marker of population mental health is the use of Internet search data, which offers the potential for real-time, large-scale analysis and identification of evolving mental health issues. 
-
-{\bf Methods:} We utilize controlled interrupted time series (CITS) approach to evaluate whether the development and announcement of safe and effective COVID-19 vaccines reduced Google searches related to symptoms of depression and anxiety. By comparing how search trends changed in the post period for mental health symptoms above and beyond changes observed in the same period for physical health symptoms, we estimate measures of association between the vaccine announcement and changes in mental health symptom search density. We adjust for state, month, and day of week effects, and we apply a sensitivity analysis to assess the robustness of our estimates to alternative specifications. We further examine whether estimates varied among states and counties that predominantly voted for the Democratic Party candidate in the 2020 presidential election compared to the Republican candidate.
-
-{\bf Findings and interpretation:} Under our main specification, we find evidence of reduced search density associated with the announcement of vaccine safety data for Google search trends for depression and anxiety. `r paper3_abstract`
-
-\emph{Keywords: mental health, controlled interrupted time series, Google searches, United States, COVID-19 vaccines.}
-
-\end{raggedright}
-
-\newpage
-
-
-## Introduction
-It has been well-documented that throughout the pandemic, symptoms of depression and anxiety have markedly increased among US adults. While it is likely that the pandemic has a direct effect on worsened mental health status due to fear of contracting and spreading the virus, public health responses to the pandemic—including lockdowns, school closures, and social distancing measures—likely have an indirect effect as well. Existing research suggests that the effects of these measures on mental health vary, and may be protective, null, or even harmful. Studies of lockdowns in multiple countries, for example, point to worsened feelings of isolation and hopelessness exacerbated by isolation measures. By contrast, the distribution of safe and effective vaccines against COVID-19 has been shown to reduce symptoms of depression and anxiety by as much as XXX. 
-
-
-* Describe symptoms database and reference published literature using it to predict COVID-19 cases and deaths [@alruilyPredictionCovid19Transmission2022; @abbasAssociationsGoogleSearch2021; @saegnerForecastingSurveillanceCOVID192022]
-
-A recently published evaluation of Google’s COVID-19 Search Trends Symptoms Dataset found strong correlation between search trends for depression and anxiety with indicators of mental health service utilization and need reported in the US Census Household Pulse Survey (HPS) with rates of emergency department visits for mental health condition as reported in the US Centers for Disease Control and Prevention’s (CDC) National Syndromic Surveillance Program (NSSP).[@vaidyanathanEvaluationInternetSearches2022]
-
-controlled interrupted time series (CITS) 
-interrupted time series (ITS) 
-
-* Motivation to explore vaccine announcement: evidence that vaccination itself reduced depression and anxiety -- do we see earlier reductions from an anticipatory effect?
-* Motivation to analyze by polity: Vaccination became politically charged in the US, possible bias from impact of 2020 election on mental health searches
-* Overview of approach: CITS using searches for headache as a control, adjusting for fixed effects, subgroup analysis by polity, analysis for 6 different mental health symptoms
-
-## Methods
-
-### Data
-
-#### Shock date
-
-We take as our first credible signal of the imminent availability of multiple safe and effective COVID-19 vaccines to be November 16, 2020. On November 9, Pzifer announced than early vaccine trial data showed 90% efficacy;[@thomasPfizerEarlyData2020] on the 16th, Moderna similarly announced preliminary results showing 94.5% efficacy for their vaccine.[@gradyEarlyDataShow2020] While U.S. Food and Drug Administration (FDA) Emergency Use Authorization (EUA) was not granted until December, the concurrent announcements of vaccine efficacy were widely reported and interpreted by many public health practitioners, policymakers, and the general public as a substantial signal of a new phase of the pandemic, with Moderna’s chief executive officer calling the news “a game changer” in the fight against COVID-19.
-
-#### Symptoms dataset 
-
-We accessed aggregated national and subnational data from Google’s COVID-19 Search Trends
-Symptoms Dataset [@Wahltinez2020] (hereafter referred to as the symptoms dataset) between January 1, 2020 and April 1, 2021. The symptoms dataset provides time series data of search term density, standardized to pairs of health symptoms and regions (e.g., searches for depression in Australia or for fever in Cook County, Illinois) and normalized within each pair based on the symptom’s relative popularity. The time series of search density for each symptom-region pair also contains artificial noise, as Google’s differential privacy technique to data aggregation and anonymization adds random noise to protect user privacy (the errors are symmetrically distributed).
-
-Search density data for over 400 symptoms are reported across national and subnational regions of six countries: Australia, the United Kingdom, Ireland, New Zealand, Singapore, and the United States. In the United States, subnational regions include states and counties.  Because the aggregated search density trends were constructed based on relative search population within each region, comparison of search density for a specific symptom between different regions is not meaningful; however, comparing search density within regions (or a group of regions) is feasible both over time and across different symptoms. 
-
-```{r methods_text_1}
-
-n_states <- data_its_state %>% select(state_name) %>% unique() %>% nrow()
-n_counties <- data_its_county %>% select(county_fips) %>% unique() %>% nrow()
-
-
-n_states <- format(n_states, big.mark = ",") 
-
-n_counties <- format(n_counties, big.mark = ",") 
-
-```
-
-For our analysis, we utilized three levels of region from the symptoms dataset: 1) national level data from the six countries in the dataset; 2) U.S. state level data across `r n_states` states; and 3) U.S. county level data reported by `r n_counties` counties. (Though there are over 3,000 counties in the U.S., due to data privacy concerns, smaller county results were not included in the symptoms dataset.) Following the convention of the symptoms dataset, we will refer to the geographic units (e.g., states, counties, and nations) within the data as "regions."
-
-#### Voting dataset
-
-We further obtained county-level presidential election returns for 2020 from the MIT Election Data and Science Lab,[@mitelectiondataandsciencelabCountyPresidentialElection2022] which we then used to calculate aggregate county and state votes (including absentee, early, and election day ballots) won by each candidate. The aggregate votes were then used to determine vote share and margins (e.g., the percentage points difference in vote share between the candidate with the most votes to the runner up). These margins were then used to sort counties and states into quintiles, such that the 20% most Republican-voting localities appearing in the symptoms dataset were sorted into the first quintile and the 20% most Democratic-voting localities sorted into the fifth). 
-
-
-#### Population data
-
-Population estimates for 2020 by Federal Information Processing Standards (FIPS) code were obtained from the United States Department of Agriculture (USDA) Economic Research Service.
-
-### Statistical analysis
-
-All analyses were completed using R (version 4.2.1).[@rcoreteamLanguageEnvironmentStatistical2022]
-
-#### Modeling approach
-
-
-We use an ITS approach to model Google search density for a given symptom $d$ using the following baseline equation: $$Y_{d,g, i} = \lambda_0 + \lambda_1 time_t + \alpha_d Post_{d,i} + \beta_d time_t*post_{d,i} + \theta_r + T^{'}_t\chi + \epsilon_{it} \ \ \ ,\ \ \ \ \ \ \ \ \ \ \ \ (3.1)$$ where $time_t$ is a continuous variable that captures the days leading to the vaccine announcement, $Post_i$ is an indicator variable which equals 1 in the period after the shock data and 0 otherwise, $\theta_r$ is a fixed effect for region $r$, and $T^{'}_t\chi$ is a matrix of time-vary fixed effects (i.e., month and day of week).
-
-In our model, $\alpha_d$ can be interpreted as a level or intercept associated with the shock date—that is, the immediate difference in search density for a disease $d$ following November 19, 2020. The term $\beta_d$—i.e., the slope change—can be interpreted as the sustained change in search density in the days following November 16th.
-
-```{r methods_text}
-
-diseases_n <- format(max(model_outputs_its$model_number), big.mark = ",")  
-mh_diseases_n <- format(length(list_mental_health_symptoms), big.mark = ",")  
-num_models_multiverse = format(max(model_outputs_multiverse$model_number), big.mark = ",") 
-
-```
-We apply this model for all available `r diseases_n` diseases with county-level data. As search density may rapidly change in response to a shock, we trimmed the bandwidth of dates to fit our model to forty days before and after November 16, 2020. 
-
-To control for time-varying confounders which may have affected symptom search trends during the study period, we applied a CITS approach to contrast how searches for mental health symptoms varied above and beyond changes in search density for a comparable physical complaint (i.e., headaches).
-
-After reviewing the list of symptoms for which search density data were available, we identified the following `r mh_diseases_n` mental health related symptoms: `r paste0(gsub("asperger", "Asperger", gsub("_", " ", printList(toPrint = sort(list_mental_health_symptoms), finalSepWord = "and", midSep = ","))),".")` 
-
-For each of these mental health symptoms, $d$, we ran the following model to predict search density:
-
-\begin{spacing}{1}
-
-$$Y_{d,it} = \lambda_0 + \lambda_1 time_t + \lambda_2 Post_t + \lambda_3 time_t*Post_t + \alpha_d treated_{di} + 
-\ \ \ \ \ $$
-$$\beta_d time_t*treated_{di}  + \delta_{d} Post_i*treated_{di} + \gamma_d time_t*Post_i*treated_{di} + \theta_g + T^{'}_t\chi +  \epsilon_{it}\ \ \ ,\ \ \ \ \ \ \ \ \ \ (3.2)$$
-\end{spacing}
-
-\vspace{12pt}
-
-where $treated_{di}$: is an indicator variable which equals 1 if the observation is for a mental health condition $d$, 0 if for headaches. The CITS effect estimates of interest are given by $\delta$, which reflects the additional level shift among mental health related symptoms searches compared to searches for headaches after the vaccine announcement, and  $\gamma$, the additional change in search density over time (i.e., slope change) comparing the same.
-
-Given the high number of observations in our sample, we evaluated significance against an alpha of 0.01, and we constructed 99% confidence intervals using heteroskedasticity-robust standard errors.
-
-##### Sensitivity analysis 
-
-As with other quasi-experimental methods, it is recommended that the modeling choices and specifications of a CITS analysis be evaluated using a sensitivity analysis. To do so, we defined a list of seven methodological choices concerning data processing and modeling assumptions and interacted these choices to generate all their plausible  combinations. These combinations were then conducted to allow for a multiverse analysis to identify how sensitive effect estimates and confidence intervals were to different methodological choices. 
-
-These criteria used to generate the plausible model combinations are outlined in Table 3.1. 
-
-\vspace{12pt}
-
-\begin{raggedright}
-
-```{r table3_1, echo = FALSE, include = TRUE, out.width = '100%'}
-
-knitr::include_graphics("table3_1.png")
-
-```
-
-\addcontentsline{lot}{table}{Table 3.1: Alternative specifications, data processing, and modeling decisions for multiverse analysis}
-
-\end{raggedright}
-
-First, we considered the role of data cleaning in the outcome data, which involved outlier smoothing using Friedman’s nonparametric super smoother regression estimator.[@friedmanVariableSpanScatterplot1984] Second, we compared the level of region of aggregated data, using U.S. counties, U.S. states, and, finally, national trends from the six counties in the sample. Third, we evaluated sensitivity to our specification of the bandwidth cut-off around the shock date, extending this from ±40 days to 40 and 60 days. Fourth, we toggled whether to account for day of week fixed effects. Fifth, we toggled month fixed effects. Sixth, we similarly toggled regional fixed effects (i.e., fixed effects for states in the U.S. state level data, fixed effects for counties in the U.S. county level data, etc.).
-
-Interacting these choices resulted in 144 plausible models for each symptom. Each of the 144 models were run for all `r mh_diseases_n` mental health related symptoms, resulting in `r num_models_multiverse` models being conducted overall. 
-
-##### Subgroup analysis 
-
-Two subgroup analyses were conducted to investigate the generalizability of the findings of the main analysis and to explore potential heterogeneities in measures of association. 
-
-The first subgroup analysis applied the CITS approach against all `r mh_diseases_n` mental health related symptoms against search data from each of the six countries in the sample, using our nationally aggregated data. This analysis aimed to investigate the extent to which effects observed in US states and counties were also seen in other countries.
-
-The second subgroup analysis applied the CITS approach to the 20% most Republican-voting localities (hereafter referred to as red states/counties) and to the 20% most Democratic-voting localities (hereafter referred to as blue states/counties) based on 2020 presidential election vote share. A growing body of evidence has documented that political ideology can play a role in how receptive people are to vaccination; this has been highlighted throughout the COVID-19 pandemic, with people identifying as conservative being more likely to express skepticism of public health authorities and the scientific community and being more likely to express concerns about the safety, effectiveness, or necessity of vaccines. Our subgroup analysis comparing CITS effect estimates in blue vs. red states aimed to investigate whether the initial response to imminent safe and effective COVID-19 vaccines showed evidence of heterogeneity by predominant political ideology, under the hypothesis that if conservative voters were more likely to be averse to vaccination, any impact on mental health related symptom search density from the announcement of upcoming vaccines would be lesser in red states and counties compared to blue ones.
-
-### Ethics statement
-
-The Institutional Review Board (IRB) of the Harvard T.H. Chan School of Public Health has determined that the study was not human subjects research, and that additional review was not required (protocol number: IRB23-0095, determined on January 25, 2023).
-
-
-## Results
 
 ```{r}
 
@@ -623,15 +464,182 @@ function_figures_cits_data <- function(geography,m){
                                    # plot_7,
                                    # plot_8,
                                    # plot_9,
-                                   align='v', ncol=1, axis='b') 
+                                   align='v', nrow=3, axis='b') 
  print(combo_plot_1)
  
   
 }
 
+paper3_abstract <- paste0("For searches related to depression, we observe a statistically significant slope change of ",
+                          function_dynamic_text_results("main","depression", "slope"), " and a level shift of ",
+                          function_dynamic_text_results("main","depression", "intercept"),
+                          ", above and beyond changes in slope and level observed for searches for headaches. For anxiety, we observe a similar slope change decline of",
+                          function_dynamic_text_results("main","anxiety", "slope"), 
+                          " and a level shift of ",
+                          function_dynamic_text_results("main","anxiety", "intercept"),
+ ". We do not observe significant variation of estimates across predominately Democrat or Republican voting states and counties, and our results are robust to alternative specifications of bandwidth, fixed effects, and data cleaning decisions.")
 
 
 ```
+
+
+
+# The impact of COVID-19 vaccine developments on Google COVID-19 search trends for mental health symptoms: a controlled interrupted time series analysis
+
+\begin{centering}
+
+\emph{Daniel Arias, Jessica Cohen, Karestan Koenen, Margaret McConnell, Stéphane Verguet}
+
+\vspace{24pt}
+
+\noindent\rule{8cm}{0.4pt}
+
+\end{centering}
+
+\begin{raggedright}
+
+\vspace*{\fill}
+
+{\bf Background:} A key obstacle to studying the effects of public health responses on population mental health in the US is a lack of daily surveillance data on mental health indicators. A potential marker of population mental health is the use of Internet search data, which offers the potential for real-time, large-scale analysis and identification of evolving mental health issues. 
+
+{\bf Methods:} We utilize controlled interrupted time series (CITS) approach to evaluate whether the development and announcement of safe and effective COVID-19 vaccines reduced Google searches related to symptoms of depression and anxiety. By comparing how search trends changed in the post period for mental health symptoms above and beyond changes observed in the same period for physical health symptoms, we estimate measures of association between the vaccine announcement and changes in mental health symptom search density. We adjust for state, month, and day of week effects, and we apply a sensitivity analysis to assess the robustness of our estimates to alternative specifications. We further examine whether estimates varied among states and counties that predominantly voted for the Democratic Party candidate in the 2020 presidential election compared to the Republican candidate.
+
+{\bf Findings and interpretation:} Under our main specification, we find evidence of reduced search density associated with the announcement of vaccine safety data for Google search trends for depression and anxiety. `r paper3_abstract`
+
+\emph{Keywords: mental health, controlled interrupted time series, Google searches, United States, COVID-19 vaccines.}
+
+\end{raggedright}
+
+\newpage
+
+
+## Introduction
+The coronavirus disease 2019 (COVID-19) pandemic has had a profound effect on the mental health and wellbeing of individuals worldwide. In the United States, approximately four in ten adults reported experiencing symptoms of anxiety or depression in December 2020—a four-fold increase from January-June 2019.[@panchalImplicationsCOVID19Mental2021, p. 19] Studies from Australia,[@batterhamTrajectoriesDepressionAnxiety2021] China,[@ahmedEpidemicCOVID19China2020; @gaoMentalHealthProblems2020; @hwangLonelinessSocialIsolation; @leiComparisonPrevalenceAssociated2020; @liuPrevalencePredictorsPTSS2020; @qiuNationwideSurveyPsychological2020; @wangImmediatePsychologicalResponses2020; @wangStudyPublicPsychological2021; @wangPsychologicalDistressCoping2020; @zhangImpactCOVID19Pandemic2020] Denmark,[@sonderskovDepressiveStateDenmark] Europe,[@hajekPrevalenceDeterminantsProbable2022] Iran,[@moghanibashi-mansouriehAssessingAnxietyLevel2020] Ireland,[@hylandAnxietyDepressionRepublic2020]  Italy,[@mazzaNationwideSurveyPsychological2020; @mocciaAffectiveTemperamentAttachment2020] Nepal,[@samadarshiOnlineSurveyFactors2020] New Zealand,[@gasteigerDepressionAnxietyStress2021] Spain,[@gonzalez-sanguinoMentalHealthConsequences2020; @ozamiz-etxebarriaStressAnxietyDepression2020] Turkey[@ozdinLevelsPredictorsAnxiety2020],  the United States,[@jiaNationalStateTrends2021, p. 2020–2021; @kujawaExposureCOVID19Pandemic2020] and the United Kingdom[@dettmannInvestigatingPrevalenceAnxiety2022] report high levels of anxiety (6-51%), depression (15-48%), and post-traumatic stress disorder (7-54%) associated with aspects of the pandemic.  Globally, it is estimated that the prevalence of depression during the COVID-19 pandemic may be as high as 24%, with the prevalence of anxiety estimated at 21.3%.[@banko-ferranImpactCOVID19Mental2020; @castaldelli-maiaInvestigatingEffectNational2021] This striking burden has been described as a mental health crisis[@melimopoulosHowCOVID19Pandemic2021] and a pandemic in its own right.[@kwaiWhatPointYoung2021] 
+
+While COVID-19 continues to bring unprecedented challenges to individuals and societies around the world, the development and distribution of safe and effective vaccines against COVID-19 has fundamentally changed the trajectory of the pandemic. Beyond the physical benefits vaccines provide in reducing the risk of infection and associated morbidity and mortality, a growing body of evidence suggests that vaccination has also contributed to improved mental health.[@agrawalImpactCOVID19Vaccine2021; @chourpiliadisShorttermImprovementMental2023; @nguyenPsychologicalBenefitsCOVID192021; @rubinsteinEffectCOVID19Vaccinations2023] Research drawing from the United States Census Bureau’s Household Pulse Survey, for example, has found that the secondary benefits of the protective effects of vaccination may include up to a 30% reduction in symptoms of anxiety and depression in vaccinated adults.[@agrawalImpactCOVID19Vaccine2021]
+
+While this literature suggests that that receiving a COVID-19 vaccine can improve mental health state, the potential mental health benefits of public health announcements regarding the development of vaccines have received comparatively little attention. In the context of a deadly pandemic, the announcement of a novel safe and effective vaccine could be a powerful signal, providing a psychological boost and hope that the worst might soon be mitigated. Studying how population mental health may have been impacted by the release of vaccine efficacy and safety trial data may provide insights into how emotional well-being changed throughout the COVID-19 pandemic in response to these signals, which, in turn, could inform public health communication and contribute to our understanding of how the public processes and responds to information about vaccines—a necessary understanding for increasing vaccine uptake and trust in public health responses.
+
+A key obstacle to studying the effects of public health responses on population mental health in the US, however, is a lack of daily surveillance data on mental health indicators; a potential marker of population mental health is the use of Internet search data, which offers the potential for real-time, large-scale analysis and identification of evolving mental health issues. A recently published evaluation of Google’s COVID-19 Search Trends Symptoms Dataset found strong correlation between search trends for depression and anxiety with indicators of mental health service utilization and need reported in the US Census Household Pulse Survey (HPS) with rates of emergency department visits for mental health condition as reported in the US Centers for Disease Control and Prevention’s (CDC) National Syndromic Surveillance Program (NSSP).[@vaidyanathanEvaluationInternetSearches2022] If taken as a reasonable proxy for mental health complaints, search data can provide valuable information on how population mental health reacts to real-time events and evolves over different shocks, enabling policymakers to better respond to mental health needs and assess reactions to public health efforts. 
+
+Our study examines how news regarding the imminent availability of multiple safe and effective COVID-19 vaccines in November 2020 may have impacted population mental health even before these vaccines were made available to the public. Using Google search density data, we employed an interrupted time series approach to investigate how these announcements may have affected search trends for mental health symptoms in the United States and in five other countries. Owing to emerging evidence that political ideology may be a predictor of confidence in public health and vaccine hesitancy[@debusPoliticalIdeologyVaccination2021; @baumgaertnerInfluencePoliticalIdeology2018; @stolerSociopoliticalPsychologicalCorrelates2022] (with people identifying as conservative being more likely to express skepticism of public health authorities and the scientific community and being more likely to express concerns about the safety, effectiveness, or necessity of vaccines), we further explored whether changes in search trends for mental health symptoms varied across states and counties that predominantly voted Democrat versus Republic in the 2020 president election. Our findings suggest both immediate and sustained declines in search density for searches related to anxiety, depression, and major depressive disorder; these declines were observed both in the U.S. and abroad, and were found to be consistent irrespective of political ideology. 
+
+
+## Methods
+
+### Data
+
+#### Shock date
+
+We take as our first credible signal of the imminent availability of multiple safe and effective COVID-19 vaccines to be November 16, 2020. On November 9, Pzifer announced than early vaccine trial data showed 90% efficacy;[@thomasPfizerEarlyData2020] on the 16th, Moderna similarly announced preliminary results showing 94.5% efficacy for their vaccine.[@gradyEarlyDataShow2020] While U.S. Food and Drug Administration (FDA) Emergency Use Authorization (EUA) was not granted until December, the concurrent announcements of vaccine efficacy were widely reported and interpreted by many public health practitioners, policymakers, and the general public as a substantial signal of a new phase of the pandemic, with Moderna’s chief executive officer calling the news “a game changer” in the fight against COVID-19.
+
+#### Symptoms dataset 
+
+We accessed aggregated national and subnational data from Google’s COVID-19 Search Trends
+Symptoms Dataset [@Wahltinez2020] (hereafter referred to as the symptoms dataset) between January 1, 2020 and April 1, 2021. The symptoms dataset provides time series data of search term density, standardized to pairs of health symptoms and regions (e.g., searches for depression in Australia or for fever in Cook County, Illinois) and normalized within each pair based on the symptom’s relative popularity. The time series of search density for each symptom-region pair also contains artificial noise, as Google’s differential privacy technique to data aggregation and anonymization adds random noise to protect user privacy (the errors are symmetrically distributed).
+
+Search density data for over 400 symptoms are reported across national and subnational regions of six countries: Australia, the United Kingdom, Ireland, New Zealand, Singapore, and the United States. In the United States, subnational regions include states and counties.  Because the aggregated search density trends were constructed based on relative search population within each region, comparison of search density for a specific symptom between different regions is not meaningful; however, comparing search density within regions (or a group of regions) is feasible both over time and across different symptoms. 
+
+```{r methods_text_1}
+
+n_states <- data_its_state %>% select(state_name) %>% unique() %>% nrow()
+n_counties <- data_its_county %>% select(county_fips) %>% unique() %>% nrow()
+
+
+n_states <- format(n_states, big.mark = ",") 
+
+n_counties <- format(n_counties, big.mark = ",") 
+
+```
+
+For our analysis, we utilized three levels of region from the symptoms dataset: 1) national level data from the six countries in the dataset; 2) U.S. state level data across `r n_states` states; and 3) U.S. county level data reported by `r n_counties` counties. (Though there are over 3,000 counties in the U.S., due to data privacy concerns, smaller county results were not included in the symptoms dataset.) Following the convention of the symptoms dataset, we will refer to the geographic units (e.g., states, counties, and nations) within the data as "regions."
+
+#### Voting dataset
+
+We further obtained county-level presidential election returns for 2020 from the MIT Election Data and Science Lab,[@mitelectiondataandsciencelabCountyPresidentialElection2022] which we then used to calculate aggregate county and state votes (including absentee, early, and election day ballots) won by each candidate. The aggregate votes were then used to determine vote share and margins (e.g., the percentage points difference in vote share between the candidate with the most votes to the runner up). These margins were then used to sort counties and states into quintiles, such that the 20% most Republican-voting localities appearing in the symptoms dataset were sorted into the first quintile and the 20% most Democratic-voting localities sorted into the fifth). 
+
+
+#### Population data
+
+Population estimates for 2020 by Federal Information Processing Standards (FIPS) code were obtained from the United States Department of Agriculture (USDA) Economic Research Service.
+
+### Statistical analysis
+
+All analyses were completed using R (version 4.2.1).[@rcoreteamLanguageEnvironmentStatistical2022]
+
+#### Modeling approach
+
+
+We use an ITS approach to model Google search density for a given symptom $d$ using the following baseline equation: $$Y_{d,g, i} = \lambda_0 + \lambda_1 time_t + \alpha_d Post_{d,i} + \beta_d time_t*post_{d,i} + \theta_r + T^{'}_t\chi + \epsilon_{it} \ \ \ ,\ \ \ \ \ \ \ \ \ \ \ \ (3.1)$$ where $time_t$ is a continuous variable that captures the days leading to the vaccine announcement, $Post_i$ is an indicator variable which equals 1 in the period after the shock data and 0 otherwise, $\theta_r$ is a fixed effect for region $r$, and $T^{'}_t\chi$ is a matrix of time-vary fixed effects (i.e., month and day of week).
+
+In our model, $\alpha_d$ can be interpreted as a level or intercept associated with the shock date—that is, the immediate difference in search density for a disease $d$ following November 19, 2020. The term $\beta_d$—i.e., the slope change—can be interpreted as the sustained change in search density in the days following November 16th.
+
+```{r methods_text}
+
+diseases_n <- format(max(model_outputs_its$model_number), big.mark = ",")  
+mh_diseases_n <- format(length(list_mental_health_symptoms), big.mark = ",")  
+num_models_multiverse = format(max(model_outputs_multiverse$model_number), big.mark = ",") 
+
+```
+We apply this model for all available `r diseases_n` diseases with county-level data. As search density may rapidly change in response to a shock, we trimmed the bandwidth of dates to fit our model to forty days before and after November 16, 2020. 
+
+To control for time-varying confounders which may have affected symptom search trends during the study period, we applied a CITS approach to contrast how searches for mental health symptoms varied above and beyond changes in search density for a comparable physical complaint (i.e., headaches).
+
+After reviewing the list of symptoms for which search density data were available, we identified the following `r mh_diseases_n` mental health related symptoms: `r paste0(gsub("asperger", "Asperger", gsub("_", " ", printList(toPrint = sort(list_mental_health_symptoms), finalSepWord = "and", midSep = ","))),".")` 
+
+For each of these mental health symptoms, $d$, we ran the following model to predict search density:
+
+\begin{spacing}{1}
+
+$$Y_{d,it} = \lambda_0 + \lambda_1 time_t + \lambda_2 Post_t + \lambda_3 time_t*Post_t + \alpha_d treated_{di} + 
+\ \ \ \ \ $$
+$$\beta_d time_t*treated_{di}  + \delta_{d} Post_i*treated_{di} + \gamma_d time_t*Post_i*treated_{di} + \theta_g + T^{'}_t\chi +  \epsilon_{it}\ \ \ ,\ \ \ \ \ \ \ \ \ \ (3.2)$$
+\end{spacing}
+
+\vspace{12pt}
+
+where $treated_{di}$: is an indicator variable which equals 1 if the observation is for a mental health condition $d$, 0 if for headaches. The CITS effect estimates of interest are given by $\delta$, which reflects the additional level shift among mental health related symptoms searches compared to searches for headaches after the vaccine announcement, and  $\gamma$, the additional change in search density over time (i.e., slope change) comparing the same.
+
+Given the high number of observations in our sample, we evaluated significance against an alpha of 0.01, and we constructed 99% confidence intervals using heteroskedasticity-robust standard errors.
+
+##### Sensitivity analysis 
+
+As with other quasi-experimental methods, it is recommended that the modeling choices and specifications of a CITS analysis be evaluated using a sensitivity analysis. To do so, we defined a list of seven methodological choices concerning data processing and modeling assumptions and interacted these choices to generate all their plausible  combinations. These combinations were then conducted to allow for a multiverse analysis to identify how sensitive effect estimates and confidence intervals were to different methodological choices. 
+
+These criteria used to generate the plausible model combinations are outlined in Table 3.1. 
+
+\vspace{12pt}
+
+\begin{raggedright}
+
+```{r table3_1, echo = FALSE, include = TRUE, out.width = '100%'}
+
+knitr::include_graphics("table3_1.png")
+
+```
+
+\addcontentsline{lot}{table}{Table 3.1: Alternative specifications, data processing, and modeling decisions for multiverse analysis}
+
+\end{raggedright}
+
+First, we considered the role of data cleaning in the outcome data, which involved outlier smoothing using Friedman’s nonparametric super smoother regression estimator.[@friedmanVariableSpanScatterplot1984] Second, we compared the level of region of aggregated data, using U.S. counties, U.S. states, and, finally, national trends from the six counties in the sample. Third, we evaluated sensitivity to our specification of the bandwidth cut-off around the shock date, extending this from ±40 days to 40 and 60 days. Fourth, we toggled whether to account for day of week fixed effects. Fifth, we toggled month fixed effects. Sixth, we similarly toggled regional fixed effects (i.e., fixed effects for states in the U.S. state level data, fixed effects for counties in the U.S. county level data, etc.).
+
+Interacting these choices resulted in 144 plausible models for each symptom. Each of the 144 models were run for all `r mh_diseases_n` mental health related symptoms, resulting in `r num_models_multiverse` models being conducted overall. 
+
+##### Subgroup analysis 
+
+Two subgroup analyses were conducted to investigate the generalizability of the findings of the main analysis and to explore potential heterogeneities in measures of association. 
+
+The first subgroup analysis applied the CITS approach against all `r mh_diseases_n` mental health related symptoms against search data from each of the six countries in the sample, using our nationally aggregated data. This analysis aimed to investigate the extent to which effects observed in US states and counties were also seen in other countries.
+
+The second subgroup analysis applied the CITS approach to the 20% most Republican-voting localities (hereafter referred to as red states/counties) and to the 20% most Democratic-voting localities (hereafter referred to as blue states/counties) based on 2020 presidential election vote share. Our subgroup analysis comparing CITS effect estimates in blue vs. red states aimed to investigate whether the initial response to imminent safe and effective COVID-19 vaccines showed evidence of heterogeneity by predominant political ideology, under the hypothesis that if conservative voters were more likely to be averse to vaccination, any impact on mental health related symptom search density from the announcement of upcoming vaccines would be lesser in red states and counties compared to blue ones.
+
+### Ethics statement
+
+The Institutional Review Board (IRB) of the Harvard T.H. Chan School of Public Health has determined that the study was not human subjects research, and that additional review was not required (protocol number: IRB23-0095, determined on January 25, 2023).
+
+
+## Results
 
 The ITS estimates for the immediate (level shift) and sustained (slope change) effects associated with the announcement of vaccine safety and efficacy data on search density for all `r diseases_n` are presented in Figure \ref{figure_all_diseases}. 
 
@@ -685,7 +693,7 @@ model_outputs_its_graph %>%
 
 ```
 
-While our ITS analysis provided suggestive evidence that search density for mental health symptoms might have changed in the post-announcement period, it also highlighted that searches may have generally changed across other diseases at the same time. Our CITS estimates of each mental health symptom (Figure \ref{figure_cits_outputs}) using searches for headaches as a comparison broadly echoed our ITS analysis, with most conditions showing level and slope changes close to the null. For three conditions, our CITS analysis showed relatively large slope changes with searches for anxiety `r function_dynamic_text_results("main","anxiety", "slope", value_include = "allnumber")`, depression `r function_dynamic_text_results("main","depression", "slope", value_include = "allnumber")`, and MDD `r function_dynamic_text_results("main","major_depressive_disorder", "slope", value_include = "allnumber")`, all showing sustained declines. All three of these symptoms had relatively large slope changes in our ITS analysis. In addition, the CITS level shift (i.e., the relative immediate effect) for anxiety was `r function_dynamic_text_results("main","anxiety", "level")`, a decrease double in magnitude compared to the majority of estimates for other symptoms.
+While our ITS analysis provided suggestive evidence that search density for mental health symptoms might have changed in the post-announcement period, it also highlighted that searches may have generally changed across other diseases at the same time. Our CITS estimates of each mental health symptom (Figure \ref{figure_cits_outputs}) using searches for headaches as a comparison broadly echoed our ITS analysis, with most conditions showing level and slope changes close to the null. For three conditions, our CITS analysis showed relatively large slope changes with searches for anxiety `r function_dynamic_text_results("main","anxiety", "slope", value_include = "allnumber")`, depression `r function_dynamic_text_results("main","depression", "slope", value_include = "allnumber")`, and MDD `r function_dynamic_text_results("main","major_depressive_disorder", "slope", value_include = "allnumber")`, all showing sustained declines. All three of these symptoms had relatively large slope changes in our ITS analysis. In addition, the CITS level shift (i.e., the relative immediate effect) for anxiety was `r function_dynamic_text_results("main","anxiety", "intercept")`, a decrease double in magnitude compared to the majority of estimates for other symptoms.
 
 
 ```{r figure_cits_outputs, include = TRUE, echo=FALSE, warnings = FALSE, fig.width = 7, fig.height = 8, fig.align='center', out.width = '95%', fig.scap="Controlled interrupted time series effect estimates on Google Search density by symptom.", out.extra='',  fig.cap="\\label{figure_cits_outputs}Controlled interrupted time series effect estimates (A: slope change per 10 days and B: level shift)  on Google Search density by symptom. Effect estimates are represented as thick, horizontal lines in between colored bands, which represent the 99\\% confidence intervals for the estimates. Colors reflect the sign and magnitude of effect estimates. Dark blue values above zero indicate an increase in search density, while the yellow and green negative values indicate a decrease. The dotted horizontal line depicts a null effect. ADHD: Attention deficit hyperactivity disorder. CoC: clouding of consciousness. GAD: Generalized anxiety disorder. MDD: Major depressive disorder."}
@@ -730,21 +738,21 @@ model_outputs_main %>%
 
 In both our analyses, search trends for anxiety, depression, and MDD showed potential immediate and sustained declines in density following November 16th. Search density for these three symptoms and the comparison search data for headaches is plotted in Figures \ref{figures_cits_data_anxiety} through \ref{figures_cits_data_mdd} at the level of U.S. states, U.S. counties, and international data. We observed relatively strong concordance between our CITS estimates and the observed trends in the data, with strong fit to both mental health symptoms and headaches. We further observed strong within-week patterns in searches, supporting our inclusion of fixed effects to account for this weekly periodicity.
 
-```{r figures_cits_data_anxiety, include = TRUE, echo=FALSE, warnings = FALSE, fig.width = 4, fig.height = 6.5, fig.align='center', out.width = '99%', fig.scap="Density of Google Search trends for anxiety, by region, as a function of time.", out.extra='',  fig.cap="\\label{figures_cits_data_anxiety}Density of Google Search trends for anxiety, by region and as a function of time. In each row, search density data for two symptoms are displayed: anxiety in blue and headaches in grey. In the first column, data from US states are shown, where each point represents the search density of a specific symptom on a specific date in a specific state. In the second column, data from US counties are shown; because of the large number of counties reporting data, county-level search data are shown as daily boxplots. In the third column, national data from Australia, the United Kingdom, Ireland, New Zealand, Singapore, and the United States are shown. Each graph shows the density of symptom searches on the y-axis, while time is centered and displayed as days prior to and following November 16, 2020 on the x-axis. The solid lines show predicted lines of best fit under a basic controlled interrupted time series (CITS) model (i.e., no fixed effects). US: United States."}
+```{r figures_cits_data_anxiety, include = TRUE, echo=FALSE, warnings = FALSE, fig.width = 4.5, fig.height = 7, fig.align='center', out.width = '99%', fig.scap="Density of Google Search trends for anxiety, by region, as a function of time.", out.extra='', fig.cap="\\label{figures_cits_data_anxiety}Density of Google Search trends for anxiety, by region and as a function of time. In each row, search density data for two symptoms are displayed: anxiety in blue and headaches in grey. In the first column, data from US states are shown, where each point represents the search density of a specific symptom on a specific date in a specific state. In the second column, data from US counties are shown; because of the large number of counties reporting data, county-level search data are shown as daily boxplots. In the third column, national data from Australia, the United Kingdom, Ireland, New Zealand, Singapore, and the United States are shown. Each graph shows the density of symptom searches on the y-axis, while time is centered and displayed as days prior to and following November 16, 2020 on the x-axis. The solid lines show predicted lines of best fit under a basic controlled interrupted time series (CITS) model (i.e., no fixed effects). US: United States."}
 
 
 function_figures_cits_data(geography = geography, "anxiety")
 
 ```
 
-```{r figures_cits_data_depression, include = TRUE, echo=FALSE, warnings = FALSE, fig.width = 4, fig.height = 6.5, fig.align='center', out.width = '99%', fig.scap="Density of Google Search trends for depression, by region, as a function of time.", out.extra='',  fig.cap="\\label{figures_cits_data_depression}Density of Google Search trends for depression, by region and as a function of time. In each row, search density data for two symptoms are displayed: depression in blue and headaches in grey. In the first column, data from US states are shown, where each point represents the search density of a specific symptom on a specific date in a specific state. In the second column, data from US counties are shown; because of the large number of counties reporting data, county-level search data are shown as daily boxplots. In the third column, national data from Australia, the United Kingdom, Ireland, New Zealand, Singapore, and the United States are shown. Each graph shows the density of symptom searches on the y-axis, while time is centered and displayed as days prior to and following November 16, 2020 on the x-axis. The solid lines show predicted lines of best fit under a basic controlled interrupted time series (CITS) model (i.e., no fixed effects). US: United States."}
+```{r figures_cits_data_depression, include = TRUE, echo=FALSE, warnings = FALSE, fig.width = 4.5, fig.height = 7, fig.align='center', out.width = '99%', fig.scap="Density of Google Search trends for depression, by region, as a function of time.", out.extra='',  fig.cap="\\label{figures_cits_data_depression}Density of Google Search trends for depression, by region and as a function of time. In each row, search density data for two symptoms are displayed: depression in blue and headaches in grey. In the first column, data from US states are shown, where each point represents the search density of a specific symptom on a specific date in a specific state. In the second column, data from US counties are shown; because of the large number of counties reporting data, county-level search data are shown as daily boxplots. In the third column, national data from Australia, the United Kingdom, Ireland, New Zealand, Singapore, and the United States are shown. Each graph shows the density of symptom searches on the y-axis, while time is centered and displayed as days prior to and following November 16, 2020 on the x-axis. The solid lines show predicted lines of best fit under a basic controlled interrupted time series (CITS) model (i.e., no fixed effects). US: United States."}
 
 
 function_figures_cits_data(geography = geography, "depression")
 
 ```
 
-```{r figures_cits_data_mdd, include = TRUE, echo=FALSE, warnings = FALSE, fig.width = 4, fig.height = 6.5, fig.align='center', out.width = '99%', fig.scap="Density of Google Search trends for major depressive disorder (MDD), by region, as a function of time.", out.extra='',  fig.cap="\\label{figures_cits_data_mdd}Density of Google Search trends for MDD, by region and as a function of time. In each row, search density data for two symptoms are displayed: MDD in blue and headaches in grey. In the first column, data from US states are shown, where each point represents the search density of a specific symptom on a specific date in a specific state. In the second column, data from US counties are shown; because of the large number of counties reporting data, county-level search data are shown as daily boxplots. In the third column, national data from Australia, the United Kingdom, Ireland, New Zealand, Singapore, and the United States are shown. Each graph shows the density of symptom searches on the y-axis, while time is centered and displayed as days prior to and following November 16, 2020 on the x-axis. The solid lines show predicted lines of best fit under a basic controlled interrupted time series (CITS) model (i.e., no fixed effects). US: United States."}
+```{r figures_cits_data_mdd, include = TRUE, echo=FALSE, warnings = FALSE, fig.width = 4.5, fig.height = 7, fig.align='center', out.width = '99%', fig.scap="Density of Google Search trends for major depressive disorder (MDD), by region, as a function of time.", out.extra='',  fig.cap="\\label{figures_cits_data_mdd}Density of Google Search trends for MDD, by region and as a function of time. In each row, search density data for two symptoms are displayed: MDD in blue and headaches in grey. In the first column, data from US states are shown, where each point represents the search density of a specific symptom on a specific date in a specific state. In the second column, data from US counties are shown; because of the large number of counties reporting data, county-level search data are shown as daily boxplots. In the third column, national data from Australia, the United Kingdom, Ireland, New Zealand, Singapore, and the United States are shown. Each graph shows the density of symptom searches on the y-axis, while time is centered and displayed as days prior to and following November 16, 2020 on the x-axis. The solid lines show predicted lines of best fit under a basic controlled interrupted time series (CITS) model (i.e., no fixed effects). US: United States."}
 
 
 function_figures_cits_data(geography = geography, "major_depressive_disorder")
@@ -1069,7 +1077,7 @@ print(combo_plot)
 
 \elandscape
 
-```{r fig_international, include = TRUE, echo=FALSE, warnings = FALSE, fig.width = 7.5, fig.height = 6.5, fig.align='center', out.width = '95%',  fig.scap="International CITS effect estimates and confidence intervals by mental health symptom.", out.extra='',  fig.cap="\\label{fig_international}International controlled interrupted time series effect estimates of changes in search density by mental health related symptom, reported across six nations (Australia, the United Kingdom, Ireland, New Zealand, Singapore, and the United States). The top panel reports estimates of the level shift and the lower panel reports the estimates for the slope change. Effect estimates are represented as solid black lines, with the shaded regions above and below the lines showing the 95% confidence intervals. The solid black line across all panels reflects a null effect. MDD: Major depressive disorder."}
+```{r fig_international, include = TRUE, echo=FALSE, warnings = FALSE, fig.width = 7.5, fig.height = 6.5, fig.align='center', out.width = '95%',  fig.scap="International CITS effect estimates and confidence intervals by mental health symptom.", out.extra='',  fig.cap="\\label{fig_international}International controlled interrupted time series effect estimates of changes in search density by mental health related symptom, reported across six nations (Australia, the United Kingdom, Ireland, New Zealand, Singapore, and the United States). The top panel reports estimates of the level shift and the lower panel reports the estimates for the slope change. Effect estimates are represented as solid black lines, with the shaded regions above and below the lines showing the 95\\% confidence intervals. The solid black line across all panels reflects a null effect. MDD: Major depressive disorder."}
 
 
 model_outputs_international %>%

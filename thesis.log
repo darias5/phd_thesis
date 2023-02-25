@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 23.1) (preloaded format=pdflatex 2023.2.18)  23 FEB 2023 10:01
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 23.1) (preloaded format=pdflatex 2023.2.18)  24 FEB 2023 18:16
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -766,62 +766,62 @@ File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 ] [2
 
 ] [3] [4] [5] [6]
-<table1_1.png, id=326, 469.755pt x 520.344pt>
+<table1_1.png, id=325, 469.755pt x 520.344pt>
 File: table1_1.png Graphic file (type png)
 <use table1_1.png>
-Package pdftex.def Info: table1_1.png  used on input line 641.
+Package pdftex.def Info: table1_1.png  used on input line 637.
 (pdftex.def)             Requested size: 469.75386pt x 520.34271pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 641--643
+Underfull \hbox (badness 10000) in paragraph at lines 637--639
 [][]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 641--643
+Underfull \hbox (badness 10000) in paragraph at lines 637--639
 
  []
 
 [7] [8 <./table1_1.png>] [9] [10] [11]
-<table1_2.png, id=358, 722.7pt x 542.025pt>
+<table1_2.png, id=357, 722.7pt x 542.025pt>
 File: table1_2.png Graphic file (type png)
 <use table1_2.png>
-Package pdftex.def Info: table1_2.png  used on input line 760.
+Package pdftex.def Info: table1_2.png  used on input line 756.
 (pdftex.def)             Requested size: 620.09836pt x 465.07376pt.
 [12
 
  <./table1_2.png>]
-<table1_3.png, id=366, 505.89pt x 252.945pt>
+<table1_3.png, id=365, 505.89pt x 252.945pt>
 File: table1_3.png Graphic file (type png)
 <use table1_3.png>
-Package pdftex.def Info: table1_3.png  used on input line 804.
+Package pdftex.def Info: table1_3.png  used on input line 800.
 (pdftex.def)             Requested size: 469.76265pt x 234.88133pt.
 [13
 
 ] [14 <./table1_3.png>]
-<thesis_files/figure-latex/figure_dalys_nation-1.pdf, id=377, 989.6975pt x 542.
+<thesis_files/figure-latex/figure_dalys_nation-1.pdf, id=376, 989.6975pt x 542.
 025pt>
 File: thesis_files/figure-latex/figure_dalys_nation-1.pdf Graphic file (type pd
 f)
 <use thesis_files/figure-latex/figure_dalys_nation-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/figure_dalys_nation-1.pdf  u
-sed on input line 811.
+sed on input line 807.
 (pdftex.def)             Requested size: 637.42125pt x 349.09479pt.
 [15 <./thesis_files/figure-latex/figure_dalys_nation-1.pdf>]
-<thesis_files/figure-latex/figure_gbd_adjusted-1.pdf, id=385, 794.97pt x 794.97
+<thesis_files/figure-latex/figure_gbd_adjusted-1.pdf, id=384, 794.97pt x 794.97
 pt>
 File: thesis_files/figure-latex/figure_gbd_adjusted-1.pdf Graphic file (type pd
 f)
 <use thesis_files/figure-latex/figure_gbd_adjusted-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/figure_gbd_adjusted-1.pdf  u
-sed on input line 824.
+sed on input line 820.
 (pdftex.def)             Requested size: 455.67284pt x 455.67284pt.
-<thesis_files/figure-latex/figure_cost_by_region-1.pdf, id=386, 578.16pt x 433.
+<thesis_files/figure-latex/figure_cost_by_region-1.pdf, id=385, 578.16pt x 433.
 62pt>
 File: thesis_files/figure-latex/figure_cost_by_region-1.pdf Graphic file (type 
 pdf)
 <use thesis_files/figure-latex/figure_cost_by_region-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/figure_cost_by_region-1.pdf 
- used on input line 833.
+ used on input line 829.
 (pdftex.def)             Requested size: 446.26086pt x 334.69565pt.
 [16
 
@@ -836,20 +836,20 @@ File: thesis_files/figure-latex/figure_ecological_zone-1.pdf Graphic file (type
  pdf)
 <use thesis_files/figure-latex/figure_ecological_zone-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/figure_ecological_zone-1.pdf
-  used on input line 1372.
+  used on input line 1370.
 (pdftex.def)             Requested size: 422.77669pt x 475.62378pt.
 [32 <./thesis_files/figure-latex/figure_ecological_zone-1.pdf>]
 <table2_1.png, id=497, 469.755pt x 476.982pt>
 File: table2_1.png Graphic file (type png)
 <use table2_1.png>
-Package pdftex.def Info: table2_1.png  used on input line 1397.
+Package pdftex.def Info: table2_1.png  used on input line 1395.
 (pdftex.def)             Requested size: 469.75386pt x 476.98082pt.
 [33 <./table2_1.png>] [34] [35]
 <thesis_files/figure-latex/figure_gps-1.pdf, id=518, 1156.32pt x 722.7pt>
 File: thesis_files/figure-latex/figure_gps-1.pdf Graphic file (type pdf)
 <use thesis_files/figure-latex/figure_gps-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/figure_gps-1.pdf  used on in
-put line 1461.
+put line 1459.
 (pdftex.def)             Requested size: 650.4284pt x 406.51775pt.
 [36 <./thesis_files/figure-latex/figure_gps-1.pdf>]
 <thesis_files/figure-latex/figure_gps_climate-1.pdf, id=534, 433.62pt x 542.025
@@ -858,7 +858,7 @@ File: thesis_files/figure-latex/figure_gps_climate-1.pdf Graphic file (type pdf
 )
 <use thesis_files/figure-latex/figure_gps_climate-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/figure_gps_climate-1.pdf  us
-ed on input line 1472.
+ed on input line 1470.
 (pdftex.def)             Requested size: 422.80096pt x 528.50119pt.
 <thesis_files/figure-latex/figure_climate_distribution-1.pdf, id=535, 433.62pt 
 x 542.025pt>
@@ -866,7 +866,7 @@ File: thesis_files/figure-latex/figure_climate_distribution-1.pdf Graphic file
 (type pdf)
 <use thesis_files/figure-latex/figure_climate_distribution-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/figure_climate_distribution-
-1.pdf  used on input line 1483.
+1.pdf  used on input line 1481.
 (pdftex.def)             Requested size: 422.80096pt x 528.50119pt.
 [37 <./thesis_files/figure-latex/figure_gps_climate-1.pdf>] [38 <./thesis_files
 /figure-latex/figure_climate_distribution-1.pdf>]
@@ -874,15 +874,15 @@ Package pdftex.def Info: thesis_files/figure-latex/figure_climate_distribution-
 File: thesis_files/figure-latex/figure_cyclone-1.pdf Graphic file (type pdf)
 <use thesis_files/figure-latex/figure_cyclone-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/figure_cyclone-1.pdf  used o
-n input line 1496.
+n input line 1494.
 (pdftex.def)             Requested size: 578.15858pt x 361.34912pt.
 [39 <./thesis_files/figure-latex/figure_cyclone-1.pdf>]
-Underfull \hbox (badness 10000) in paragraph at lines 1540--1542
+Underfull \hbox (badness 10000) in paragraph at lines 1538--1540
 
  []
 
 
-Overfull \hbox (17.0pt too wide) in paragraph at lines 1539--1543
+Overfull \hbox (17.0pt too wide) in paragraph at lines 1537--1541
 []$[]$ 
  []
 
@@ -896,22 +896,22 @@ Overfull \hbox (17.0pt too wide) in paragraph at lines 1539--1543
 File: thesis_files/figure-latex/figure_marginal-1.pdf Graphic file (type pdf)
 <use thesis_files/figure-latex/figure_marginal-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/figure_marginal-1.pdf  used 
-on input line 1582.
+on input line 1580.
 (pdftex.def)             Requested size: 446.25755pt x 446.25755pt.
 <thesis_files/figure-latex/figure_lag-1.pdf, id=570, 578.16pt x 650.43pt>
 File: thesis_files/figure-latex/figure_lag-1.pdf Graphic file (type pdf)
 <use thesis_files/figure-latex/figure_lag-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/figure_lag-1.pdf  used on in
-put line 1591.
+put line 1589.
 (pdftex.def)             Requested size: 422.77669pt x 475.62378pt.
 [41] [42 <./thesis_files/figure-latex/figure_marginal-1.pdf>] [43 <./thesis_fil
 es/figure-latex/figure_lag-1.pdf>] [44]
-Underfull \hbox (badness 10000) in paragraph at lines 1687--1689
+Underfull \hbox (badness 10000) in paragraph at lines 1685--1687
 
  []
 
 
-Overfull \hbox (17.0pt too wide) in paragraph at lines 1686--1690
+Overfull \hbox (17.0pt too wide) in paragraph at lines 1684--1688
 []$[]$ 
  []
 
@@ -922,10 +922,10 @@ File: thesis_files/figure-latex/figure_sensitivity_analysis_temp-1.pdf Graphic
 file (type pdf)
 <use thesis_files/figure-latex/figure_sensitivity_analysis_temp-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/figure_sensitivity_analysis_
-temp-1.pdf  used on input line 1750.
+temp-1.pdf  used on input line 1748.
 (pdftex.def)             Requested size: 617.93147pt x 370.75887pt.
 
-LaTeX Warning: Float too large for page by 6.20387pt on input line 1755.
+LaTeX Warning: Float too large for page by 6.20387pt on input line 1753.
 
 <thesis_files/figure-latex/figure_sensitivity_analysis_sm-1.pdf, id=623, 1084.0
 5pt x 650.43pt>
@@ -933,10 +933,10 @@ File: thesis_files/figure-latex/figure_sensitivity_analysis_sm-1.pdf Graphic fi
 le (type pdf)
 <use thesis_files/figure-latex/figure_sensitivity_analysis_sm-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/figure_sensitivity_analysis_
-sm-1.pdf  used on input line 1759.
+sm-1.pdf  used on input line 1757.
 (pdftex.def)             Requested size: 617.93147pt x 370.75887pt.
 
-LaTeX Warning: Float too large for page by 6.20387pt on input line 1764.
+LaTeX Warning: Float too large for page by 6.20387pt on input line 1762.
 
 <thesis_files/figure-latex/figure_sensitivity_analysis_cyclone-1.pdf, id=624, 1
 084.05pt x 650.43pt>
@@ -944,10 +944,10 @@ File: thesis_files/figure-latex/figure_sensitivity_analysis_cyclone-1.pdf Graph
 ic file (type pdf)
 <use thesis_files/figure-latex/figure_sensitivity_analysis_cyclone-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/figure_sensitivity_analysis_
-cyclone-1.pdf  used on input line 1768.
+cyclone-1.pdf  used on input line 1766.
 (pdftex.def)             Requested size: 617.93147pt x 370.75887pt.
 
-LaTeX Warning: Float too large for page by 6.20387pt on input line 1773.
+LaTeX Warning: Float too large for page by 6.20387pt on input line 1771.
 
 [48 <./thesis_files/figure-latex/figure_sensitivity_analysis_temp-1.pdf>] [49 <
 ./thesis_files/figure-latex/figure_sensitivity_analysis_sm-1.pdf>] [50 <./thesi
@@ -956,705 +956,879 @@ s_files/figure-latex/figure_sensitivity_analysis_cyclone-1.pdf>] [51
 
 ] [52] [53] [54] [55] [56] [57
 
-] [58] [59] [60] [61] [62]
-<table3_1.png, id=733, 469.755pt x 433.62pt>
+] [58] [59] [60] [61] [62] [63] [64]
+<table3_1.png, id=742, 542.025pt x 433.62pt>
 File: table3_1.png Graphic file (type png)
 <use table3_1.png>
-Package pdftex.def Info: table3_1.png  used on input line 2227.
-(pdftex.def)             Requested size: 469.75386pt x 433.61894pt.
-[63] [64 <./table3_1.png>] [65]
-<thesis_files/figure-latex/figure_all_diseases-1.pdf, id=751, 433.62pt x 325.21
+Package pdftex.def Info: table3_1.png  used on input line 2265.
+(pdftex.def)             Requested size: 469.77148pt x 375.81718pt.
+[65 <./table3_1.png>] [66]
+<thesis_files/figure-latex/figure_all_diseases-1.pdf, id=757, 433.62pt x 325.21
 5pt>
 File: thesis_files/figure-latex/figure_all_diseases-1.pdf Graphic file (type pd
 f)
 <use thesis_files/figure-latex/figure_all_diseases-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/figure_all_diseases-1.pdf  u
-sed on input line 2317.
+sed on input line 2348.
 (pdftex.def)             Requested size: 433.65202pt x 325.23901pt.
-[66] [67 <./thesis_files/figure-latex/figure_all_diseases-1.pdf>]
-<thesis_files/figure-latex/figure_cits_outputs-1.pdf, id=772, 505.89pt x 578.16
+[67] [68 <./thesis_files/figure-latex/figure_all_diseases-1.pdf>]
+<thesis_files/figure-latex/figure_cits_outputs-1.pdf, id=776, 505.89pt x 578.16
 pt>
 File: thesis_files/figure-latex/figure_cits_outputs-1.pdf Graphic file (type pd
 f)
 <use thesis_files/figure-latex/figure_cits_outputs-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/figure_cits_outputs-1.pdf  u
-sed on input line 2344.
+sed on input line 2375.
 (pdftex.def)             Requested size: 446.27298pt x 510.02628pt.
-<thesis_files/figure-latex/figures_cits_data_anxiety-1.pdf, id=775, 397.485pt x
- 469.755pt>
+<thesis_files/figure-latex/figures_cits_data_anxiety-1.pdf, id=779, 325.215pt x
+ 505.89pt>
 File: thesis_files/figure-latex/figures_cits_data_anxiety-1.pdf Graphic file (t
 ype pdf)
 <use thesis_files/figure-latex/figures_cits_data_anxiety-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/figures_cits_data_anxiety-1.
-pdf  used on input line 2365.
-(pdftex.def)             Requested size: 397.48402pt x 469.75386pt.
-<thesis_files/figure-latex/figures_cits_data_depression-1.pdf, id=776, 397.485p
-t x 469.755pt>
+pdf  used on input line 2396.
+(pdftex.def)             Requested size: 325.21916pt x 505.89645pt.
+
+LaTeX Warning: Float too large for page by 1.46649pt on input line 2401.
+
+<thesis_files/figure-latex/figures_cits_data_depression-1.pdf, id=780, 325.215p
+t x 505.89pt>
 File: thesis_files/figure-latex/figures_cits_data_depression-1.pdf Graphic file
  (type pdf)
 <use thesis_files/figure-latex/figures_cits_data_depression-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/figures_cits_data_depression
--1.pdf  used on input line 2373.
-(pdftex.def)             Requested size: 397.48402pt x 469.75386pt.
-<thesis_files/figure-latex/figures_cits_data_mdd-1.pdf, id=777, 397.485pt x 469
-.755pt>
+-1.pdf  used on input line 2405.
+(pdftex.def)             Requested size: 325.21916pt x 505.89645pt.
+
+LaTeX Warning: Float too large for page by 1.46649pt on input line 2410.
+
+<thesis_files/figure-latex/figures_cits_data_mdd-1.pdf, id=781, 325.215pt x 505
+.89pt>
 File: thesis_files/figure-latex/figures_cits_data_mdd-1.pdf Graphic file (type 
 pdf)
 <use thesis_files/figure-latex/figures_cits_data_mdd-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/figures_cits_data_mdd-1.pdf 
- used on input line 2382.
-(pdftex.def)             Requested size: 397.48402pt x 469.75386pt.
-<thesis_files/figure-latex/fig_multiverse_analysis_all-1.pdf, id=779, 542.025pt
+ used on input line 2414.
+(pdftex.def)             Requested size: 325.21916pt x 505.89645pt.
+
+LaTeX Warning: Float too large for page by 1.46649pt on input line 2419.
+
+<thesis_files/figure-latex/fig_multiverse_analysis_all-1.pdf, id=783, 542.025pt
  x 686.565pt>
 File: thesis_files/figure-latex/fig_multiverse_analysis_all-1.pdf Graphic file 
 (type pdf)
 <use thesis_files/figure-latex/fig_multiverse_analysis_all-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/fig_multiverse_analysis_all-
-1.pdf  used on input line 2402.
+1.pdf  used on input line 2434.
 (pdftex.def)             Requested size: 446.28291pt x 565.29169pt.
 
-LaTeX Warning: Float too large for page by 6.4617pt on input line 2407.
+LaTeX Warning: Float too large for page by 6.4617pt on input line 2439.
 
-[68] [69 <./thesis_files/figure-latex/figure_cits_outputs-1.pdf>] [70 <./thesis
-_files/figure-latex/figures_cits_data_anxiety-1.pdf>] [71 <./thesis_files/figur
-e-latex/figures_cits_data_depression-1.pdf>] [72 <./thesis_files/figure-latex/f
-igures_cits_data_mdd-1.pdf>] [73 <./thesis_files/figure-latex/fig_multiverse_an
-alysis_all-1.pdf>] [74]
-<thesis_files/figure-latex/fig_multiverse_analysis-1.pdf, id=849, 1445.4pt x 86
+[69] [70 <./thesis_files/figure-latex/figure_cits_outputs-1.pdf>] [71 <./thesis
+_files/figure-latex/figures_cits_data_anxiety-1.pdf>] [72 <./thesis_files/figur
+e-latex/figures_cits_data_depression-1.pdf>] [73 <./thesis_files/figure-latex/f
+igures_cits_data_mdd-1.pdf>] [74 <./thesis_files/figure-latex/fig_multiverse_an
+alysis_all-1.pdf>] [75]
+<thesis_files/figure-latex/fig_multiverse_analysis-1.pdf, id=853, 1445.4pt x 86
 7.24pt>
 File: thesis_files/figure-latex/fig_multiverse_analysis-1.pdf Graphic file (typ
 e pdf)
 <use thesis_files/figure-latex/fig_multiverse_analysis-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/fig_multiverse_analysis-1.pd
-f  used on input line 2442.
+f  used on input line 2475.
 (pdftex.def)             Requested size: 643.91777pt x 386.35066pt.
 
-LaTeX Warning: Float too large for page by 35.39568pt on input line 2447.
+LaTeX Warning: Float too large for page by 35.39568pt on input line 2480.
 
-[75 <./thesis_files/figure-latex/fig_multiverse_analysis-1.pdf>]
-<thesis_files/figure-latex/fig_international-1.pdf, id=861, 542.025pt x 469.755
+[76 <./thesis_files/figure-latex/fig_multiverse_analysis-1.pdf>]
+<thesis_files/figure-latex/fig_international-1.pdf, id=865, 542.025pt x 469.755
 pt>
 File: thesis_files/figure-latex/fig_international-1.pdf Graphic file (type pdf)
 
 <use thesis_files/figure-latex/fig_international-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/fig_international-1.pdf  use
-d on input line 2453.
+d on input line 2486.
 (pdftex.def)             Requested size: 446.28291pt x 386.77853pt.
-[76
+[77
 
 
- <./thesis_files/figure-latex/fig_international-1.pdf>] [77]
-<thesis_files/figure-latex/fig_political-1.pdf, id=874, 722.7pt x 361.35pt>
+ <./thesis_files/figure-latex/fig_international-1.pdf>] [78]
+<thesis_files/figure-latex/fig_political-1.pdf, id=879, 722.7pt x 361.35pt>
 File: thesis_files/figure-latex/fig_political-1.pdf Graphic file (type pdf)
 <use thesis_files/figure-latex/fig_political-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/fig_political-1.pdf  used on
- input line 2482.
+ input line 2515.
 (pdftex.def)             Requested size: 617.91492pt x 308.95746pt.
-[78 <./thesis_files/figure-latex/fig_political-1.pdf>] [79
+[79 <./thesis_files/figure-latex/fig_political-1.pdf>] [80
 
 
-] [80]
-Underfull \hbox (badness 10000) in paragraph at lines 2550--2556
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2557--2562
+] [81] [82] [83]
+Underfull \hbox (badness 10000) in paragraph at lines 2661--2667
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2563--2569
+Underfull \hbox (badness 10000) in paragraph at lines 2668--2673
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2570--2577
+Underfull \hbox (badness 10000) in paragraph at lines 2674--2680
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2578--2584
+Underfull \hbox (badness 10000) in paragraph at lines 2681--2688
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2585--2592
+Underfull \hbox (badness 10000) in paragraph at lines 2689--2695
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2593--2599
+Underfull \hbox (badness 10000) in paragraph at lines 2696--2703
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2600--2605
+Underfull \hbox (badness 10000) in paragraph at lines 2704--2710
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2606--2612
+Underfull \hbox (badness 10000) in paragraph at lines 2711--2716
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2613--2620
+Underfull \hbox (badness 10000) in paragraph at lines 2717--2723
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2621--2628
+Underfull \hbox (badness 10000) in paragraph at lines 2724--2731
 
  []
 
-[81
+
+Underfull \hbox (badness 10000) in paragraph at lines 2732--2739
+
+ []
+
+[84
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 2629--2635
+Underfull \hbox (badness 10000) in paragraph at lines 2740--2746
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2636--2641
+Underfull \hbox (badness 10000) in paragraph at lines 2747--2752
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2642--2647
+Underfull \hbox (badness 10000) in paragraph at lines 2753--2758
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2648--2656
+Underfull \hbox (badness 10000) in paragraph at lines 2759--2767
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2657--2663
+Underfull \hbox (badness 10000) in paragraph at lines 2768--2774
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2664--2671
+Underfull \hbox (badness 10000) in paragraph at lines 2775--2782
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2672--2679
+Underfull \hbox (badness 10000) in paragraph at lines 2783--2790
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2680--2687
+Underfull \hbox (badness 10000) in paragraph at lines 2791--2798
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2688--2694
+Underfull \hbox (badness 10000) in paragraph at lines 2799--2805
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2695--2701
+Underfull \hbox (badness 10000) in paragraph at lines 2806--2812
 
  []
 
-[82]
-Underfull \hbox (badness 10000) in paragraph at lines 2702--2708
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2709--2716
+[85]
+Underfull \hbox (badness 10000) in paragraph at lines 2813--2819
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2717--2722
+Underfull \hbox (badness 10000) in paragraph at lines 2820--2827
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2723--2729
+Underfull \hbox (badness 10000) in paragraph at lines 2828--2833
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2730--2737
+Underfull \hbox (badness 10000) in paragraph at lines 2834--2840
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2738--2741
+Underfull \hbox (badness 10000) in paragraph at lines 2841--2848
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2742--2748
+Underfull \hbox (badness 10000) in paragraph at lines 2849--2852
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2749--2755
+Underfull \hbox (badness 10000) in paragraph at lines 2853--2859
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2756--2763
-
- []
-
-[83]
-Underfull \hbox (badness 10000) in paragraph at lines 2764--2771
+Underfull \hbox (badness 10000) in paragraph at lines 2860--2866
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2772--2777
+Underfull \hbox (badness 10000) in paragraph at lines 2867--2874
+
+ []
+
+[86]
+Underfull \hbox (badness 10000) in paragraph at lines 2875--2882
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2778--2786
+Underfull \hbox (badness 10000) in paragraph at lines 2883--2888
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2787--2793
+Underfull \hbox (badness 10000) in paragraph at lines 2889--2897
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2794--2801
+Underfull \hbox (badness 10000) in paragraph at lines 2898--2904
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2802--2807
+Underfull \hbox (badness 10000) in paragraph at lines 2905--2910
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2808--2814
+Underfull \hbox (badness 10000) in paragraph at lines 2911--2917
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2815--2821
-
- []
-
-[84]
-Underfull \hbox (badness 10000) in paragraph at lines 2822--2829
+Underfull \hbox (badness 10000) in paragraph at lines 2918--2924
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2830--2836
+Underfull \hbox (badness 10000) in paragraph at lines 2925--2932
+
+ []
+
+[87]
+Underfull \hbox (badness 10000) in paragraph at lines 2933--2939
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2837--2842
+Underfull \hbox (badness 10000) in paragraph at lines 2940--2945
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2843--2849
+Underfull \hbox (badness 10000) in paragraph at lines 2946--2952
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2850--2856
+Underfull \hbox (badness 10000) in paragraph at lines 2953--2959
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2857--2864
+Underfull \hbox (badness 10000) in paragraph at lines 2960--2967
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2865--2872
+Underfull \hbox (badness 10000) in paragraph at lines 2968--2975
 
  []
 
 
-Underfull \hbox (badness 2512) in paragraph at lines 2879--2879
+Underfull \hbox (badness 2512) in paragraph at lines 2982--2982
 []\T1/lmr/m/n/10.95 (+20) Stanke C, Kerac M, Prud-homme C, Med-lock J, Mur-ray 
 V. []Health Ef-fects of
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2873--2880
+Underfull \hbox (badness 10000) in paragraph at lines 2976--2983
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2881--2889
-
- []
-
-[85]
-Underfull \hbox (badness 10000) in paragraph at lines 2890--2897
+Underfull \hbox (badness 10000) in paragraph at lines 2984--2992
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2898--2902
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2903--2910
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2911--2915
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2916--2921
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2922--2927
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2928--2933
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2934--2940
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2941--2946
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2947--2952
-
- []
-
-[86]
-Underfull \hbox (badness 10000) in paragraph at lines 2953--2957
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2958--2963
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2964--2968
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2969--2975
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2976--2982
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2983--2987
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2988--2993
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2994--2998
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2999--3005
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 3006--3012
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 3013--3019
-
- []
-
-[87]
-Underfull \hbox (badness 10000) in paragraph at lines 3020--3025
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 3026--3033
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 3034--3040
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 3041--3048
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 3049--3055
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 3056--3065
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 3066--3072
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 3073--3080
+Underfull \hbox (badness 10000) in paragraph at lines 2993--3000
 
  []
 
 [88]
-Underfull \hbox (badness 10000) in paragraph at lines 3081--3087
+Underfull \hbox (badness 10000) in paragraph at lines 3001--3005
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3088--3094
+Underfull \hbox (badness 10000) in paragraph at lines 3006--3013
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3095--3103
+Underfull \hbox (badness 10000) in paragraph at lines 3014--3018
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3104--3111
+Underfull \hbox (badness 10000) in paragraph at lines 3019--3024
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3112--3119
+Underfull \hbox (badness 10000) in paragraph at lines 3025--3030
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3120--3127
+Underfull \hbox (badness 10000) in paragraph at lines 3031--3036
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3128--3133
+Underfull \hbox (badness 10000) in paragraph at lines 3037--3043
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3134--3139
+Underfull \hbox (badness 10000) in paragraph at lines 3044--3049
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3140--3144
+Underfull \hbox (badness 10000) in paragraph at lines 3050--3055
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3056--3060
 
  []
 
 [89]
-Underfull \hbox (badness 10000) in paragraph at lines 3145--3150
+Underfull \hbox (badness 10000) in paragraph at lines 3061--3066
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3151--3156
+Underfull \hbox (badness 10000) in paragraph at lines 3067--3071
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3157--3163
+Underfull \hbox (badness 10000) in paragraph at lines 3072--3078
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3164--3169
+Underfull \hbox (badness 10000) in paragraph at lines 3079--3085
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3170--3176
+Underfull \hbox (badness 10000) in paragraph at lines 3086--3090
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3091--3096
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3097--3101
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3102--3108
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3109--3115
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3116--3122
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3123--3128
 
  []
 
 [90]
-<table_s_1_1.png, id=1145, 505.89pt x 289.08pt>
+Underfull \hbox (badness 10000) in paragraph at lines 3129--3136
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3137--3143
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3144--3151
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3152--3158
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3159--3168
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3169--3175
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3176--3183
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3184--3190
+
+ []
+
+[91]
+Underfull \hbox (badness 10000) in paragraph at lines 3191--3197
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3198--3206
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3207--3212
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3213--3220
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3221--3227
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3228--3234
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3235--3241
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3242--3251
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3252--3259
+
+ []
+
+[92]
+Underfull \hbox (badness 10000) in paragraph at lines 3260--3267
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3268--3276
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3277--3284
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3285--3292
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3293--3301
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3302--3308
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3309--3317
+
+ []
+
+[93]
+Underfull \hbox (badness 10000) in paragraph at lines 3318--3324
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3325--3331
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3332--3340
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3341--3348
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3349--3355
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3356--3363
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3364--3371
+
+ []
+
+[94]
+Underfull \hbox (badness 10000) in paragraph at lines 3372--3380
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3381--3388
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3389--3397
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3398--3405
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3406--3413
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3414--3421
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3422--3430
+
+ []
+
+[95]
+Underfull \hbox (badness 10000) in paragraph at lines 3431--3435
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3436--3441
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3442--3448
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3449--3455
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3456--3462
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3463--3469
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3470--3476
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3477--3483
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3484--3491
+
+ []
+
+[96]
+Underfull \hbox (badness 10000) in paragraph at lines 3492--3497
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3498--3503
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3504--3508
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3509--3514
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3515--3520
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3521--3527
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3528--3533
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3534--3540
+
+ []
+
+[97]
+<table_s_1_1.png, id=1260, 505.89pt x 289.08pt>
 File: table_s_1_1.png Graphic file (type png)
 <use table_s_1_1.png>
-Package pdftex.def Info: table_s_1_1.png  used on input line 3194.
+Package pdftex.def Info: table_s_1_1.png  used on input line 3558.
 (pdftex.def)             Requested size: 469.76265pt x 268.43579pt.
-[91
+[98
 
  <./table_s_1_1.png>]
-<table_s_1_2.png, id=1151, 505.89pt x 289.08pt>
+<table_s_1_2.png, id=1266, 505.89pt x 289.08pt>
 File: table_s_1_2.png Graphic file (type png)
 <use table_s_1_2.png>
-Package pdftex.def Info: table_s_1_2.png  used on input line 3201.
+Package pdftex.def Info: table_s_1_2.png  used on input line 3565.
 (pdftex.def)             Requested size: 469.76265pt x 268.43579pt.
-[92 <./table_s_1_2.png>]
-<table_s_1_3.png, id=1157, 542.025pt x 722.7pt>
+[99 <./table_s_1_2.png>]
+<table_s_1_3.png, id=1272, 542.025pt x 722.7pt>
 File: table_s_1_3.png Graphic file (type png)
 <use table_s_1_3.png>
-Package pdftex.def Info: table_s_1_3.png  used on input line 3208.
+Package pdftex.def Info: table_s_1_3.png  used on input line 3572.
 (pdftex.def)             Requested size: 473.18726pt x 630.91634pt.
 
-Overfull \hbox (3.43224pt too wide) in paragraph at lines 3208--3209
+Overfull \hbox (3.43224pt too wide) in paragraph at lines 3572--3573
  [][] 
  []
 
-[93 <./table_s_1_3.png>]
-<table_s_1_4.png, id=1163, 722.7pt x 542.025pt>
+[100 <./table_s_1_3.png>]
+<table_s_1_4.png, id=1278, 722.7pt x 542.025pt>
 File: table_s_1_4.png Graphic file (type png)
 <use table_s_1_4.png>
-Package pdftex.def Info: table_s_1_4.png  used on input line 3214.
+Package pdftex.def Info: table_s_1_4.png  used on input line 3578.
 (pdftex.def)             Requested size: 607.57112pt x 455.67833pt.
-[94
+[101
 
  <./table_s_1_4.png>]
-<table_s_1_5.png, id=1169, 722.7pt x 542.025pt>
+<table_s_1_5.png, id=1284, 722.7pt x 542.025pt>
 File: table_s_1_5.png Graphic file (type png)
 <use table_s_1_5.png>
-Package pdftex.def Info: table_s_1_5.png  used on input line 3221.
+Package pdftex.def Info: table_s_1_5.png  used on input line 3585.
 (pdftex.def)             Requested size: 607.57112pt x 455.67833pt.
-[95 <./table_s_1_5.png>]
-<table_s_1_6.png, id=1175, 722.7pt x 542.025pt>
+[102 <./table_s_1_5.png>]
+<table_s_1_6.png, id=1291, 722.7pt x 542.025pt>
 File: table_s_1_6.png Graphic file (type png)
 <use table_s_1_6.png>
-Package pdftex.def Info: table_s_1_6.png  used on input line 3229.
+Package pdftex.def Info: table_s_1_6.png  used on input line 3593.
 (pdftex.def)             Requested size: 607.57112pt x 455.67833pt.
-[96 <./table_s_1_6.png>]
-<table_s_1_7.png, id=1182, 505.89pt x 361.35pt>
+[103 <./table_s_1_6.png>]
+<table_s_1_7.png, id=1297, 505.89pt x 361.35pt>
 File: table_s_1_7.png Graphic file (type png)
 <use table_s_1_7.png>
-Package pdftex.def Info: table_s_1_7.png  used on input line 3239.
+Package pdftex.def Info: table_s_1_7.png  used on input line 3603.
 (pdftex.def)             Requested size: 469.76265pt x 335.54477pt.
-[97
-
- <./table_s_1_7.png>]
-<table_s_1_8a.png, id=1188, 722.7pt x 542.025pt>
-File: table_s_1_8a.png Graphic file (type png)
-<use table_s_1_8a.png>
-Package pdftex.def Info: table_s_1_8a.png  used on input line 3247.
-(pdftex.def)             Requested size: 607.57112pt x 455.67833pt.
-<table_s_1_8b.png, id=1189, 722.7pt x 542.025pt>
-File: table_s_1_8b.png Graphic file (type png)
-<use table_s_1_8b.png>
-Package pdftex.def Info: table_s_1_8b.png  used on input line 3248.
-(pdftex.def)             Requested size: 607.57112pt x 455.67833pt.
-<table_s_1_8c.png, id=1190, 722.7pt x 542.025pt>
-File: table_s_1_8c.png Graphic file (type png)
-<use table_s_1_8c.png>
-Package pdftex.def Info: table_s_1_8c.png  used on input line 3249.
-(pdftex.def)             Requested size: 607.57112pt x 455.67833pt.
-<table_s_1_8d.png, id=1191, 722.7pt x 542.025pt>
-File: table_s_1_8d.png Graphic file (type png)
-<use table_s_1_8d.png>
-Package pdftex.def Info: table_s_1_8d.png  used on input line 3250.
-(pdftex.def)             Requested size: 607.57112pt x 455.67833pt.
-<table_s_1_8e.png, id=1192, 722.7pt x 542.025pt>
-File: table_s_1_8e.png Graphic file (type png)
-<use table_s_1_8e.png>
-Package pdftex.def Info: table_s_1_8e.png  used on input line 3251.
-(pdftex.def)             Requested size: 607.57112pt x 455.67833pt.
-<table_s_1_8f.png, id=1193, 722.7pt x 542.025pt>
-File: table_s_1_8f.png Graphic file (type png)
-<use table_s_1_8f.png>
-Package pdftex.def Info: table_s_1_8f.png  used on input line 3252.
-(pdftex.def)             Requested size: 607.57112pt x 455.67833pt.
-[98
-
- <./table_s_1_8a.png>] [99 <./table_s_1_8b.png>] [100 <./table_s_1_8c.png>] [10
-1 <./table_s_1_8d.png>] [102 <./table_s_1_8e.png>] [103 <./table_s_1_8f.png>]
-<table_s_2_1.png, id=1225, 542.025pt x 289.08pt>
-File: table_s_2_1.png Graphic file (type png)
-<use table_s_2_1.png>
-Package pdftex.def Info: table_s_2_1.png  used on input line 3301.
-(pdftex.def)             Requested size: 469.77148pt x 250.54478pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 3301--3303
-
- []
-
 [104
 
-] [105 <./table_s_2_1.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 3367--3368
+ <./table_s_1_7.png>]
+<table_s_1_8a.png, id=1303, 722.7pt x 542.025pt>
+File: table_s_1_8a.png Graphic file (type png)
+<use table_s_1_8a.png>
+Package pdftex.def Info: table_s_1_8a.png  used on input line 3611.
+(pdftex.def)             Requested size: 607.57112pt x 455.67833pt.
+<table_s_1_8b.png, id=1304, 722.7pt x 542.025pt>
+File: table_s_1_8b.png Graphic file (type png)
+<use table_s_1_8b.png>
+Package pdftex.def Info: table_s_1_8b.png  used on input line 3612.
+(pdftex.def)             Requested size: 607.57112pt x 455.67833pt.
+<table_s_1_8c.png, id=1305, 722.7pt x 542.025pt>
+File: table_s_1_8c.png Graphic file (type png)
+<use table_s_1_8c.png>
+Package pdftex.def Info: table_s_1_8c.png  used on input line 3613.
+(pdftex.def)             Requested size: 607.57112pt x 455.67833pt.
+<table_s_1_8d.png, id=1306, 722.7pt x 542.025pt>
+File: table_s_1_8d.png Graphic file (type png)
+<use table_s_1_8d.png>
+Package pdftex.def Info: table_s_1_8d.png  used on input line 3614.
+(pdftex.def)             Requested size: 607.57112pt x 455.67833pt.
+<table_s_1_8e.png, id=1307, 722.7pt x 542.025pt>
+File: table_s_1_8e.png Graphic file (type png)
+<use table_s_1_8e.png>
+Package pdftex.def Info: table_s_1_8e.png  used on input line 3615.
+(pdftex.def)             Requested size: 607.57112pt x 455.67833pt.
+<table_s_1_8f.png, id=1308, 722.7pt x 542.025pt>
+File: table_s_1_8f.png Graphic file (type png)
+<use table_s_1_8f.png>
+Package pdftex.def Info: table_s_1_8f.png  used on input line 3616.
+(pdftex.def)             Requested size: 607.57112pt x 455.67833pt.
+[105
+
+ <./table_s_1_8a.png>] [106 <./table_s_1_8b.png>] [107 <./table_s_1_8c.png>] [1
+08 <./table_s_1_8d.png>] [109 <./table_s_1_8e.png>] [110 <./table_s_1_8f.png>]
+<table_s_2_1.png, id=1340, 542.025pt x 289.08pt>
+File: table_s_2_1.png Graphic file (type png)
+<use table_s_2_1.png>
+Package pdftex.def Info: table_s_2_1.png  used on input line 3665.
+(pdftex.def)             Requested size: 469.77148pt x 250.54478pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 3665--3667
+
+ []
+
+[111
+
+] [112 <./table_s_2_1.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 3731--3732
 
  []
 
 
-Overfull \hbox (17.0pt too wide) in paragraph at lines 3366--3369
+Overfull \hbox (17.0pt too wide) in paragraph at lines 3730--3733
 []$[]$ 
  []
 
-[106] [107]
-Overfull \hbox (35.15247pt too wide) in alignment at lines 3419--3429
+[113] [114]
+Overfull \hbox (35.15247pt too wide) in alignment at lines 3783--3793
  [] [] [] [] [] [] [] [] [] [] [] 
  []
 
-[108]
-Overfull \hbox (7.4442pt too wide) in alignment at lines 3435--3601
+[115]
+Overfull \hbox (7.4442pt too wide) in alignment at lines 3799--3965
  [] [] [] [] [] [] [] [] [] [] [] [] [] 
  []
 
-[109] [110] [111] [112] [113] [114] [115] [116] [117] [118] [119] [120] [121] [
-122] [123] [124] [125] [126] [127]
-<thesis_files/figure-latex/figure_communes_fokontany-1.pdf, id=1333, 650.43pt x
+[116] [117] [118] [119] [120] [121] [122] [123] [124] [125] [126] [127] [128] [
+129] [130] [131] [132] [133] [134]
+<thesis_files/figure-latex/figure_communes_fokontany-1.pdf, id=1448, 650.43pt x
  614.295pt>
 File: thesis_files/figure-latex/figure_communes_fokontany-1.pdf Graphic file (t
 ype pdf)
 <use thesis_files/figure-latex/figure_communes_fokontany-1.pdf>
 Package pdftex.def Info: thesis_files/figure-latex/figure_communes_fokontany-1.
-pdf  used on input line 4381.
+pdf  used on input line 4745.
 (pdftex.def)             Requested size: 446.27629pt x 421.48315pt.
-[128] [129 <./thesis_files/figure-latex/figure_communes_fokontany-1.pdf>] [130]
-[131] [132] [133] (thesis.aux) )
+[135] [136 <./thesis_files/figure-latex/figure_communes_fokontany-1.pdf>] [137]
+[138] [139] [140] [141] (thesis.aux) )
 (\end occurred inside a group at level 1)
 
 ### semi simple group (level 1) entered at line 69 (\begingroup)
 ### bottom level 
 Here is how much of TeX's memory you used:
- 17876 strings out of 476374
- 304867 string characters out of 5788854
- 1960340 words of memory out of 5000000
- 37354 multiletter control sequences out of 15000+600000
- 559575 words of font info for 153 fonts, out of 8000000 for 9000
+ 17936 strings out of 476374
+ 306478 string characters out of 5788854
+ 1961340 words of memory out of 5000000
+ 37356 multiletter control sequences out of 15000+600000
+ 563498 words of font info for 162 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 89i,10n,90p,1744b,11138s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 89i,10n,90p,1744b,11136s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 pdfTeX warning (dest): name{acronyms_LMIC} has been referenced but does not exi
 st, replaced by a fixed one
@@ -1666,17 +1840,18 @@ s/danie/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc}{C:/User
 s/danie/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts1.enc}<C:/Users/d
 anie/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx10.pfb><C:/Users/d
 anie/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx12.pfb><C:/Users/d
-anie/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi10.pfb><C:/Users/d
-anie/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi8.pfb><C:/Users/da
-nie/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C:/Users/dan
-ie/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr12.pfb><C:/Users/dani
-e/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr8.pfb><C:/Users/danie/
-AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri10.pfb><C:/Users/danie/
-AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy10.pfb><C:/Users/danie/
-AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy6.pfb>
-Output written on thesis.pdf (146 pages, 98121395 bytes).
+anie/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx8.pfb><C:/Users/da
+nie/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi10.pfb><C:/Users/da
+nie/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi8.pfb><C:/Users/dan
+ie/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C:/Users/dani
+e/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr12.pfb><C:/Users/danie
+/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr8.pfb><C:/Users/danie/A
+ppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri10.pfb><C:/Users/danie/A
+ppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy10.pfb><C:/Users/danie/A
+ppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy6.pfb>
+Output written on thesis.pdf (154 pages, 98357125 bytes).
 PDF statistics:
- 1656 PDF objects out of 1728 (max. 8388607)
- 396 named destinations out of 1000 (max. 500000)
- 25195 words of extra memory for PDF output out of 29859 (max. 10000000)
+ 1789 PDF objects out of 2073 (max. 8388607)
+ 437 named destinations out of 1000 (max. 500000)
+ 27243 words of extra memory for PDF output out of 29859 (max. 10000000)
 

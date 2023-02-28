@@ -237,6 +237,95 @@ map_mdg_3 <- st_read(paste0(mappath_MOH,"/",
 map_mdg_4 <- st_read(paste0(mappath_MOH,"/",
                             "adm4_mada_utm38S.shp"))
 
+
+
+
+```
+
+```{r rayshader}
+
+
+crsLONGLAT <- "+proj=longlat +datum=WGS84 +no_defs"
+map_mdg_0_un <- map_mdg_0_un %>%
+  st_as_sf(crs= crsLONGLAT)
+
+# map_mdg_0 <- map_mdg_0 %>%
+#   st_as_sf(crs= crsLONGLAT)
+
+library(rayshader)
+
+z_level = 6
+
+country_elevation <- get_elev_raster(
+  locations = map_mdg_0_un,
+  z = z_level,
+  clip = "locations")
+
+extent_map = extent(country_elevation)
+
+country_elevation = raster_to_matrix(country_elevation)
+
+
+ground_units <- ifelse(z_level == 5, 4892.0, 
+                       ifelse(z_level == 6, 2446.0,
+                              "ERROR"))
+
+height_max <- max(country_elevation, na.rm = TRUE)
+
+zscale_selected <- ground_units/40
+
+country_elevation %>%
+  sphere_shade(colorintensity=0.25,
+               sunangle = 360-90+15,
+               texture = 
+                 create_texture(lightcolor = "#FEFEFE",
+                                shadowcolor = "#C6C6C6",
+                                leftcolor = "#EAEAEA",
+                                rightcolor = "#EAEAEA",
+                                centercolor = "#FDFDFD")
+               
+                 # grey70","grey60","grey75","grey80","white")
+               # create_texture(col_grey_lightest, col_grey_dark, col_grey_med ,col_grey_light,"white")
+               # create_texture("#8AD7FE","#051C2D","#1D3EDB","white","white")
+               ) %>%
+  # add_shadow(ray_shade(country_elevation, zscale = zscale_selected), max_darken=0.95) %>%
+  # add_shadow(ambient_shade(country_elevation, zscale = zscale_selected), max_darken=0.95) %>%
+  add_water(detect_water(country_elevation), color = "white")  %>%
+  save_png(paste0(gpspath_fig, "/elevation_map.png"))
+
+  library(png)
+  
+  madagascar_topo_map <- readPNG(source = paste0(gpspath_fig, "/elevation_map.png"))
+  
+# Get the spatial extent of the shapefile
+  
+  madagascar_bbox <- st_bbox(map_mdg_0_un)
+
+# Get the spatial extent of the PNG image
+madagascar_map_bbox <- c(xmin = 0, ymin = 0, xmax = ncol(madagascar_topo_map), ymax = nrow(madagascar_topo_map))
+
+
+# Calculate the scaling factor for the x-axis
+x_scale_factor <- diff(madagascar_bbox[c("xmin", "xmax")]) / diff(madagascar_map_bbox[c("xmin", "xmax")])
+
+# Calculate the scaling factor for the y-axis
+y_scale_factor <- diff(madagascar_bbox[c("ymin", "ymax")]) / diff(madagascar_map_bbox[c("ymin", "ymax")])
+
+
+# Extract minimum and maximum longitude and latitude
+min_lon <- as.numeric(bbox["xmin"])
+max_lon <-  as.numeric(bbox["xmax"])
+min_lat <-  as.numeric(bbox["ymin"])
+max_lat <-  as.numeric(bbox["ymax"])
+
+function_add_rayshading <- function(){
+   annotation_raster(madagascar_topo_map, 
+                    xmin = madagascar_bbox["xmin"], 
+                    ymin = madagascar_bbox["ymin"], 
+                    xmax = madagascar_bbox["xmax"], # + (1-x_scale_factor * ncol(madagascar_topo_map)), 
+                    ymax = madagascar_bbox["ymax"])  # + (1-y_scale_factor * nrow(madagascar_topo_map))) +
+  }
+
 ```
 
 
@@ -675,15 +764,7 @@ To explore potential heterogeneity of our effect estimates, we evaluated Models 
 ```{r figure_ecological_zone, include = TRUE, echo=FALSE, warnings = FALSE,  fig.cap="\\label{figure_ecological_zone}Predominant ecoregions of Madagascar, summarized by administrative region.", fig.width = 8, fig.height = 9, fig.align='center', out.width = '90%'}
 
 
-ecological_zones <- read_excel(
-  paste(data_climate_path,
-        "ecological_zones.xlsx",
-        sep = "/")) %>%
-  rename(ecological_zone = 'ecological_zone (1 = Eastern rainforest; 2 = High Plateau; 3 = Arid/Desert; 4 = Dry Deciduos Forest)',
-         REGION_NAM = region_name)
-
-
-map_mdg_1 %>% inner_join(ecological_zones, by = "REGION_NAM") %>%
+map_mdg_1_un %>% rename(REGION_NAM = ADM1_EN) %>% inner_join(ecological_zones, by = "REGION_NAM") %>%
   mutate(ecological_zone = ifelse(ecological_zone == 1, "Eastern lowland forests",
                                   ifelse(ecological_zone == 2, "Highland subhumid forests",
                                          ifelse(ecological_zone == 3, "Desert and xeric shrubland", "Dry deciduous forests")))) %>%
@@ -691,17 +772,15 @@ map_mdg_1 %>% inner_join(ecological_zones, by = "REGION_NAM") %>%
                                                               "Highland subhumid forests",
                                                               "Desert and xeric shrubland",
                                                               "Dry deciduous forests"))) %>%
-  
   ggplot(aes(geometry = geometry, fill = ecological_zone)) +
-  geom_sf(size = 0.2,
+  function_add_rayshading() + 
+    geom_sf(size = 0.2,
           color = col_grey_med,
-          alpha = 0.6) +
-  geom_sf(data = map_mdg_1_un,
+          alpha = 0.4) +
+  geom_sf(data = map_mdg_0_un,
           size = 0.2,
           color = col_black,
-          fill = NA) +
-  theme_void() +
-  theme(text = element_text(family = "Source Sans Pro"),
+          fill = NA) +theme(text = element_text(family = "Source Sans Pro"),
         legend.position = "right") +
   scale_fill_manual(values = c(col_eco_rainforest,
                                col_eco_highlands,
@@ -709,8 +788,6 @@ map_mdg_1 %>% inner_join(ecological_zones, by = "REGION_NAM") %>%
                                col_eco_drydecid),
                     name = "Ecoregion") +
   theme_void()
-
-
 
 
 ggsave(filename = paste0("figure_4b.jpg"),
@@ -818,6 +895,8 @@ Figure \ref{figure_gps_climate} shows the spatial distribution of temperature an
 
 map_a <- facilities_all_gps %>%
   ggplot(aes(geometry=geometry)) +
+     function_add_rayshading() + 
+
   geom_sf(data = map_mdg_3_un,
           size = 0.2,
           color = col_grey_light,
@@ -850,6 +929,8 @@ map_b <- facilities_all_gps %>%
                                                                   "District hospital",
                                                                   "Regional/university hospital"))) %>%
   ggplot(aes(geometry=geometry)) +
+    function_add_rayshading() + 
+
   geom_sf(data = map_mdg_3_un,
           size = 0.2,
           color = col_grey_light,
@@ -876,18 +957,18 @@ combined_plot <- ggarrange(map_a, map_b, ncol = 2)
 compass_file <- paste0(analysis_figures, "/compass.png")
 # From https://commons.wikimedia.org/wiki/File:Gray_compass_rose.svg
 
-ggdraw() +
+ggdraw() +   draw_plot(combined_plot) +
   draw_image(
     compass_file, scale = .2, x = .51, y = .02,
     hjust = 1, halign = 1, valign = 0
-  )  +
-  draw_plot(combined_plot)
+  ) 
 
 ggsave(filename = paste0("figure_1.jpg"),
        plot = last_plot(),
        path = analysis_figures,
        width = 16,
-       height = 10)
+       height = 10,
+       bg = "white")
 
 ```
 
@@ -969,7 +1050,8 @@ ggsave(filename = paste0("figure_2.jpg"),
        plot = last_plot(),
        path = analysis_figures,
        width = 6,
-       height = 7)
+       height = 7,
+       bg = "white")
 
 ```
 

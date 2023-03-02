@@ -194,7 +194,7 @@ mh_english_disease <- read_excel(
   paste(datapath_reference, "disease_names_crosswalk.xlsx", sep = "/"))
 
 data_mh <- rbind(csb_data, chd_data, chu_data) %>% # Join all data
-  select(commune, district, region, clinic_name) %>%
+  dplyr::select(commune, district, region, clinic_name) %>%
   mutate(region = str_to_title(region), # Capitalizing region names
          clinic_name = str_squish(clinic_name)) %>%
   unique()
@@ -212,7 +212,7 @@ ifelse(require("RPushbullet") == TRUE,
        pbPost("note", "Appendix 2 started", paste0("GPS do file started.")),
        "")
 
-n_facilities_name <- data_mh %>% select(clinic_name) %>% unique %>% nrow()
+n_facilities_name <- data_mh %>% dplyr::select(clinic_name) %>% unique %>% nrow()
 n_facilities <- data_mh %>% unique %>% nrow()
 
 ```
@@ -247,12 +247,12 @@ Before beginning to geolocate our sample, we began by identifying the unique fac
 ```{r table_facility-names-duplicates_1, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
 
 data_mh_dup_names <- data_mh %>%
-  select(region, clinic_name) %>% unique()
+  dplyr::select(region, clinic_name) %>% unique()
 
 duplicates <- data_mh_dup_names$clinic_name[duplicated(data_mh_dup_names$clinic_name)]
 
 # data_mh_dup_names %>%
-#   select(region, clinic_name) %>%
+#   dplyr::select(region, clinic_name) %>%
 #   unique() %>%
 #   filter(clinic_name %in% duplicates) %>%
 #   relocate(clinic_name, .before = region) %>%
@@ -1254,18 +1254,18 @@ A summary of the standardization changes is provided below.
 
 ``` {r table_standardization_region_1, results = TRUE, , warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
 
-column2 <- data_mh %>% select(commune, district, region) %>% unique()
-column1 <- facilities_all %>% select(region_name, district_name, commune_name) %>% unique()
+column2 <- data_mh %>% dplyr::select(commune, district, region) %>% unique()
+column1 <- facilities_all %>% dplyr::select(region_name, district_name, commune_name) %>% unique()
 
-r_old <- column1 %>% select(region_name) %>% unique()
-r_new <- column2 %>% select(region) %>% unique()
+r_old <- column1 %>% dplyr::select(region_name) %>% unique()
+r_new <- column2 %>% dplyr::select(region) %>% unique()
 
 cbind(r_old, r_new) %>% mutate(test = region_name == region) %>%
   filter(test == FALSE) %>%
   relocate(region, .before = region_name) %>%
   rename("Name in data" = region,
          "Standardized name" = region_name) %>%
-  select(!test) %>%
+  dplyr::select(!test) %>%
   gt() %>%
   tab_header(
     title = md("**Table S2.6: Standardization of region names**"))
@@ -1399,7 +1399,7 @@ as.data.frame(cbind(commune_old, commune_new)) %>%
   arrange(commune_old) %>%
   mutate(test = commune_new == commune_old) %>%
   filter(test == FALSE) %>%
-  select(!test) %>%
+  dplyr::select(!test) %>%
   rename("Name in data" = commune_old,
          "Standardized name" = commune_new) %>%
   gt() %>%
@@ -1529,7 +1529,7 @@ gps_source_join_map <- function(data){
   map_mdg_3 %>%
   st_transform(., crs = 4326) %>% 
   st_join(data,., join = st_within) %>%
-  select(clinic_name, clinic_type, source, 
+  dplyr::select(clinic_name, clinic_type, source, 
          COMMUNE_NA, DISTRICT_N, REGION_NAM, geometry) %>%
   rename(commune_name = COMMUNE_NA, 
          district_name = DISTRICT_N,
@@ -1796,7 +1796,7 @@ approximate_string_match  <- function(data,   # Df w/o coordinates
       st_centroid() %>%
       
       # And drop all columns except for the unique commune-district-region name, centroid, and area
-      select(area_km, full_name, geometry)
+      dplyr::select(area_km, full_name, geometry)
 
     }
   
@@ -1830,7 +1830,7 @@ data_trim_2 <- data_2 %>%
   st_centroid() %>%
   
   # And drop all columns except for the unique commune-district-region name, centroid, and area
-  select(area_km, full_name, geometry)
+  dplyr::select(area_km, full_name, geometry)
 
 
   }
@@ -1908,7 +1908,7 @@ data_trim_2 <- data_2 %>%
   # are created that contain only the concatenated string ("full name") and an ID
 
   data_no_gps <- data_trim %>%
-    select(full_name, facility_ID) %>%
+    dplyr::select(full_name, facility_ID) %>%
     mutate(full_name = str_squish(full_name))
 
   
@@ -1916,17 +1916,17 @@ data_trim_2 <- data_2 %>%
       
     print("Matching on centroid")
     data_gps <- data_trim_2 %>%
-    select(full_name, area_km) %>%
+    dplyr::select(full_name, area_km) %>%
     mutate(full_name = str_squish(full_name))
     } else(
   data_gps <- data_trim_2 %>%
-    select(full_name, ID) %>%
+    dplyr::select(full_name, ID) %>%
     mutate(full_name = str_squish(full_name))
     )
 
   ## We can save on run time by using innerjoin to match facilities where a match is identical
   perfect_matches <- inner_join(data_gps, data_no_gps)
-in_perfect_matches <- perfect_matches %>% select(facility_ID) %>% unique()
+in_perfect_matches <- perfect_matches %>% dplyr::select(facility_ID) %>% unique()
   in_perfect_matches <- as.vector(in_perfect_matches$facility_ID)
   data_no_gps <- data_no_gps %>%    
     filter(!facility_ID %in% in_perfect_matches) 
@@ -1972,7 +1972,7 @@ in_perfect_matches <- perfect_matches %>% select(facility_ID) %>% unique()
     rename(full_name_gps = full_name,
            full_name = s1name)  %>%
     inner_join(., data_no_gps) %>%
-    select(!c(s2.i, s1.i)) %>%
+    dplyr::select(!c(s2.i, s1.i)) %>%
    rbind(perfect_matches) %>%
        arrange(adist)
  
@@ -1988,7 +1988,7 @@ table_aprox_string_matches <- function() {
     sample_frac(sample_fraction) %>% 
     st_drop_geometry %>%
     arrange(adist) %>%
-    select(full_name, full_name_gps, adist) %>%
+    dplyr::select(full_name, full_name_gps, adist) %>%
     rename("String (sample)" = full_name,
            "String (coord.)"= full_name_gps,
            "Levenshtein distance" = adist) %>%
@@ -2030,7 +2030,7 @@ approximate_string_match_bind <- function(max_distance) {
   }
   
   facilities_all_gps_temp <- asm_matches_retained %>%
-    select(geometry, facility_ID) %>%
+    dplyr::select(geometry, facility_ID) %>%
     unique()
   
   duplicates <-
@@ -2048,7 +2048,7 @@ approximate_string_match_bind <- function(max_distance) {
   
   n_matched_facilities <- facilities_all_gps %>% nrow()
   
-  with_gps <- facilities_all_gps %>% select(facility_ID) %>% unique()
+  with_gps <- facilities_all_gps %>% dplyr::select(facility_ID) %>% unique()
   with_gps <- as.vector(with_gps$facility_ID)
   
   facilities_all_nogps <- facilities_all %>%
@@ -2092,7 +2092,7 @@ approximate_string_match_bind_centroid <- function(max_distance) {
     filter(area_km <= ifelse(gps_source == "commune", commune_lim, fokontany_lim)) %>%
     st_sf() %>% 
     st_transform(crs = 4326) %>%
-    select(geometry, facility_ID) %>%
+    dplyr::select(geometry, facility_ID) %>%
     unique()
   
   duplicates <-
@@ -2110,7 +2110,7 @@ approximate_string_match_bind_centroid <- function(max_distance) {
   
   n_matched_facilities <- facilities_all_gps %>% nrow()
   
-  with_gps <- facilities_all_gps %>% select(facility_ID) %>% unique()
+  with_gps <- facilities_all_gps %>% dplyr::select(facility_ID) %>% unique()
   with_gps <- as.vector(with_gps$facility_ID)
   
   facilities_all_nogps <- facilities_all %>%
@@ -2163,7 +2163,7 @@ facilities_gps_who <- st_read(paste(data_gps_sources_reposit,
          
          # "Health Centre" corresponds to CSB2
          clinic_type = gsub("Health Centre", "CSB2", clinic_type)) %>%
-  select(!c(Country, Ownership)) %>%
+  dplyr::select(!c(Country, Ownership)) %>%
     rename(source = LL.source,
          latitude = Lat,
          longitude = Long) 
@@ -2172,7 +2172,7 @@ facilities_gps_who <- st_read(paste(data_gps_sources_reposit,
 # let us save a standardized subset of the columns for later use
 
 facilities_gps_who_0 <- facilities_gps_who %>%
-  select(clinic_type, latitude, longitude, source, clinic_name) %>%
+  dplyr::select(clinic_type, latitude, longitude, source, clinic_name) %>%
   st_drop_geometry()
 
 # Returning to the original inventory, we standardize commune, district,
@@ -2268,7 +2268,7 @@ facilities_gps_3 <- read.csv(paste(data_gps_sources_reposit,
          district_name = CommuneNom,
          clinic_name = FacilityNom, 
          clinic_type = FacilityType) %>%
-  select(district_name, clinic_name, 
+  dplyr::select(district_name, clinic_name, 
          clinic_type, latitude, longitude) %>%
   
   # Drop missing values
@@ -2276,7 +2276,7 @@ facilities_gps_3 <- read.csv(paste(data_gps_sources_reposit,
   filter(longitude != 0) %>%
   unique() %>%
   mutate(source = "RHINoVision Decision Support System") %>%
-  select(clinic_name, longitude, latitude, source, clinic_type) 
+  dplyr::select(clinic_name, longitude, latitude, source, clinic_type) 
 
 facilities_gps_rhino <- facilities_gps_3 %>%
   st_as_sf(., coords = c("longitude", "latitude"), 
@@ -2362,7 +2362,7 @@ facilities_gps_OCHA_1 <- st_read(paste(data_gps_sources_reposit,
                                        "hotosm_mdg_health_facilities_points_shp",
                                        "hotosm_mdg_health_facilities_points.shp",
                                        sep = "/")) %>%
-  select(name, geometry, osm_id) %>%
+  dplyr::select(name, geometry, osm_id) %>%
   unique() %>%
   filter(!is.na(name)) %>%
   rename(clinic_name = name, ID_OSM = osm_id)
@@ -2374,10 +2374,10 @@ facilities_gps_OCHA_1 <- cbind(facilities_gps_OCHA_1, facilities_gps_coordinates
 
 facilities_gps_OCHA_1 <- facilities_gps_OCHA_1 %>%
   st_drop_geometry() %>%
-  select(clinic_name, X, Y, ID_OSM)
+  dplyr::select(clinic_name, X, Y, ID_OSM)
 
 crs_system <- st_crs(facilities_gps_OCHA_1)
-with_gps_OCHA <- facilities_gps_OCHA_1 %>% select(ID_OSM) %>% unique()
+with_gps_OCHA <- facilities_gps_OCHA_1 %>% dplyr::select(ID_OSM) %>% unique()
 with_gps_OCHA <- with_gps_OCHA$ID_OSM
 
 #OpenStreetMap contributors
@@ -2390,7 +2390,7 @@ facilities_gps_OCHA_2 <- read_csv(paste(data_gps_sources_reposit,
   filter(!is.na(X)) %>%
   filter(!is.na(Y)) %>%
   filter(!is.na(name)) %>%
-  select(name, X, Y, osm_id) %>%
+  dplyr::select(name, X, Y, osm_id) %>%
   rename(clinic_name = name, ID_OSM = osm_id) %>%
   unique() %>%
   filter(!ID_OSM %in% with_gps_OCHA) %>%
@@ -2406,7 +2406,7 @@ facilities_gps_0 <- facilities_gps_OCHA %>%
   rename(latitude = Y,
          longitude = X) %>%
   mutate(source = "OpenStreetMap", type = NA) %>%
-  select(!c(ID_OSM))
+  dplyr::select(!c(ID_OSM))
 
 rm(facilities_gps_OCHA)
 
@@ -2422,14 +2422,14 @@ facilities_gps_1 <- read_excel(paste(data_gps_sources_reposit,
          longitude = as.numeric(sub(" .*", "", geometry))) %>%
   
   # Trim dataset
-  select(region, district, commune, type, FS, longitude, latitude) %>%
+  dplyr::select(region, district, commune, type, FS, longitude, latitude) %>%
   rename(clinic_name = FS, district_name = commune) %>%
   
   # Drop missing values
   filter(!is.na(longitude)) %>%
   filter(!is.na(latitude)) %>%
   mutate(source = "File 1 (Consultant?)") %>%
-  select(clinic_name, longitude, latitude, source, type)
+  dplyr::select(clinic_name, longitude, latitude, source, type)
 
 # Import next source of GPS data
 facilities_gps_2 <- read.csv(paste(data_gps_sources_reposit,
@@ -2438,13 +2438,13 @@ facilities_gps_2 <- read.csv(paste(data_gps_sources_reposit,
   
   # Ensure longitude is saved as numeric, not character 
   mutate(longitude = as.numeric(longitude)) %>%
-  select(Nom.Commune, Type..CSB1..CSB2.., 
+  dplyr::select(Nom.Commune, Type..CSB1..CSB2.., 
          Nom.complet.FS.1, latitude, longitude) %>% 
   rename(clinic_name = Nom.complet.FS.1, 
          district_name = Nom.Commune, type = Type..CSB1..CSB2..) %>%
   unique() %>%
   mutate(source = "File 2 (MOH?)") %>%
-  select(clinic_name, longitude, latitude, source, type) %>%
+  dplyr::select(clinic_name, longitude, latitude, source, type) %>%
   
   # Drop missing values
   filter(!is.na(longitude)) %>%
@@ -2460,28 +2460,28 @@ facilities_gps_4 <- read.csv(paste(data_gps_sources_reposit,
                                    sep = "/"), 
                              header=TRUE) %>%
   rename(district_name = District, clinic_name = Health.center.names) %>%
-  select(district_name, clinic_name, latitude, longitude) %>%
+  dplyr::select(district_name, clinic_name, latitude, longitude) %>%
   
   # Drop missing values
   filter(latitude != 0) %>%
   filter(longitude != 0) %>%
   unique() %>%
   mutate(source = "File 3 (?)", type = NA) %>%
-  select(clinic_name, longitude, latitude, source, type)
+  dplyr::select(clinic_name, longitude, latitude, source, type)
 
 facilities_gps_5 <- read_excel(paste(data_gps_sources_reposit, 
                                      "CHD ET CHU XY 2012.xls", sep = "/")) %>%
   rename(district_name = "Nom District", 
          clinic_name = "Nom FS GESIS",
          latitude = "Y", longitude = "X") %>%
-  select(district_name, clinic_name, latitude, longitude) %>%
+  dplyr::select(district_name, clinic_name, latitude, longitude) %>%
   
   # Drop missing values
   filter(latitude != 0) %>%
   filter(longitude != 0) %>%
   unique() %>%
   mutate(source = "File 4 (Consultant)", type = NA) %>%
-  select(clinic_name, longitude, latitude, source, type)
+  dplyr::select(clinic_name, longitude, latitude, source, type)
 
 # Import next source of GPS data
 facilities_gps_6 <- read.csv(paste(data_gps_sources_reposit, 
@@ -2489,14 +2489,14 @@ facilities_gps_6 <- read.csv(paste(data_gps_sources_reposit,
                              header=TRUE) %>%
   rename(district_name = district_n, clinic_name = clinic_nam,
          latitude = Latitude, longitude = Longitude) %>%
-  select(district_name, clinic_name, latitude, longitude) %>%
+  dplyr::select(district_name, clinic_name, latitude, longitude) %>%
   
   # Drop missing values
   filter(latitude != 0) %>%
   filter(longitude != 0) %>%
   unique() %>%
   mutate(source = "File 5 (Chris)", type = NA) %>%
-  select(clinic_name, longitude, latitude, source, type)
+  dplyr::select(clinic_name, longitude, latitude, source, type)
 
 # Merge the GPS data sources and reconcile duplicate data
 facilities_gps_any <- facilities_gps_0 %>%
@@ -2541,7 +2541,7 @@ facility_gps_types <- facilities_gps_any %>%
   group_by(source, clinic_type) %>%
   mutate(value = sum(count, na.rm = FALSE)) %>%
   ungroup() %>%
-  select(source, clinic_type, value) %>%
+  dplyr::select(source, clinic_type, value) %>%
   unique() %>%
   arrange(source) %>%
   pivot_wider(names_from = source) %>%
@@ -2691,35 +2691,35 @@ n_groups <- facilities_gps_any %>% nrow()
 
 n_mean_area_polygons <- facilities_gps_any %>% filter(shape_type == "polygon") %>% 
   st_drop_geometry() %>%
-  select(area_km) %>%
+  dplyr::select(area_km) %>%
   mutate(mean = mean(area_km)) %>%
-  select(mean) %>%
+  dplyr::select(mean) %>%
   unique()
 
 n_mean_area_polygons <- n_mean_area_polygons$mean
 
 n_max_area_polygons <- facilities_gps_any %>% filter(shape_type == "polygon") %>% 
   st_drop_geometry() %>%
-  select(area_km) %>%
+  dplyr::select(area_km) %>%
   mutate(max = max(area_km)) %>%
-  select(max) %>%
+  dplyr::select(max) %>%
   unique()
 n_max_area_polygons <- n_max_area_polygons$max
 
 n_mean_length <- facilities_gps_any %>% filter(shape_type == "line") %>% 
   st_drop_geometry() %>%
-  select(length) %>%
+  dplyr::select(length) %>%
   mutate(mean = mean(length)) %>%
-  select(mean) %>%
+  dplyr::select(mean) %>%
   unique()
 
 n_mean_length <- n_mean_length$mean
 
 n_max_length <- facilities_gps_any %>% filter(shape_type == "line") %>% 
   st_drop_geometry() %>%
-  select(length) %>%
+  dplyr::select(length) %>%
   mutate(max = max(length)) %>%
-  select(max) %>%
+  dplyr::select(max) %>%
   unique()
 n_max_length <- n_max_length$max
 
@@ -2842,7 +2842,7 @@ Among polygon groups, the mean area was `r format(round(n_mean_area_polygons,2),
 facilities_gps_any <- facilities_gps_any %>% 
   filter(retain == "Within threshold") %>%
   st_centroid() %>% 
-  select(!c(shape_type, length, area_km, retain)) %>%
+  dplyr::select(!c(shape_type, length, area_km, retain)) %>%
   clean_catchment_area() %>%
   unique() %>%
   gps_source_match_prep()
@@ -2949,7 +2949,7 @@ facilities_manual_matches <- read_xlsx(path = paste(data_gps_sources,
 # tab_step_4 <-
 
   facilities_manual_matches %>%
-  select(commune_name, district_name, clinic_name, clinic_type, clinic_type_new,
+  dplyr::select(commune_name, district_name, clinic_name, clinic_type, clinic_type_new,
          clinic_name_new, district_name_new, commune_name_new, region_name, region_name_new) %>%
   mutate(clinic_type_new = ifelse(clinic_type_new == clinic_type, " ~ ", clinic_type_new),
          clinic_name_new = ifelse(clinic_name_new == clinic_name, " ~ ", clinic_name_new),
@@ -2958,7 +2958,7 @@ facilities_manual_matches <- read_xlsx(path = paste(data_gps_sources,
          region_name_new = ifelse(region_name_new == region_name, " ~ ", region_name_new)) %>%
   na_if(., "") %>%
   mutate_all(~replace_na(.,"")) %>%
-select(order(colnames(.),
+dplyr::select(order(colnames(.),
                       decreasing = FALSE)) %>%
 #   mutate(clinic_name=str_replace_all(clinic_name," ","<br>"),
 # clinic_name_new=str_replace_all(clinic_name_new," ","<br>"),
@@ -2970,8 +2970,8 @@ select(order(colnames(.),
 # district_name_new=str_replace_all(district_name_new," ","<br>"),
 # region_name=str_replace_all(region_name," ","<br>"),
 # region_name_new=str_replace_all(region_name_new," ","<br>")) %>%
-    # select(!c(region_name, region_name_new)) %>%
-      select(c(clinic_name, clinic_name_new)) %>%
+    # dplyr::select(!c(region_name, region_name_new)) %>%
+      dplyr::select(c(clinic_name, clinic_name_new)) %>%
 
   rename("Facility name, data" = clinic_name,
          "Facility name, inventory" = clinic_name_new,
@@ -3023,7 +3023,7 @@ select(order(colnames(.),
 # tab_step_4 <-
 
   facilities_manual_matches %>%
-  select(commune_name, district_name, clinic_name, clinic_type, clinic_type_new,
+  dplyr::select(commune_name, district_name, clinic_name, clinic_type, clinic_type_new,
          clinic_name_new, district_name_new, commune_name_new, region_name, region_name_new) %>%
   mutate(clinic_type_new = ifelse(clinic_type_new == clinic_type, " ~ ", clinic_type_new),
          clinic_name_new = ifelse(clinic_name_new == clinic_name, " ~ ", clinic_name_new),
@@ -3032,7 +3032,7 @@ select(order(colnames(.),
          region_name_new = ifelse(region_name_new == region_name, " ~ ", region_name_new)) %>%
   na_if(., "") %>%
   mutate_all(~replace_na(.,"")) %>%
-select(order(colnames(.),
+dplyr::select(order(colnames(.),
                       decreasing = FALSE)) %>%
 #   mutate(clinic_name=str_replace_all(clinic_name," ","<br>"),
 # clinic_name_new=str_replace_all(clinic_name_new," ","<br>"),
@@ -3044,8 +3044,8 @@ select(order(colnames(.),
 # district_name_new=str_replace_all(district_name_new," ","<br>"),
 # region_name=str_replace_all(region_name," ","<br>"),
 # region_name_new=str_replace_all(region_name_new," ","<br>")) %>%
-    # select(!c(region_name, region_name_new)) %>%
-      select(c(clinic_name, clinic_type, clinic_type_new)) %>%
+    # dplyr::select(!c(region_name, region_name_new)) %>%
+      dplyr::select(c(clinic_name, clinic_type, clinic_type_new)) %>%
 
   rename("Facility name, data" = clinic_name,
          # "Facility name, inventory" = clinic_name_new,
@@ -3096,7 +3096,7 @@ select(order(colnames(.),
 # tab_step_4 <-
 
   facilities_manual_matches %>%
-  select(commune_name, district_name, clinic_name, clinic_type, clinic_type_new,
+  dplyr::select(commune_name, district_name, clinic_name, clinic_type, clinic_type_new,
          clinic_name_new, district_name_new, commune_name_new, region_name, region_name_new) %>%
   mutate(clinic_type_new = ifelse(clinic_type_new == clinic_type, " ~ ", clinic_type_new),
          clinic_name_new = ifelse(clinic_name_new == clinic_name, " ~ ", clinic_name_new),
@@ -3105,7 +3105,7 @@ select(order(colnames(.),
          region_name_new = ifelse(region_name_new == region_name, " ~ ", region_name_new)) %>%
   na_if(., "") %>%
   mutate_all(~replace_na(.,"")) %>%
-select(order(colnames(.),
+dplyr::select(order(colnames(.),
                       decreasing = FALSE)) %>%
 #   mutate(clinic_name=str_replace_all(clinic_name," ","<br>"),
 # clinic_name_new=str_replace_all(clinic_name_new," ","<br>"),
@@ -3117,8 +3117,8 @@ select(order(colnames(.),
 # district_name_new=str_replace_all(district_name_new," ","<br>"),
 # region_name=str_replace_all(region_name," ","<br>"),
 # region_name_new=str_replace_all(region_name_new," ","<br>")) %>%
-    # select(!c(region_name, region_name_new)) %>%
-      select(c(clinic_name, district_name, district_name_new)) %>%
+    # dplyr::select(!c(region_name, region_name_new)) %>%
+      dplyr::select(c(clinic_name, district_name, district_name_new)) %>%
 
   rename("Facility name, data" = clinic_name,
          # "Facility name, inventory" = clinic_name_new,
@@ -3169,7 +3169,7 @@ select(order(colnames(.),
 # tab_step_4 <-
 
   facilities_manual_matches %>%
-  select(commune_name, district_name, clinic_name, clinic_type, clinic_type_new,
+  dplyr::select(commune_name, district_name, clinic_name, clinic_type, clinic_type_new,
          clinic_name_new, district_name_new, commune_name_new, region_name, region_name_new) %>%
   mutate(clinic_type_new = ifelse(clinic_type_new == clinic_type, " ~ ", clinic_type_new),
          clinic_name_new = ifelse(clinic_name_new == clinic_name, " ~ ", clinic_name_new),
@@ -3178,7 +3178,7 @@ select(order(colnames(.),
          region_name_new = ifelse(region_name_new == region_name, " ~ ", region_name_new)) %>%
   na_if(., "") %>%
   mutate_all(~replace_na(.,"")) %>%
-select(order(colnames(.),
+dplyr::select(order(colnames(.),
                       decreasing = FALSE)) %>%
 #   mutate(clinic_name=str_replace_all(clinic_name," ","<br>"),
 # clinic_name_new=str_replace_all(clinic_name_new," ","<br>"),
@@ -3190,8 +3190,8 @@ select(order(colnames(.),
 # district_name_new=str_replace_all(district_name_new," ","<br>"),
 # region_name=str_replace_all(region_name," ","<br>"),
 # region_name_new=str_replace_all(region_name_new," ","<br>")) %>%
-    # select(!c(region_name, region_name_new)) %>%
-      select(c(clinic_name, commune_name, commune_name_new)) %>%
+    # dplyr::select(!c(region_name, region_name_new)) %>%
+      dplyr::select(c(clinic_name, commune_name, commune_name_new)) %>%
 
   rename("Facility name, data" = clinic_name,
          # "Facility name, inventory" = clinic_name_new,
@@ -3246,7 +3246,7 @@ facilities_manual_matches_temp <- facilities_gps_any %>%
          region_name_new = region_name) %>%
   mutate(commune_name_new = ifelse(is.na(commune_name_new), "", commune_name_new)) %>%
   inner_join(., facilities_manual_matches, by = c("clinic_type_new", "clinic_name_new", "region_name_new", "district_name_new", "commune_name_new")) %>%
-  select(geometry, commune_name,  region_name, clinic_name_full) %>%
+  dplyr::select(geometry, commune_name,  region_name, clinic_name_full) %>%
   rename(clinic_name = clinic_name_full) %>%
   inner_join(., facilities_all_nogps, by = c("commune_name", "region_name", "clinic_name")) %>%
   mutate(source = label)
@@ -3257,7 +3257,7 @@ facilities_all_gps <- rbind(facilities_all_gps,facilities_manual_matches_temp) %
 
 n_matched_facilities_step_3 <- facilities_all_gps %>% nrow()
 
-with_gps <- facilities_all_gps %>% select(facility_ID) %>% unique()
+with_gps <- facilities_all_gps %>% dplyr::select(facility_ID) %>% unique()
 with_gps <- as.vector(with_gps$facility_ID)
 
 facilities_all_nogps <- facilities_all_nogps %>%
@@ -3409,12 +3409,12 @@ label = "Searches"
 # CHD facilities from Symphonia    
 facilities_chd <- read.xlsx(paste(data_gps_sources_searches, 'CHDD GPS points.xlsx', sep = "/")) %>%
   rename(clinic_name = clinic_nam) %>%
-  select(clinic_name, clinic_typ,	region_nam,	district_n, Latitude, Longitude) %>%
+  dplyr::select(clinic_name, clinic_typ,	region_nam,	district_n, Latitude, Longitude) %>%
   unique() %>%
   mutate(longitude = as.numeric(Longitude),
          latitude = as.numeric(Latitude)) %>%
   rename(clinic_type = clinic_typ, region_name = region_nam, district_name = district_n) %>%
-  select(clinic_type, clinic_name,  region_name, district_name, latitude, longitude) %>%
+  dplyr::select(clinic_type, clinic_name,  region_name, district_name, latitude, longitude) %>%
   unique() %>%
   st_as_sf(coords = c("longitude", "latitude"), 
            crs = 4326) %>%
@@ -3425,14 +3425,14 @@ facilities_chd <- read.xlsx(paste(data_gps_sources_searches, 'CHDD GPS points.xl
 # Facilities from Google searching
 facilities_gps_search_1 <- read.xlsx(paste(data_gps_sources_searches, 'gps_search.xlsx', sep = "/")) %>%
   filter(location != "") %>%
-  select(!c(source, X1)) %>%
+  dplyr::select(!c(source, X1)) %>%
   separate(location, c("latitude", "longitude"), sep = ',') %>%
   mutate(longitude = as.numeric(longitude),
          latitude = as.numeric(latitude)) %>%
   unique() %>%
   st_as_sf(coords = c("longitude", "latitude"), 
            crs = 4326) %>%
-  select(clinic_name, clinic_type, district_name,  geometry) %>%
+  dplyr::select(clinic_name, clinic_type, district_name,  geometry) %>%
   mutate(gps_type = "Search") %>%
   mutate(full_name = paste(clinic_type, clinic_name, district_name, sep = " ")) %>%
   mutate(region_name = "", commune_name = "")
@@ -3440,14 +3440,14 @@ facilities_gps_search_1 <- read.xlsx(paste(data_gps_sources_searches, 'gps_searc
 # Facility from additional searches
 facilities_gps_search_2 <- read.xlsx(paste(data_gps_sources_searches, 'no_gps_facilities_coordinates.xlsx', sep = "/")) %>%
   filter(LAT != "" | LONG != "") %>%
-  select(!c(clinic_name_w_type, ID)) %>%
+  dplyr::select(!c(clinic_name_w_type, ID)) %>%
   mutate(longitude = as.numeric(LONG)/1000000,
          latitude = as.numeric(LAT)/1000000) %>%
-  select(!c(LONG, LAT)) %>%
+  dplyr::select(!c(LONG, LAT)) %>%
   unique() %>%
   st_as_sf(coords = c("longitude", "latitude"), 
            crs = 4326) %>%
-  select(clinic_name, clinic_type, district_name, commune_name, region_name, geometry) %>%
+  dplyr::select(clinic_name, clinic_type, district_name, commune_name, region_name, geometry) %>%
   mutate(gps_type = "Search") %>%
   mutate(full_name = paste(clinic_type, clinic_name,district_name, sep = " ")) 
 
@@ -3461,17 +3461,17 @@ facilities_gps_search_3 <- read.xlsx(paste(data_gps_sources_searches, 'no_gps_fa
   separate(col = location, into = c("longitude", "latitude"), sep = ",") %>%
   st_as_sf(coords = c("longitude", "latitude"), 
            crs = 4326) %>%
-  select(clinic_name, clinic_type, district_name, commune_name, region_name, geometry) %>%
+  dplyr::select(clinic_name, clinic_type, district_name, commune_name, region_name, geometry) %>%
   mutate(gps_type = "Search") %>%
   mutate(full_name = paste(clinic_type, clinic_name,district_name, sep = " ")) 
 
 facilities_gps_searches <- rbind(facilities_chd, facilities_gps_search_1, facilities_gps_search_2, facilities_gps_search_3) %>%
   rename(source = gps_type) %>%
-  select(!full_name) %>%
+  dplyr::select(!full_name) %>%
   map_clean_arrondis() %>%
   clean_clinic_name() %>%
   clean_catchment_area() %>%
-  select(clinic_name_clean, region_name, district_name, clinic_type_clean, geometry, source) %>%
+  dplyr::select(clinic_name_clean, region_name, district_name, clinic_type_clean, geometry, source) %>%
   group_by(clinic_name_clean, region_name, district_name, clinic_type_clean) %>%
   summarise() %>%
   st_convex_hull() %>%
@@ -3487,7 +3487,7 @@ duplicates <-
   
   facilities_gps_searches <- facilities_gps_searches %>%
     filter(!facility_ID %in% duplicates) %>%
-    select(facility_ID, geometry, source) %>%
+    dplyr::select(facility_ID, geometry, source) %>%
     inner_join(facilities_all)
   
 
@@ -3518,7 +3518,7 @@ facilities_all_gps<-rbind(facilities_all_gps, facilities_all_gps_temp) %>% uniqu
 
 n_matched_facilities_step_6 <- facilities_all_gps %>% nrow()
 
-with_gps <- facilities_all_gps %>% select(facility_ID) %>% unique()
+with_gps <- facilities_all_gps %>% dplyr::select(facility_ID) %>% unique()
 with_gps <- as.vector(with_gps$facility_ID)
 
 facilities_all_nogps <- facilities_all %>%
@@ -3694,7 +3694,7 @@ facilities_sample <- read_excel(paste(gpspath_spread,
                                               "3_validation",
                                               "validation_sample - coordinates.xlsx",
                                               sep = "/")) %>%
-  select(!c(Longitude, Latitude, Longitude_search, Latitude_search, Source)) %>%
+  dplyr::select(!c(Longitude, Latitude, Longitude_search, Latitude_search, Source)) %>%
   rename(clinic_name = "Clinic name",
          region_name = Region,
          district_name= District,
@@ -3724,7 +3724,7 @@ Table S2.10 provides the list of facilities in the validation sample.
 ```{r validation_start, warning = FALSE, message = FALSE, echo = FALSE, include = TRUE, results=TRUE}
 
 # facilities_sample <- facilities_sample %>%
-#   select(clinic_name_full,  region_name, district_name, commune_name, geometry) %>%
+#   dplyr::select(clinic_name_full,  region_name, district_name, commune_name, geometry) %>%
 #   st_as_sf() %>%
 #       mutate(Longitude = sf::st_coordinates(.)[,1],
 #                 Latitude = sf::st_coordinates(.)[,2]) %>%
@@ -3748,7 +3748,7 @@ tab_2 <- facilities_sample %>%
     # mutate(district_name=str_replace_all(district_name," ","<br>")) %>% 
     # mutate(commune_name=str_replace_all(commune_name," ","<br>")) %>% 
 
-  select(!c(district_name, commune_name, clinic_name, clinic_type,
+  dplyr::select(!c(district_name, commune_name, clinic_name, clinic_type,
             clinic_type_clean, source, facility_ID)) %>%
     rename("Clinic name" = clinic_name_clean,
            Region = region_name) %>%
@@ -3780,7 +3780,7 @@ tab_2
 ```{r validation-cross, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
 
 facilities_sample <- facilities_sample %>%
-  select(clinic_name, region_name, district_name, commune_name,
+  dplyr::select(clinic_name, region_name, district_name, commune_name,
          Latitude, Longitude) %>%
   rename(Region = region_name, District = district_name, Commune = commune_name)
 
@@ -3788,7 +3788,7 @@ facilities_sample_matches <- read_excel(paste(gpspath_spread,
                                               "3_validation",
                                               "validation_sample - coordinates.xlsx",
                                               sep = "/")) %>%
-  select(!c(Longitude, Latitude)) %>%
+  dplyr::select(!c(Longitude, Latitude)) %>%
   rename(clinic_name = "Clinic name") %>%
   inner_join(., facilities_sample) %>%
   
@@ -3796,7 +3796,7 @@ facilities_sample_matches <- read_excel(paste(gpspath_spread,
   # to be considered to be referring to the same clinic
   mutate(old = paste0(Longitude, " ", Latitude),
          new = paste0(Longitude_search," ", Latitude_search)) %>%
-  # select(!c(Longitude, Latitude, "Longitude, search", "Latitude, search")) %>%
+  # dplyr::select(!c(Longitude, Latitude, "Longitude, search", "Latitude, search")) %>%
   pivot_longer(cols = c("old", "new"), values_to = "geometry", names_to = "type" ) %>%
   separate(   col = geometry,
     sep = " ",
@@ -3815,7 +3815,7 @@ facilities_sample_matches <- read_excel(paste(gpspath_spread,
   # And calculate the length and area of the resulting groups
   mutate(length = as.numeric(st_length(geometry)/1000)) %>%
   
-  select(clinic_name, length) %>%
+  dplyr::select(clinic_name, length) %>%
   arrange(length)
 
 validation_mean_dist <- mean(facilities_sample_matches$length)
@@ -3942,8 +3942,8 @@ ifelse(require("RPushbullet") == TRUE,
 # LEGACY CODE
 
   
-  # region_names_data <- facilities_all %>% select(region_name) %>% unique()
-  # region_names_standard <- map_mdg_1 %>% st_drop_geometry() %>%select(REGION_NAM) %>% unique() %>% arrange(REGION_NAM)
+  # region_names_data <- facilities_all %>% dplyr::select(region_name) %>% unique()
+  # region_names_standard <- map_mdg_1 %>% st_drop_geometry() %>%dplyr::select(REGION_NAM) %>% unique() %>% arrange(REGION_NAM)
   #
   # region_crosswalk <- cbind(region_names_data, region_names_standard) %>%
   #   mutate(crosswalk = region_name == REGION_NAM)
@@ -3954,9 +3954,9 @@ ifelse(require("RPushbullet") == TRUE,
   #     str_detect(region_name, "Amoron'i Mania") ~ "Amoron I Mania",
 #     TRUE ~ region_name))
 #
-# district_names_data <- facilities_all %>% select(region_name, district_name) %>% unique()  %>% arrange(region_name, district_name) %>%
+# district_names_data <- facilities_all %>% dplyr::select(region_name, district_name) %>% unique()  %>% arrange(region_name, district_name) %>%
 #    filter(!is.na(district_name)) %>% mutate(flag1 = 1)
-# district_names_standard <- map_mdg_2 %>% st_drop_geometry() %>%select(REGION_NAM, DISTRICT_N) %>%
+# district_names_standard <- map_mdg_2 %>% st_drop_geometry() %>%dplyr::select(REGION_NAM, DISTRICT_N) %>%
 #     mutate(DISTRICT_N = case_when(
 #     str_detect(DISTRICT_N, "Arrondissement") ~ "Antananarivo Renivohitra",
 #     TRUE ~ DISTRICT_N)) %>%
@@ -3979,11 +3979,11 @@ ifelse(require("RPushbullet") == TRUE,
 #                                   "Lalangina",
 #                                   district_name ))
 
-# commune_names_data <- facilities_all %>% select(region_name, district_name, commune_name) %>% unique()  %>% arrange(region_name, district_name, commune_name) %>%
+# commune_names_data <- facilities_all %>% dplyr::select(region_name, district_name, commune_name) %>% unique()  %>% arrange(region_name, district_name, commune_name) %>%
 #    filter(!is.na(district_name)) %>% filter(!is.na(commune_name)) %>% mutate(flag1 = 1) %>%
 #    mutate(full_name = paste(region_name, district_name, commune_name, sep = "-"))
 # 
-# commune_names_standard <- map_mdg_3 %>% st_drop_geometry() %>%select(COMMUNE_NA, REGION_NAM, DISTRICT_N) %>%
+# commune_names_standard <- map_mdg_3 %>% st_drop_geometry() %>%dplyr::select(COMMUNE_NA, REGION_NAM, DISTRICT_N) %>%
 #     mutate(DISTRICT_N = case_when(
 #     str_detect(DISTRICT_N, "Arrondissement") ~ "Antananarivo Renivohitra",
 #     TRUE ~ DISTRICT_N)) %>%
@@ -3994,7 +3994,7 @@ ifelse(require("RPushbullet") == TRUE,
 #   relocate(commune_name, .after = district_name)
 # 
 # 
-# perfect_matches <- commune_names_standard %>% select(full_name) 
+# perfect_matches <- commune_names_standard %>% dplyr::select(full_name) 
 # perfect_matches <- perfect_matches$full_name
 # 
 # commune_names_data_fix <- commune_names_data %>% filter(!full_name %in% perfect_matches)

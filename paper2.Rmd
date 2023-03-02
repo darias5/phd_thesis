@@ -47,7 +47,7 @@ library(gganimate)
 library(transformr)
 library(huxtable)
 library(ggtext)
-library(margins)
+# library(margins)
 library(ncdf4) # package for netcdf manipulation
 library(magrittr)
 library(lmtest)
@@ -249,13 +249,13 @@ map_mdg_4 <- st_read(paste0(mappath_MOH,"/",
 
 ```{r rayshader}
 
-
 crsLONGLAT <- "+proj=longlat +datum=WGS84 +no_defs"
 map_mdg_0_un <- map_mdg_0_un %>%
   st_as_sf(crs= crsLONGLAT)
 
-# map_mdg_0 <- map_mdg_0 %>%
-#   st_as_sf(crs= crsLONGLAT)
+library(elevatr)
+library(rayshader)
+library(raster)
 
 z_level = 6
 
@@ -300,26 +300,25 @@ country_elevation %>%
   
   madagascar_topo_map <- readPNG(source = paste0(gpspath_fig, "/elevation_map.png"))
   
-# Get the spatial extent of the shapefile
   
   madagascar_bbox <- st_bbox(map_mdg_0_un)
 
-# Get the spatial extent of the PNG image
-madagascar_map_bbox <- c(xmin = 0, ymin = 0, xmax = ncol(madagascar_topo_map), ymax = nrow(madagascar_topo_map))
-
-
-# Calculate the scaling factor for the x-axis
-x_scale_factor <- diff(madagascar_bbox[c("xmin", "xmax")]) / diff(madagascar_map_bbox[c("xmin", "xmax")])
-
-# Calculate the scaling factor for the y-axis
-y_scale_factor <- diff(madagascar_bbox[c("ymin", "ymax")]) / diff(madagascar_map_bbox[c("ymin", "ymax")])
-
-
-# Extract minimum and maximum longitude and latitude
-min_lon <- as.numeric(bbox["xmin"])
-max_lon <-  as.numeric(bbox["xmax"])
-min_lat <-  as.numeric(bbox["ymin"])
-max_lat <-  as.numeric(bbox["ymax"])
+# # Get the spatial extent of the PNG image
+# madagascar_map_bbox <- c(xmin = 0, ymin = 0, xmax = ncol(madagascar_topo_map), ymax = nrow(madagascar_topo_map))
+# 
+# 
+# # Calculate the scaling factor for the x-axis
+# x_scale_factor <- diff(madagascar_bbox[c("xmin", "xmax")]) / diff(madagascar_map_bbox[c("xmin", "xmax")])
+# 
+# # Calculate the scaling factor for the y-axis
+# y_scale_factor <- diff(madagascar_bbox[c("ymin", "ymax")]) / diff(madagascar_map_bbox[c("ymin", "ymax")])
+# 
+# 
+# # Extract minimum and maximum longitude and latitude
+# min_lon <- as.numeric(bbox["xmin"])
+# max_lon <-  as.numeric(bbox["xmax"])
+# min_lat <-  as.numeric(bbox["ymin"])
+# max_lat <-  as.numeric(bbox["ymax"])
 
 function_add_rayshading <- function(){
    annotation_raster(madagascar_topo_map, 
@@ -328,6 +327,7 @@ function_add_rayshading <- function(){
                     xmax = madagascar_bbox["xmax"], # + (1-x_scale_factor * ncol(madagascar_topo_map)), 
                     ymax = madagascar_bbox["ymax"])  # + (1-y_scale_factor * nrow(madagascar_topo_map))) +
   }
+
 
 ```
 
@@ -668,7 +668,7 @@ function_pval_stars <- function(x){
 
 \emph{Daniel Arias, Karestan Koenen, Christopher Golden}
 
-\vspace{12pt}
+\vspace{8pt}
 
 \noindent\rule{8cm}{0.4pt}
 
@@ -676,20 +676,15 @@ function_pval_stars <- function(x){
 
 \begin{raggedright}
 
-
 {\bf Background:} Climate change-related exposures (CCEs) are linked to worsened mental health, yet few studies of CCEs have taken place in low- and middle-income countries. 
 
 {\bf Methods:} To better understand climate conditions and population mental health in these settings, we leverage meteorologic, geospatial, and monthly cases of mental and neurological disorders reported by `r num_facilities_pretty` facilities in Madagascar from 2010 to 2020 to explore the mental health impacts of three CCEs using negative binomial regression: temperature, soil moisture, and duration of cyclones and tropical storms. 
 
 {\bf Findings and interpretation:} We found a statistically significant reduction in monthly cases reported associated with temperature—approximately `r function_dynamic_text_results(section = "main", coefficient_option = "exposure_temperature", model_option = 4, value = "irr", value_include = "only")` cases reported per each degree Celsius increase `r function_dynamic_text_results(section = "main", coefficient_option = "exposure_temperature", model_option = 4, value = "irr", value_include = TRUE)`. A multiverse analysis of `r num_models_multiverse` models found this estimate to be robust to alternative specifications; ecoregion analysis indicated that this association was primarily localized to facilities in the central highlands, where cooler temperatures are more prevalent. We further found that higher soil moisture may be associated with higher case counts in the future, with an `r function_dynamic_text_results(section = "lags", lag_option = 3, coefficient_option = "exposure_sm", value = "irr", value_include = "only")`  elevation in incident cases reported `r function_dynamic_text_results(section = "lags", lag_option = 3, coefficient_option = "exposure_sm", value = "irr", value_include =TRUE)`  after a three month lag. Ecoloregion analysis suggest higher cases are reported in the eastern lowlands and the northern dry deciduous forests when soil moisture rises, which is consistent with the geographic concentration of flood risk in Madagascar. Our findings highlight the complex interactions between CCEs and population mental health and suggest potential heterogeneity in how changing climate conditions will impact mental health needs and system responses.
 
-\vspace*{\fill}
-
 \emph{Keywords: climate mental health, planetary health, eco-anxiety, climate change, humidity, soil moisture, drought, temperature, cyclones.}
 
 \end{raggedright}
-
-\newpage
 
 ## Introduction
 
@@ -813,6 +808,7 @@ ggsave(filename = paste0("figure_4b.jpg"),
        bg = "white")
 
 ```
+\newpage
 
 #### Sensitivity analysis 
 
@@ -912,10 +908,10 @@ map_a <- facilities_all_gps %>%
   ggplot(aes(geometry=geometry)) +
      function_add_rayshading() + 
 
-  geom_sf(data = map_mdg_3_un,
-          size = 0.2,
-          color = col_grey_light,
-          fill = NA) +
+  # geom_sf(data = map_mdg_3_un,
+  #         size = 0.2,
+  #         color = col_grey_light,
+  #         fill = NA) +
   geom_sf(data = map_mdg_2_un,
           size = 0.2,
           color = col_grey_med,
@@ -946,10 +942,10 @@ map_b <- facilities_all_gps %>%
   ggplot(aes(geometry=geometry)) +
     function_add_rayshading() + 
 
-  geom_sf(data = map_mdg_3_un,
-          size = 0.2,
-          color = col_grey_light,
-          fill = NA) +
+  # geom_sf(data = map_mdg_3_un,
+  #         size = 0.2,
+  #         color = col_grey_light,
+  #         fill = NA) +
   geom_sf(data = map_mdg_2_un,
           size = 0.2,
           color = col_grey_med,
@@ -1004,10 +1000,10 @@ panel_a <- data_climate_subset %>%
   #         size = 0.2,
   #         color = col_grey_light,
   #         fill = NA) +
-  geom_sf(data = map_mdg_2_un,
-          size = 0.2,
-          color = "grey40",
-          fill = NA) +
+  # geom_sf(data = map_mdg_2_un,
+  #         size = 0.2,
+  #         color = "grey40",
+  #         fill = NA) +
   geom_sf(data = map_mdg_1_un,
           size = 0.2,
           color = col_black,
@@ -1038,10 +1034,10 @@ panel_b <-  data_climate_subset %>%
   #         size = 0.2,
   #         color = col_grey_light,
   #         fill = NA) +
-  geom_sf(data = map_mdg_2_un,
-          size = 0.2,
-          color = "grey40",
-          fill = NA) +
+  # geom_sf(data = map_mdg_2_un,
+  #         size = 0.2,
+  #         color = "grey40",
+  #         fill = NA) +
   geom_sf(data = map_mdg_1_un,
           size = 0.2,
           color = col_black,
@@ -1243,6 +1239,9 @@ ggsave(filename = paste0("figure_4.jpg"),
 
 \newpage
 
+\begin{spacing}{1.5}
+
+
 ```{r table 2,include = TRUE, echo=FALSE, warnings = FALSE}
 
 
@@ -1364,6 +1363,7 @@ model_outputs_preferred_model %>%
   tab_options(table.width = pct(100))
 
 ```
+\end{spacing}{1.5}
 
 \addcontentsline{lot}{table}{Table 2.2: Main analysis results, summarized by incidence rate ratios (IRRs) and average marginal effects (AME) from Models 1 through 4.}
 

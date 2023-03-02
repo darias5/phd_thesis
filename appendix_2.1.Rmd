@@ -275,18 +275,18 @@ data %>% filter(sex == "both" & subgroup == "total") %>%
     # mutate(count = sum(count)) %>% 
     # filter(count != 0 & count != 14 & count != 7 & count != 21 & count != 28 & count != 35 & count != 42  & count != 49  & count != 56  & count != 63  & count != 70) %>% 
     # ungroup() %>%
-    # select(clinic_name, disease, year, ) %>%
+    # dplyr::select(clinic_name, disease, year, ) %>%
     # unique() %>%
     # mutate(n = 1) %>% 
     # group_by(year, disease) %>%  
     mutate(sum = sum(count)) %>%  
-    select(sum, year, disease) %>% 
+    dplyr::select(sum, year, disease) %>% 
     ungroup() %>%
     unique() %>% 
   left_join(mh_english_disease, by = "disease") %>%
   mutate(disease = paste0(disease_english, " (", 
                           StrTrunc(disease, maxlen = 25, ellipsis = "...", wbound = TRUE),")")) %>%
-      select(year, disease, sum) %>%
+      dplyr::select(year, disease, sum) %>%
     rename(Year = year, Total = sum) %>%
   mutate(disease = gsub(" and ", " & ", disease),
          disease = case_when(
@@ -309,7 +309,7 @@ data %>% filter(sex == "both" & subgroup == "total") %>%
     fns = function(x) ifelse(is.na(x), "—", prettyNum(x, big.mark = ",")))
 }
 
-n_chu <- chu_data %>% select(disease) %>% unique() %>% nrow
+n_chu <- chu_data %>% dplyr::select(disease) %>% unique() %>% nrow
 
 
 ```
@@ -366,7 +366,7 @@ data_mh <- data_mh %>%
       
   ## Add English translations for diseases, drop French disease names
   left_join(., mh_english_disease, by = "disease") %>%
-  select(!c(disease)) %>%
+  dplyr::select(!c(disease)) %>%
   rename(disease = disease_english) %>%
   relocate(disease, .after = clinic_name) %>%
   
@@ -1388,7 +1388,7 @@ data_mh <- data_mh %>%
 
 ## Create a unique facility ID based on the clinic name and location
 data_mh_temp <- data_mh %>%
-  select(clinic_name, region_name, district_name, commune_name) %>%
+  dplyr::select(clinic_name, region_name, district_name, commune_name) %>%
   unique() %>%
   arrange(clinic_name, region_name, district_name, commune_name) %>%
   mutate(facility_ID = seq.int(nrow(.)))
@@ -1405,18 +1405,18 @@ data_mh <- data_mh %>%
 rm(data_mh_temp)
 
 data_mh_temp <- data_mh %>%
-   select(!c(disease, count)) %>%
+   dplyr::select(!c(disease, count)) %>%
    unique() %>%
    pivot_longer('Any mental or neurological disorders', names_to = "disease", values_to = "count")
 
 
 data_mh <- data_mh %>%
-  select(!c('Any mental or neurological disorders')) %>%
+  dplyr::select(!c('Any mental or neurological disorders')) %>%
   rbind(., data_mh_temp)
 
 rm(data_mh_temp,csb_data, chd_data, chu_data, mh_english_disease)
 
-data_mh %>% filter(sex == "both") %>% select(clinic_name, district_name, region_name, commune_name) %>% unique() %>% nrow()
+data_mh %>% filter(sex == "both") %>% dplyr::select(clinic_name, district_name, region_name, commune_name) %>% unique() %>% nrow()
 
 max(data_mh$facility_ID)
 ```
@@ -1627,12 +1627,12 @@ Linear interpolation ultimately only impacted `r format(as.numeric(n_changed), b
 <!--   filter(subgroup == "total") %>% -->
 <!--   filter(cleaning_status == "count_raw") %>% -->
 <!--   mutate(reporting = ifelse(count == 0, NA, "Yes")) %>% -->
-<!--   select(date, region_name, district_name, commune_name, clinic_name_clean, clinic_type, reporting) %>% -->
+<!--   dplyr::select(date, region_name, district_name, commune_name, clinic_name_clean, clinic_type, reporting) %>% -->
 <!--   unique() -->
 
 
 <!-- duplicate_name_facilities <- data_facility_reporting %>% -->
-<!--   select(region_name, district_name, commune_name, clinic_name_clean, clinic_type) %>% -->
+<!--   dplyr::select(region_name, district_name, commune_name, clinic_name_clean, clinic_type) %>% -->
 <!--   unique() %>% -->
 <!--   mutate(full_string = paste0(region_name, district_name, commune_name, clinic_name_clean)) -->
 
@@ -1643,7 +1643,7 @@ Linear interpolation ultimately only impacted `r format(as.numeric(n_changed), b
 <!--   filter(!is.na(reporting)) %>% -->
 <!--   mutate(full_string = paste0(region_name, district_name, commune_name, clinic_name_clean)) %>% -->
 <!--   filter(full_string %in% duplicates) %>% -->
-<!--   select(!full_string) %>% -->
+<!--   dplyr::select(!full_string) %>% -->
 <!--   arrange(clinic_name_clean) %>% -->
 <!--   group_by(region_name, district_name, commune_name, clinic_name_clean) %>% -->
 <!--   mutate(n=1) %>% -->
@@ -1670,13 +1670,13 @@ Linear interpolation ultimately only impacted `r format(as.numeric(n_changed), b
 
 <!-- duplicate_name_facilities %>% -->
 <!--   filter(full_string %in% duplicates) %>% -->
-<!--   select(!full_string) %>% -->
+<!--   dplyr::select(!full_string) %>% -->
 <!--   arrange(clinic_name_clean) %>% -->
 <!--   group_by(region_name, district_name, commune_name, clinic_name_clean) %>% -->
 <!--   summarise(clinic_type = paste(clinic_type, collapse = " | ")) %>% -->
 <!--   ungroup() %>% -->
 <!--   unique() %>% -->
-<!--   select(clinic_name_clean, clinic_type) %>% -->
+<!--   dplyr::select(clinic_name_clean, clinic_type) %>% -->
 <!--   rename("Facility name" = clinic_name_clean, -->
 <!--          "Types" = clinic_type) %>% -->
 <!--   gt() %>%  -->
@@ -1736,10 +1736,10 @@ Linear interpolation ultimately only impacted `r format(as.numeric(n_changed), b
 ##   mutate(date = as.yearmon(paste(year, month), "%Y %m"))
 ## 
 ## ## Identify all unique variable descriptions, names, tables, and medical codes
-## variable_descrip <- data_raw %>% select(description) %>% unique()
-## variable_name <- data_raw %>% select(variable) %>% unique()
-## variable_tabname <- data_raw %>% select(table_name) %>% unique()
-## variable_medco <- data_raw %>% select(medical_code) %>% unique()
+## variable_descrip <- data_raw %>% dplyr::select(description) %>% unique()
+## variable_name <- data_raw %>% dplyr::select(variable) %>% unique()
+## variable_tabname <- data_raw %>% dplyr::select(table_name) %>% unique()
+## variable_medco <- data_raw %>% dplyr::select(medical_code) %>% unique()
 ## 
 ## ## Export unique values 
 ## write.csv(variable_descrip, file = "results/variable_descriptions.csv")
@@ -1750,7 +1750,7 @@ Linear interpolation ultimately only impacted `r format(as.numeric(n_changed), b
 ## 
 ## ## Bring in descriptions of medical codes 
 ## medical_codes <- read.csv(paste(datapath, "medical_codes.csv", sep = "/")) %>%
-##   select(code, description) %>% 
+##   dplyr::select(code, description) %>% 
 ##   rename(medical_code = code)
 ## variable_medco_joined <- inner_join(variable_medco, medical_codes, by = "medical_code") %>% 
 ##   unique()
@@ -1768,7 +1768,7 @@ Linear interpolation ultimately only impacted `r format(as.numeric(n_changed), b
 ##   group_by(date) %>% 
 ##   mutate(count = sum(as.numeric(value))) %>% 
 ##   ungroup() %>%
-##   select(date, count) %>%
+##   dplyr::select(date, count) %>%
 ##   unique()
 ## 
 ## ## Plot total number of NP referrals over time
@@ -1787,8 +1787,8 @@ Linear interpolation ultimately only impacted `r format(as.numeric(n_changed), b
 ##        height = 6)
 ## 
 ## ## Extraction of unique clinics and district appearing in the data
-## facilities_clinic_codes <- data_raw %>% select(clinic_code) %>% unique()
-## facilities_district_codes <- data_raw %>% select(district_code) %>% unique()
+## facilities_clinic_codes <- data_raw %>% dplyr::select(clinic_code) %>% unique()
+## facilities_district_codes <- data_raw %>% dplyr::select(district_code) %>% unique()
 ## 
 ## ## Exporting unique values
 ## write.csv(facilities_clinic_codes, file = "results/facilities_clinic_codes.csv")
@@ -1801,7 +1801,7 @@ Linear interpolation ultimately only impacted `r format(as.numeric(n_changed), b
 ## ## Clinic names
 ## facilities_crosswalk <- read.csv(paste(datapath, 'clinics.csv', sep = "/"), 
 ##                                  header=TRUE) %>% 
-##   select(district_code, clinic_code, name) %>%
+##   dplyr::select(district_code, clinic_code, name) %>%
 ##   rename(clinic_name = name) %>%
 ##   unique()
 ## 
@@ -1810,7 +1810,7 @@ Linear interpolation ultimately only impacted `r format(as.numeric(n_changed), b
 ## ## District names and types
 ## facilities_district <- read.csv(paste(datapath, 'districts.csv', sep = "/"), 
 ##                                 header=TRUE) %>% 
-##   select(district_code, district_type, name) %>%
+##   dplyr::select(district_code, district_type, name) %>%
 ##   rename(district_name = name) %>%
 ##   unique()
 ## 
@@ -1819,7 +1819,7 @@ Linear interpolation ultimately only impacted `r format(as.numeric(n_changed), b
 ## ## Latitude and longitude of clinics
 ## facilities_coordinates <- read.csv(paste(datapath, 'Health clinic data points.csv', sep = "/"), 
 ##                                    header=TRUE) %>%
-##   select(Nom.complet.FS.1, latitude, longitude) %>% 
+##   dplyr::select(Nom.complet.FS.1, latitude, longitude) %>% 
 ##   rename(clinic_name = Nom.complet.FS.1) %>%
 ##   unique() 
 ## 
@@ -1831,7 +1831,7 @@ Linear interpolation ultimately only impacted `r format(as.numeric(n_changed), b
 ## ## District information
 ## map_mdg_2_trim <- map_mdg_2_trim %>% 
 ##   rename(district_name = ADM2_EN) %>%
-##   select(district_name, ADM2_PCODE)
+##   dplyr::select(district_name, ADM2_PCODE)
 ## 
 ## facilities_map <- left_join(
 ##   facilities_clinic_codes_merged_district_coord,
@@ -1839,7 +1839,7 @@ Linear interpolation ultimately only impacted `r format(as.numeric(n_changed), b
 ## 
 ## facilities_unmatched <- facilities_map %>%
 ##   filter(!is.na(ADM2_PCODE)) %>%
-##   select(district_code, district_name, ADM2_PCODE) %>%
+##   dplyr::select(district_code, district_name, ADM2_PCODE) %>%
 ##   unique()
 ## 
 ## write.csv(facilities_unmatched, 
@@ -1847,9 +1847,9 @@ Linear interpolation ultimately only impacted `r format(as.numeric(n_changed), b
 ## 
 ## 
 ## ## Standardizing district names to shapefile names (ADM2_EN)
-## facilities_map_clean <- facilities_map %>% select(clinic_code:clinic_name) %>%
+## facilities_map_clean <- facilities_map %>% dplyr::select(clinic_code:clinic_name) %>%
 ##   left_join(., district_crosswalk, by = "district_code") %>%
-##   select(!c(district_name)) %>%
+##   dplyr::select(!c(district_name)) %>%
 ##   rename(district_name = rename) %>%
 ##   unique()
 ## 
@@ -1858,7 +1858,7 @@ Linear interpolation ultimately only impacted `r format(as.numeric(n_changed), b
 ## 
 ## ## Create map of district-level summary data
 ## map_clean %>%
-##   select(ADM2_PCODE, district_name, district_code, geometry) %>%
+##   dplyr::select(ADM2_PCODE, district_name, district_code, geometry) %>%
 ##   left_join(., facility_district_count, by = "ADM2_PCODE") %>%
 ##   unique() %>% 
 ##   mutate(manual_fill = cut(n, breaks = c(-0.1, 0.1, 1.1, 2.1, 3.1, 4.1, 9.1, Inf),

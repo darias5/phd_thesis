@@ -1148,7 +1148,7 @@ All analyses were completed using R (version 4.2.1).[@rcoreteamLanguageEnvironme
 
 ### Ethics statement
 
-The research draws exclusively on secondary country-level data reported at the national or subnational level. As such, it does not involve data collection, experimentation, or investigation concerning human subjects. The Institutional Review Board (IRB) of the Harvard T.H. Chan School of Public Health has determined that the study was not human subjects research, and that additional review was not required (protocol number: IRB20-1946, determined on November 13, 2020).
+The research draws exclusively on secondary country-level data reported at the national or subnational level. As such, it does not involve data collection, experimentation, or investigation concerning human subjects. The Institutional Review Board (IRB) of the Harvard T.H. Chan School of Public Health determined that the study was not human subjects research, and that additional review was not required (protocol number: IRB20-1946, determined on November 13, 2020).
 
 ### Role of funding source
 

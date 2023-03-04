@@ -514,7 +514,7 @@ paper3_abstract <- paste0("For searches related to depression, we observe a sust
 
 \begin{centering}
 
-\emph{Daniel Arias, Jessica Cohen, Karestan Koenen, Margaret McConnell, Stéphane Verguet}
+\emph{Daniel Arias, Jessica Cohen, Margaret McConnell, Stéphane Verguet}
 
 \vspace{24pt}
 
@@ -583,8 +583,6 @@ We utilized three levels of region: 1) national level for the six countries; 2) 
 #### Voting dataset
 
 We obtained county-level presidential election results for 2020 from the MIT Election Data and Science Lab,[@mitelectiondataandsciencelabCountyPresidentialElection2022] which we used to calculate aggregate county and state votes (including absentee, early, and election day ballots) for each candidate. The aggregate votes were then used to determine vote share and margins (e.g., the percentage points difference in vote share between the winning candidate and the runner up). Applying a similar approach as other research into COVID-19 and political party inclination,[@grossmannAllStatesClose2021] we used these margins to sort counties and states into quintiles, such that the 20% most Republican-voting localities appearing in the symptoms dataset were sorted into the first quintile and the 20% most Democratic-voting localities sorted into the fifth quintile. 
-
-\newpage
 
 #### Population data
 
@@ -1209,6 +1207,34 @@ Further countering the explanation that observed declines in search trends for m
 Our findings should be interpreted with some limitation in mind. First, the aggregated and anonymized nature of our data imposes a constraint to our interpretations, as we are unable to identify whether individual political ideologies were correlated with changes in search trends. Instead, we relied on population aggregates that reflect political orientation (i.e., vote share by county and state) as a proxy, focusing on the 20% most Democrat and Republican-voting areas to strengthen the plausibility of this proxy. In addition, we highlighted that the use of Google search density as a proxy for population mental health could not be directly validated in our study, as the search data was anonymized and aggregated. While this is an important limitation, prior work has found a strong correlation between searches for anxiety and depression and U.S. population survey responses for receiving therapy, receiving medication for mental health disorders, and having unmet mental health needs.[@agrawalImpactCOVID19Vaccine2021] Given the paucity of high frequency population mental health data, Google search density data offered a unique opportunity to investigate the immediate and sustained impacts of vaccine safety and efficacy announcements with an aggregated measures that may be linked with subjective wellbeing and care seeking.
 
 Despite these limitations, our findings suggest that the announcement of COVID-19 vaccine safety and efficacy led to a robust and sustained reduction in Google search density for anxiety and depression, relative to search density prior to the announcements and to searches for other symptoms. If symptom search density echoes population health, our results would indicate that these announcements led to an improvement in mental health, an improvement observed across countries and predominant political party inclination. Our findings underscore the importance of timely and transparent communication and highlight the potential application of high frequency internet search data for population mental health surveillance. 
+
+
+## Acknowledgements
+<!-- Update with names of internal reviewers -->
+
+We thank Karestan Koenen for feedback on an earlier version of this paper.
+
+
+### Author contributions
+<!-- For future versions: All authors contributed to critical revision of the manuscript, with responses to reviewers and subsequent revisions led by DA.  -->
+
+All authors contributed to study conception, methodology, and interpretation. DA oversaw data acquisition, programming, formal analysis, visualization, and the first draft of the manuscript. 
+
+### Funding statement
+<!-- Confirm with team -->
+
+This study recieved no funding.
+
+### Declaration of interests
+<!-- Confirm with team  -->
+
+We declare no competing interests.
+
+### Data sharing statement
+<!-- Would be good to provide information on whether the Madagascar mental health data is available  -->
+All codes used for the analysis in this article are available on GitHub (https://github.com/darias5/mh_google_search_trends).
+
+
 
 ```{r todolist_PAPER3}
 

@@ -8,9 +8,9 @@ output:
 
     # pandoc_args: ['--lua-filter=section-bibliographies.lua.txt']
     # pandoc_args: ['--lua-filter=multibib.lua']
-  # pdf_document:
-    # pandoc_args: !expr acronymsdown::add_filter()
-    # number_sections: TRUE 
+  # word_document:
+  #   pandoc_args: !expr acronymsdown::add_filter()
+  #   number_sections: TRUE
     
 reference-section-title: Works Cited
 
@@ -190,29 +190,29 @@ Augue eget arcu dictum varius duis at. Tempor orci eu lobortis elementum nibh. N
 ```{r paper3, child='paper3.Rmd'}
 ```
 
-\newpage
+<!-- \newpage -->
 
-```{r conclusion, child='conclusion.Rmd'}
-```
+<!-- ```{r conclusion, child='conclusion.Rmd'} -->
+<!-- ``` -->
 
-\cleardoublepage
+<!-- \cleardoublepage -->
 
-\section*{References}
+<!-- \section*{References} -->
 
-\addcontentsline{toc}{section}{References}
+<!-- \addcontentsline{toc}{section}{References} -->
 
-<div id="refs"></div>
+<!-- <div id="refs"></div> -->
 
-\cleardoublepage
+<!-- \cleardoublepage -->
 
-\section*{Supplementary materials}
+<!-- \section*{Supplementary materials} -->
 
-\addcontentsline{toc}{section}{Supplementary materials}
+<!-- \addcontentsline{toc}{section}{Supplementary materials} -->
 
-```{r appendix_all, child='appendix.Rmd'}
-```
+<!-- ```{r appendix_all, child='appendix.Rmd'} -->
+<!-- ``` -->
 
-\newpage
+<!-- \newpage -->
 
 
 ```{r todo}

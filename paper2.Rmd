@@ -76,7 +76,6 @@ library(janitor)
 library(cowplot)
 library(ggridges)
 library(elevatr)
-library(raster)
 library(rayshader)
 
 
@@ -329,7 +328,12 @@ function_add_rayshading <- function(){
   }
 
 
+
+detach("package:raster", unload=TRUE)
+
 ```
+
+
 
 
 ```{r loading_data}
@@ -668,7 +672,7 @@ function_pval_stars <- function(x){
 
 \emph{Daniel Arias, Karestan Koenen, Christopher Golden}
 
-\vspace{8pt}
+\vspace{24pt}
 
 \noindent\rule{8cm}{0.4pt}
 
@@ -707,11 +711,11 @@ As a measure of population mental health, we considered facility-level monthly r
 
 ### Data 
 
-To analyze the impact of climate on population mental health in Madagascar, we first obtained health management information system (HMIS) data from the Madagascar Ministère de la Santé Publique. We then obtained gridded temperature and soil moisture data from the European ReAnalysis (ERA5)[@copernicusclimatechangeservicec3sFifthGenerationECMWF2017] and the European Space Agency’s Climate Change Initiative (ESA CCI),[@europeanspaceagencyEuropeanSpaceAgency2022] respectively. Data on tropical storms and cyclones were obtained from open-source compilations of storms in the South-West Indian Ocean[@SouthWestIndianOcean2023], which were in turn cross-referenced against storm trajectory data from the National Oceanic and Atmospheric Administration (NOAA)[@InternationalBestTrack2021] for accuracy.
+To analyze the impact of climate on population mental health in Madagascar, we first obtained health management information system (HMIS) data from the Madagascar Ministère de la Santé Publique. We then obtained gridded temperature and soil moisture data from the European ReAnalysis (ERA5)[@copernicusclimatechangeservicec3sFifthGenerationECMWF2017] and the European Space Agency’s Climate Change Initiative (ESA CCI),[@europeanspaceagencyEuropeanSpaceAgency2022] respectively. Data on tropical storms and cyclones were obtained from open-source compilations of storms in the South-West Indian Ocean[@wikipediaSouthWestIndianOcean2023], which were in turn cross-referenced against storm trajectory data from the National Oceanic and Atmospheric Administration (NOAA)[@InternationalBestTrack2021] for accuracy.
 
 #### Outcomes 
 
-Madagascar’s health information system provided facility-level data on counts of disease incidence summarized and reported monthly. Prior to 2019, this system was the Gestion du Système d'Information Sanitaire (GESIS); in early 2019, the system transitioned to using District Health Information Software 2 (DHIS2).
+Madagascar’s health information system provided facility-level data on counts of disease incidence summarized and reported monthly. Prior to 2019, this system was the Gestion du Système d'Information Sanitaire (GESIS); in early 2019, the system transitioned to using District Health Information Software 2 (DHIS2).[@measureevaluationStrengtheningHealthInformation2019]
 
 Among facilities reporting any mental health data between 2010 and 2020, data were obtained from `r num_facilities_CSB` public and private primary health centers (known as Centres Santé de Base or CSBs and Formations Sanitaires Privées de Base or FSBs, respectively), `r num_facilities_CHD` district referral hospitals (CHDs), `r num_facilities_CHRR_CHU` regional referral hospitals (CHRRs) and university hospitals (CHUs), for a total of `r num_facilities_pretty` uniquely-identified facilities in our sample.
 
@@ -737,13 +741,13 @@ To gauge the accuracy of the geolocating process, a subset of 1% of geolocated f
 
 Facility geolocations were then used to retrieve spatially referenced monthly averages of temperature and soil moisture data from ERA5 and ESA CCI, respectively. To allow for modelling of lagged associations, data were obtained for both ERA5 and ESA CCI SM from `r earliest_climate_date` to `r latest_climate_date`.
 
-ERA 5 is a global atmospheric reanalysis from the European Centre for Medium-Range Weather Forecasts (ECMWF) and is freely available through its Copernicus Climate Change Service (C3S)@europeanspaceagencyEuropeanSpaceAgency2022. The spatial resolution of ERA 5 is approximately 30 km, with quality-assured hourly estimates available from 1959 to the present  @europeanspaceagencyEuropeanSpaceAgency2022. Using Google Earth Engine, a time series of monthly aggregate values for mean air temperature in degrees Kelvin at a height of 2 meters was obtained for each facility geolocation  @ERA5MonthlyAggregates2022. Temperature data was then converted to degrees Celsius.
+ERA 5 is a global atmospheric reanalysis from the European Centre for Medium-Range Weather Forecasts (ECMWF) and is freely available through its Copernicus Climate Change Service (C3S)[@europeanspaceagencyEuropeanSpaceAgency2022]. The spatial resolution of ERA 5 is approximately 30 km, with quality-assured hourly estimates available from 1959 to the present.[@europeanspaceagencyEuropeanSpaceAgency2022] Using Google Earth Engine, a time series of monthly aggregate values for mean air temperature in degrees Kelvin at a height of 2 meters was obtained for each facility geolocation  [@googleearthengineERA5MonthlyAggregates2022] Temperature data was then converted to degrees Celsius.
 
 We obtained soil moisture data from the European Space Agency’s soil moisture dataset (ESA CCI SM), the world’s first and most comprehensive, multi-decade, satellite-observed dataset of global soil moisture. The spatial resolution of ESA CCI SM is approximately 26 km, with daily estimates available from 1978 to 2021. Using ESA CCI SM active and passive radiometer data, a time series of monthly aggregate values for mean soil moisture—measured as saturation percentage—was constructed from daily observations at each land grid point within Madagascar. We then applied nearest neighbor matching to link these time series to our geolocated facilities. 
 
 For a location to have soil moisture data available in ESA CCI SM, it must fall within one of 244,243 land grid points. For some facilities on Madagascar’s coastline, their location placed them outside of ESA CCI’s spatial coverage, resulting in missing values. To address facilities without any soil moisture data, nearest neighbor searching was conducted to identify the nearest land grid point for which ESA CCI SM data would be available; this nearest neighbor’s soil moisture time series data would then be applied to the facility with missing data. Within a time series of ESA CCI data for a given location, however, monthly data could still be missing if adequate satellite observation was not recorded anytime during a given month; for these values, we used linear interpolation to address missing data within a time series.
 
-In addition, we obtained data on tropical storms and cyclones in the South-West Indian Ocean for the 2009-2010 to 2020-2021 seasons, inclusive. Open source data on tropical cyclones in the south-west Indian Ocean was obtained by scraping information from Wikipedia summaries of each cyclone season, which were originally sourced from alerts issued by Météo-France La Réunion (MFR La Réunion), the World Meteorological Organisation designated Regional Specialized Meteorological Centre (RSMC) for the provision of forecasts and warnings of tropical cyclones in the South-West Indian Ocean. To ensure that the compiled data accurately reflected storms in Madagascar during the study period, we cross-referenced these data against storm trajectory data for the South Indian Basin from NOAA.[@InternationalBestTrack2021] 
+In addition, we obtained data on tropical storms and cyclones in the South-West Indian Ocean for the 2009-2010 to 2020-2021 seasons, inclusive. Open source data on tropical cyclones in the south-west Indian Ocean was obtained by scraping information from Wikipedia summaries of each cyclone season, which were originally sourced from alerts issued by Météo-France La Réunion (MFR La Réunion), the World Meteorological Organisation designated Regional Specialized Meteorological Centre (RSMC) for the provision of forecasts and warnings of tropical cyclones in the South-West Indian Ocean. To ensure that the compiled data accurately reflected storms in Madagascar during the study period, we cross-referenced these data against storm trajectory data for the South Indian Basin from NOAA.[@internationalbesttrackarchiveforclimatestewardshipibtracsInternationalBestTrack2021] 
 
 With these data, we generated two indicators to measure exposure to storm activity in a given month: a binary indicator for whether a storm impacted Madagascar in that month and a count indicator for the number of days per month with a storm. To capture lingering post-dissipation effects, we defined impact as the storm's duration plus an additional 14 days.
 
@@ -924,7 +928,7 @@ map_a <- facilities_all_gps %>%
   theme_void() +
   theme(text = element_text(size = 16, family = "Source Sans Pro"),
         legend.position = "left") +
-  scale_color_manual(values = c(col_centroid,
+ scale_color_manual(values = c(col_centroid,
                                 col_exact_all,
                                 col_exact_rhino,
                                 col_exact_val,
@@ -2210,9 +2214,9 @@ We thank Jessica Cohen, Karestan Koenen, Margaret McConnell, and Stéphane Vergu
 
 
 ### Author contributions
-<!-- For future versions: All authors contributed to critical revision of the manuscript, with responses to reviewers and subsequent revisions led by DA.  -->
+<!-- For future versions: All authors contributed to critical revision of the manuscript, with responses to reviewers and subsequent revisions led by DA. All authors had access to and verified all the data and accept responsibility for the decision to submit for publication. -->
 
-All authors contributed to study conception, methodology, and interpretation. DA oversaw data acquisition, programming, formal analysis, visualization, and the first draft of the manuscript. All authors had access to and verified all the data and accept responsibility for the decision to submit for publication.
+All authors contributed to study conception, methodology, and interpretation. DA oversaw data acquisition, programming, formal analysis, visualization, and the first draft of the manuscript. 
 
 ### Funding statement
 <!-- Confirm with team -->

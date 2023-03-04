@@ -11,8 +11,15 @@ Overview of Paper 3
 
 Policy implications and future research
 
+The magnitude of this burden has galvanized a global movement and a call to action for greater investment and prioritization for mental health.[@patelRenewedAgendaGlobal2011] This movement has emphasized the importance of investing in mental health as a means of promoting sustainable development, human rights, and social inclusion.[@patelLancetCommissionGlobal2018]
+
 Burden may be larger than traditionally conceptualized
 
 Papers also show that mental health is linked to broader contextual challenges (climate change, COVID-19) – resilience/vulnerability, exacerbating existing disparities, but also could be critical to overcoming them…
 
 In the absence of population mental health metrics, innovative uses of health data may be helpful in conducting research, but come with limitations
+
+
+
+
+

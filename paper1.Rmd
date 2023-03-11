@@ -2,30 +2,6 @@
 
 ```{r paper1code_libraries_data}
 
-# Loading libraries
-library(readxl)
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(RColorBrewer)
-library(sp)
-library(broom)
-library(sf)
-library(scales)
-library(viridis)
-library(data.table)
-library(ggpubr)
-library(lemon)
-library(rnaturalearth)
-library(rnaturalearthdata)
-library(sysfonts)
-library(showtext)
-font_add_google("Source Sans Pro")
-library(gridExtra)
-showtext_auto() 
-showtext_opts(dpi = 300)  
-library(rnaturalearthhires) # install.packages("rnaturalearthhires", repos = "http://packages.ropensci.org", type = "source")
-
 col_light = "#b1f2ff"
 col_white = "white"
 col_black = "black"
@@ -42,7 +18,7 @@ datapath <- paste(path,'data', sep = "/")
 resultspath <- paste(path,'results', sep = "/")
 
 ######################
-##       DATA       ##
+##    DATA    ##
 ######################
 
 # Loading IHME Global Burden of Disease Data
@@ -56,13 +32,13 @@ data <- read.csv(file = file.path(datapath,"IHME-GBD_2019_DATA-2019.csv"))
 
 # Adding alpha-3 codes from ISO 3166-1 (i.e., World Bank Codes)
 ihme_crosswalk <- read_excel(path = file.path(datapath, "ihme_crosswalk.xlsx")) %>% 
-  select(-c("location_name"))
+ select(-c("location_name"))
 data <- left_join(data, ihme_crosswalk, by = "location_id")
 
 # Adding World Bank income classifications
 income_level <- read_excel(path = file.path(datapath, "OGHIST.xls"), sheet = 2) %>% 
-  select(-(c(2:34))) %>% 
-  rename("income_level" = "2019")
+ select(-(c(2:34))) %>% 
+ rename("income_level" = "2019")
 data <- left_join(data, income_level, by = "iso_code")
 
 # Adding population (backed out using IHME rate data for consistency)
@@ -70,20 +46,20 @@ data <- data %>% unique() %>% gather("numeric_name", "est", "val":"lower")
 data_number <- data %>% filter(metric_id == 1) %>% rename("number" = "est")
 data_rate <- data %>% filter(metric_id == 3) %>% select("measure_id","location_id", "sex_id", "age_id", "cause_id", "year", "numeric_name", "est") %>% rename("rate" = "est")
 data <- left_join(data_number, data_rate, by = c("measure_id","location_id", "sex_id", "age_id", "cause_id", "year", "numeric_name")) %>% 
-  select(!c("metric_id", "metric_name")) %>%
-  unique()
+ select(!c("metric_id", "metric_name")) %>%
+ unique()
 data$population_100k <- data$number/data$rate
-data$population <- data$population_100k  * 100000
+data$population <- data$population_100k * 100000
 
 # Removing unused columns
-data <- data %>% select(!c("rate"))  %>% 
-  select(!c("sex_id", "sex_name", "age_id", "age_name", "year")) %>%
-  filter(measure_id != 5)
+data <- data %>% select(!c("rate")) %>% 
+ select(!c("sex_id", "sex_name", "age_id", "age_name", "year")) %>%
+ filter(measure_id != 5)
 
 
 
 #######################################################
-##  ORIGINAL AND 2016 REALLOCATION APPROACH  ##
+## ORIGINAL AND 2016 REALLOCATION APPROACH ##
 ##################################################
 
 # VIGO EL AL. 2016 WEIGHTS: ALLOCATION OF THE FOLLOWING TO MENTAL HEALTH 
@@ -122,50 +98,50 @@ original_weights <- c(1)
 original_weights_df <- data.frame(cause_id, original_weights)
 data_rev <- left_join(data, original_weights_df, by = c("cause_id"))
 data_rev$original_weights[is.na(data_rev$original_weights)] <- 0
-data_rev$original_value <- data_rev$number * data_rev$original_weights  
+data_rev$original_value <- data_rev$number * data_rev$original_weights 
 
 # 2016 reallocation
 
 cause_id <- c(mental_disorder_cause_id,
-              dementia_cause_id1,
-              dementia_cause_id2,
-              epilepsy_cause_id,
-              migraine_cause_id,
-              tension_type_headache_cause_id,
-              self_harm_cause_id,
-              alcohol_use_disorders_cause_id,
-              drug_use_disorders_cause_id,
-              low_back_pain_cause_id,
-              neck_pain_cause_id,
-              other_musculoskeletal_cause_id,
-              mental_disorder_cause_id,
-              dementia_cause_id1,
-              dementia_cause_id2,
-              epilepsy_cause_id,
-              migraine_cause_id,
-              tension_type_headache_cause_id,
-              self_harm_cause_id,
-              alcohol_use_disorders_cause_id,
-              drug_use_disorders_cause_id,
-              low_back_pain_cause_id,
-              neck_pain_cause_id,
-              other_musculoskeletal_cause_id,
-              mental_disorder_cause_id,
-              dementia_cause_id1,
-              dementia_cause_id2,
-              epilepsy_cause_id,
-              migraine_cause_id,
-              tension_type_headache_cause_id,
-              self_harm_cause_id,
-              alcohol_use_disorders_cause_id,
-              drug_use_disorders_cause_id,
-              low_back_pain_cause_id,
-              neck_pain_cause_id,
-              other_musculoskeletal_cause_id)
+       dementia_cause_id1,
+       dementia_cause_id2,
+       epilepsy_cause_id,
+       migraine_cause_id,
+       tension_type_headache_cause_id,
+       self_harm_cause_id,
+       alcohol_use_disorders_cause_id,
+       drug_use_disorders_cause_id,
+       low_back_pain_cause_id,
+       neck_pain_cause_id,
+       other_musculoskeletal_cause_id,
+       mental_disorder_cause_id,
+       dementia_cause_id1,
+       dementia_cause_id2,
+       epilepsy_cause_id,
+       migraine_cause_id,
+       tension_type_headache_cause_id,
+       self_harm_cause_id,
+       alcohol_use_disorders_cause_id,
+       drug_use_disorders_cause_id,
+       low_back_pain_cause_id,
+       neck_pain_cause_id,
+       other_musculoskeletal_cause_id,
+       mental_disorder_cause_id,
+       dementia_cause_id1,
+       dementia_cause_id2,
+       epilepsy_cause_id,
+       migraine_cause_id,
+       tension_type_headache_cause_id,
+       self_harm_cause_id,
+       alcohol_use_disorders_cause_id,
+       drug_use_disorders_cause_id,
+       low_back_pain_cause_id,
+       neck_pain_cause_id,
+       other_musculoskeletal_cause_id)
 
 numeric_name <- c("val", "val", "val", "val", "val","val", "val", "val", "val", "val", "val","val",
-                  "lower","lower","lower","lower","lower","lower","lower","lower","lower","lower","lower","lower",
-                  "upper","upper","upper","upper","upper","upper","upper","upper","upper","upper","upper","upper")
+         "lower","lower","lower","lower","lower","lower","lower","lower","lower","lower","lower","lower",
+         "upper","upper","upper","upper","upper","upper","upper","upper","upper","upper","upper","upper")
 
 
 # Allocations of low back pain, neck pain, and other musculoskeletal disorders is based on
@@ -179,84 +155,84 @@ numeric_name <- c("val", "val", "val", "val", "val","val", "val", "val", "val", 
 # that one third (rather than zero percent, as it is now) of
 # the disease burden of these pain syndromes is
 # potentially attributable to mental disorders and explore
-#  the effect on mental illness burden calculations..."
+# the effect on mental illness burden calculations..."
 
 rev_2016_weights <- c(1,
-                      1,
-                      1,
-                      1,
-                      1,
-                      1,
-                      1,
-                      1,
-                      1,
-                      2/6, # Allocating 1/3
-                      2/6,
-                      1/2*2/6, 
-                      
-                      1,
-                      1,
-                      1,
-                      1,
-                      1,
-                      1,
-                      1,
-                      1,
-                      1,
-                      1/6, # Allocating 1/6
-                      1/6,
-                      1/2*1/6, 
-                      
-                      1,
-                      1,
-                      1,
-                      1,
-                      1,
-                      1,
-                      1,
-                      1,
-                      1,
-                      3/6, # Allocating 1/2 
-                      3/6,
-                      1/2*3/6) 
+           1,
+           1,
+           1,
+           1,
+           1,
+           1,
+           1,
+           1,
+           2/6, # Allocating 1/3
+           2/6,
+           1/2*2/6, 
+           
+           1,
+           1,
+           1,
+           1,
+           1,
+           1,
+           1,
+           1,
+           1,
+           1/6, # Allocating 1/6
+           1/6,
+           1/2*1/6, 
+           
+           1,
+           1,
+           1,
+           1,
+           1,
+           1,
+           1,
+           1,
+           1,
+           3/6, # Allocating 1/2 
+           3/6,
+           1/2*3/6) 
 
 
 rev_2016_weights_df <- data.frame(cause_id,numeric_name, rev_2016_weights)
 data_rev <- left_join(data_rev, rev_2016_weights_df, by = c("cause_id", "numeric_name"))
 
 data_rev$rev_2016_weights[is.na(data_rev$rev_2016_weights)] <- 0
-data_rev$rev_2016_value <- data_rev$number * data_rev$rev_2016_weights  
+data_rev$rev_2016_value <- data_rev$number * data_rev$rev_2016_weights 
 
 
 ############################
-##  COMPOSITE APPROACH  ##
+## COMPOSITE APPROACH ##
 ############################
 
 # Due to the distributive property of the Population Attributable Fraction, a category-specific attribution fraction is estimated
-# using the formula from Rockhill et al, 1998:https://pubmed.ncbi.nlm.nih.gov/9584027/  
+# using the formula from Rockhill et al, 1998:https://pubmed.ncbi.nlm.nih.gov/9584027/ 
 
 natural_cause_id <- 409 #NCDs
 unnatural_cause_id <- 687 # Injuries
 
 
 cause_id <- c(natural_cause_id,
-              unnatural_cause_id,
-              natural_cause_id,
-              unnatural_cause_id,
-              natural_cause_id,
-              unnatural_cause_id)
+       unnatural_cause_id,
+       natural_cause_id,
+       unnatural_cause_id,
+       natural_cause_id,
+       unnatural_cause_id)
 
 
 numeric_name <- c("val", "val", 
-                  "lower","lower",
-                  "upper","upper")
+         "lower","lower",
+         "upper","upper")
 
 relative_risk <- c(1.8,
-                   7.22,
-                   1.71,
-                   6.43,
-                   1.88,
-                   8.12)
+          7.22,
+          1.71,
+          6.43,
+          1.88,
+          8.12)
 
 relative_risk_df <- data.frame(cause_id,numeric_name, relative_risk)
 
@@ -264,17 +240,17 @@ data_rev <- left_join(data_rev, relative_risk_df, by = c("cause_id", "numeric_na
 
 data_prev <- read.csv(file = file.path(datapath,"IHME-GBD_2019_DATA-2019-prev.csv"))
 data_prev <- data_prev %>%
-  gather("numeric_name", "prevalence", "val":"lower")  %>% 
-  select(!c("sex_id", "sex_name", "age_id", "age_name", "year")) %>% filter(cause_id == mental_disorder_cause_id) %>% select("location_id", "numeric_name", "prevalence")
-data_rev  <- left_join(data_rev, data_prev, by = c("location_id", "numeric_name"))
+ gather("numeric_name", "prevalence", "val":"lower") %>% 
+ select(!c("sex_id", "sex_name", "age_id", "age_name", "year")) %>% filter(cause_id == mental_disorder_cause_id) %>% select("location_id", "numeric_name", "prevalence")
+data_rev <- left_join(data_rev, data_prev, by = c("location_id", "numeric_name"))
 
 # Two approaches to calculating the PAF are presented here. Later, only one will be retained for the creation of graphs, tables, and charts.
 # In Walker et al., the PAF formula numbered as formula 4 in Rockhill et al. is used, in which prevalence is meant to be the
 # prevalence of mental disorders among cases (i.e., the deceased). The conventional formula, formula 2, takes prevalence as 
 # the prevalence of mental disorders in the general population, but is not internally valid in cases of confounding.
 
-data_rev$paf2 <-     (data_rev$prevalence  * ((data_rev$relative_risk - 1))) /   ((data_rev$prevalence  * ((data_rev$relative_risk - 1))+1))
-data_rev$paf4 <-     data_rev$prevalence  * ((data_rev$relative_risk - 1) /    data_rev$relative_risk)
+data_rev$paf2 <-   (data_rev$prevalence * ((data_rev$relative_risk - 1))) /  ((data_rev$prevalence * ((data_rev$relative_risk - 1))+1))
+data_rev$paf4 <-   data_rev$prevalence * ((data_rev$relative_risk - 1) /  data_rev$relative_risk)
 
 data_rev <- data_rev%>% gather("paf_formula", "paf", "paf2":"paf4") 
 data_rev$paf[is.na(data_rev$paf)] <- 0
@@ -282,17 +258,17 @@ data_rev$rev_2015_value <- data_rev$number * data_rev$paf
 
 # Combine original and re-allocated values by location, measure, PAF formula used, and numeric value (point estimate, and upper or lower bounds)
 data_rev <- data_rev %>% 
-  group_by(location_id, measure_id, numeric_name, paf_formula) %>% 
-  mutate(rev_2016_value_agg = sum(rev_2016_value),  rev_2015_value_agg = sum(rev_2015_value),original_value_agg = sum(original_value)) %>%
-  rename("measure_total" = number) %>%
-  ungroup %>%
-  filter(cause_id == "294") %>% select(!c("original_weights":"relative_risk", "paf":"rev_2015_value"))
+ group_by(location_id, measure_id, numeric_name, paf_formula) %>% 
+ mutate(rev_2016_value_agg = sum(rev_2016_value), rev_2015_value_agg = sum(rev_2015_value),original_value_agg = sum(original_value)) %>%
+ rename("measure_total" = number) %>%
+ ungroup %>%
+ filter(cause_id == "294") %>% select(!c("original_weights":"relative_risk", "paf":"rev_2015_value"))
 
 # Clean up
 
 
 ############################
-##  COMPOSITE METHOD  ##
+## COMPOSITE METHOD ##
 ############################
 
 # This method pulls YLLs from Walker et al. and YLDs from Vigo et al. together to re-estimate 
@@ -306,8 +282,8 @@ data_rev$composite_ylls <-ifelse(data_rev$measure_id == 4, data_rev$rev_2015_val
 
 # Combine to calculate DALYs
 data_rev_composite <- data_rev %>% select(location_id, numeric_name, paf_formula, measure_id, composite_ylds, composite_ylls) %>%
-  group_by(location_id, numeric_name, paf_formula) %>%
-  mutate(composite_dalys = sum(composite_ylds, composite_ylls))
+ group_by(location_id, numeric_name, paf_formula) %>%
+ mutate(composite_dalys = sum(composite_ylds, composite_ylls))
 data_rev_composite <- data_rev_composite %>% filter(measure_id == 2) %>% ungroup() %>% unique() %>% select("location_id", "numeric_name", "paf_formula", "composite_dalys") 
 data_rev <- left_join(data_rev, data_rev_composite, by = c("location_id", "numeric_name", "paf_formula"))
 data_rev$composite_dalys[data_rev$measure_id != 2] <- 0
@@ -321,20 +297,20 @@ data_rev$composite_deaths[data_rev$measure_id != 1] <- 0
 
 # Combined columns, clean up, re-organizing, tidying, and labeling
 data_rev$composite <- data_rev$composite_ylds + data_rev$composite_ylls + data_rev$composite_dalys + data_rev$composite_deaths
-data_rev <- data_rev %>% select(!c("composite_ylds":"composite_deaths")) %>%  relocate(original_value_agg, .after = paf_formula) %>%
-  relocate(numeric_name, .after = prevalence) %>%  
-  rename("Composite method" = composite,
-         "PAF method" = rev_2015_value_agg,
-         "2016 reallocation approach" = rev_2016_value_agg,
-         "GBD 2019" = original_value_agg)
+data_rev <- data_rev %>% select(!c("composite_ylds":"composite_deaths")) %>% relocate(original_value_agg, .after = paf_formula) %>%
+ relocate(numeric_name, .after = prevalence) %>% 
+ rename("Composite method" = composite,
+     "PAF method" = rev_2015_value_agg,
+     "2016 reallocation approach" = rev_2016_value_agg,
+     "GBD 2019" = original_value_agg)
 
 data_rev$cause_name <- "Mental disorders"
 data_rev <- data_rev %>% gather("estimate", "number", "GBD 2019":"Composite method")
 
 
 data_rev$estimate_id <- ifelse(data_rev$estimate == "Composite method", 4, 
-                               ifelse(data_rev$estimate == "PAF method", 3,
-                                      ifelse(data_rev$estimate == "2016 reallocation approach", 2, 1)))
+                ifelse(data_rev$estimate == "PAF method", 3,
+                   ifelse(data_rev$estimate == "2016 reallocation approach", 2, 1)))
 data_rev <- data_rev %>% relocate(estimate_id, .after = estimate)
 
 # Calculate rates and percent of burden
@@ -344,15 +320,15 @@ data_rev$percent <- data_rev$number/data_rev$measure_total*100
 
 
 ############################
-##        COSTING         ##
+##    COSTING     ##
 ############################
 
 # Import GDP
-gdp_data <- read.csv(file = file.path(datapath,# "wdi_gdp_ppp.csv"  # Using PPP
-                                      "wdi_gdp.csv"                  # Not using PPP
+gdp_data <- read.csv(file = file.path(datapath,# "wdi_gdp_ppp.csv" # Using PPP
+                   "wdi_gdp.csv"         # Not using PPP
 )) %>%
-  select(-(c(3:62))) %>% 
-  rename("gdp" = "X2019")
+ select(-(c(3:62))) %>% 
+ rename("gdp" = "X2019")
 gdp <- gdp_data %>% select(c(iso_code, gdp))
 data_rev <- left_join(data_rev, gdp, by = "iso_code")
 data_rev <- data_rev %>% relocate(gdp, .after = iso_code)
@@ -365,11 +341,11 @@ data_rev <- data_rev %>% relocate (gdp_per_capita, .after = gdp)
 # Clean up
 
 # Import GDP PPP
-gdp_data <- read.csv(file = file.path(datapath, "wdi_gdp_ppp.csv"  # Using PPP
-                                      #"wdi_gdp.csv"                  # Not using PPP
+gdp_data <- read.csv(file = file.path(datapath, "wdi_gdp_ppp.csv" # Using PPP
+                   #"wdi_gdp.csv"         # Not using PPP
 )) %>%
-  select(-(c(3:62))) %>% 
-  rename("gdp_ppp" = "X2019")
+ select(-(c(3:62))) %>% 
+ rename("gdp_ppp" = "X2019")
 gdp <- gdp_data %>% select(c(iso_code, gdp_ppp))
 data_rev <- left_join(data_rev, gdp, by = "iso_code")
 data_rev <- data_rev %>% relocate(gdp_ppp, .after = iso_code)
@@ -386,27 +362,27 @@ data_rev <- data_rev %>% relocate (gdp_ppp_per_capita, .after = gdp_ppp)
 
 # Method 1: Copenhagen Consensus 1 - $1,000
 data_rev$cost_cc1 <- ifelse(data_rev$measure_id == 2,
-                            data_rev$number * 1000, 0)
+              data_rev$number * 1000, 0)
 
 # Method 2: Copenhagen Consensus 2 - $5,000
 data_rev$cost_cc2 <- data_rev$cost_cc1 * 5
 
 # Method 3: WHO - GDP/capita
 data_rev$cost_who1 <-ifelse(data_rev$measure_id == 2,
-                            data_rev$number * data_rev$gdp_per_capita, 0)
+              data_rev$number * data_rev$gdp_per_capita, 0)
 
 # Method 4: WHO - GDP/capita * 3
 data_rev$cost_who2 <- data_rev$cost_who1 * 3
 
 # Method 5: WHO - GDP PPP/capita
 data_rev$cost_who3 <-ifelse(data_rev$measure_id == 2,
-                            data_rev$number * data_rev$gdp_ppp_per_capita, 0)
+              data_rev$number * data_rev$gdp_ppp_per_capita, 0)
 
 # Method 6: WHO - GDP PPP/capita * 3
 data_rev$cost_who4 <- data_rev$cost_who3 * 3
 
 ##################################
-##         PAF FORMULA          ##
+##     PAF FORMULA     ##
 ##################################
 
 # Select which of the PAF formulae to use for the remainder of the analysis
@@ -416,34 +392,34 @@ data_rev <- data_rev %>% filter(paf_formula == "paf2") # Conventional formula
 
 
 ################################
-##         MAP PREP           ##
+##     MAP PREP      ##
 ################################
 
 data_rev_gbd <- data_rev %>% filter(estimate_id == 1) %>% 
-  select (c(measure_id, location_id, numeric_name, paf_formula, number:cost_who4)) %>%
-  rename(
-    "number_gbd" = "number",
-    "rate_per_100k_gbd" = "rate_per_100k",
-    "percent_gbd" = "percent",
-    "cost_cc1_gbd" = "cost_cc1",
-    "cost_cc2_gbd" = "cost_cc2",
-    "cost_who1_gbd" = "cost_who1",
-    "cost_who2_gbd" = "cost_who2",
-    "cost_who3_gbd" = "cost_who3",
-    "cost_who4_gbd" = "cost_who4")
+ select (c(measure_id, location_id, numeric_name, paf_formula, number:cost_who4)) %>%
+ rename(
+  "number_gbd" = "number",
+  "rate_per_100k_gbd" = "rate_per_100k",
+  "percent_gbd" = "percent",
+  "cost_cc1_gbd" = "cost_cc1",
+  "cost_cc2_gbd" = "cost_cc2",
+  "cost_who1_gbd" = "cost_who1",
+  "cost_who2_gbd" = "cost_who2",
+  "cost_who3_gbd" = "cost_who3",
+  "cost_who4_gbd" = "cost_who4")
 
 data_rev <- left_join(data_rev, data_rev_gbd, by = c("location_id", "measure_id", "numeric_name", "paf_formula"))
 
 data_rev <- data_rev %>% mutate(
-  number_diff = number - number_gbd,
-  rate_per_100k_diff = rate_per_100k - rate_per_100k_gbd,
-  percent_diff = percent - percent_gbd,
-  cost_cc1_diff = cost_cc1 - cost_cc1_gbd,
-  cost_cc2_diff = cost_cc2 - cost_cc2_gbd,
-  cost_who1_diff = cost_who1 - cost_who1_gbd,
-  cost_who2_diff = cost_who2 - cost_who2_gbd,
-  cost_who3_diff = cost_who3 - cost_who3_gbd,
-  cost_who4_diff = cost_who4 - cost_who4_gbd)
+ number_diff = number - number_gbd,
+ rate_per_100k_diff = rate_per_100k - rate_per_100k_gbd,
+ percent_diff = percent - percent_gbd,
+ cost_cc1_diff = cost_cc1 - cost_cc1_gbd,
+ cost_cc2_diff = cost_cc2 - cost_cc2_gbd,
+ cost_who1_diff = cost_who1 - cost_who1_gbd,
+ cost_who2_diff = cost_who2 - cost_who2_gbd,
+ cost_who3_diff = cost_who3 - cost_who3_gbd,
+ cost_who4_diff = cost_who4 - cost_who4_gbd)
 
 # Import regional data
 region <- read_excel(path = file.path(datapath, "regions.xlsx"))
@@ -455,111 +431,111 @@ data_rev <- full_join(data_rev, region, by = "iso_code")
 # WHO region map prep
 
 data_rev <- data_rev %>% group_by(estimate_id, measure_id, numeric_name, paf_formula, who_region) %>% 
-  mutate(who_region_pop100k = sum(population_100k),
-         who_region_number = sum(number),
-         who_region_measure_total = sum(measure_total),
-         who_region_gdp = sum(gdp, na.rm=TRUE),
-         who_region_gdp_ppp = sum(gdp_ppp, na.rm=TRUE))%>%
-  mutate(who_region_rate_per_100k = who_region_number/who_region_pop100k,
-         who_region_percent = who_region_number/who_region_measure_total*100,
-         who_region_population = who_region_pop100k * 100000) %>%
-  mutate(who_region_gdp_per_capita = who_region_gdp/who_region_population,
-         who_region_gdp_ppp_per_capita = who_region_gdp_ppp/who_region_population,
-         who_region_cost_cc1 = ifelse(measure_id == 2,
-                                      who_region_number * 1000, 0),
-         who_region_cost_cc2 = who_region_cost_cc1 * 5,
-         who_region_cost_who1 = ifelse(measure_id == 2,
-                                       who_region_number * who_region_gdp_per_capita, 0),
-         who_region_cost_who2 = who_region_cost_who1 * 3,
-         who_region_cost_who3 = ifelse(measure_id == 2,
-                                       who_region_number * who_region_gdp_ppp_per_capita, 0),
-         who_region_cost_who4 = who_region_cost_who3 * 3) %>%
-  ungroup()
+ mutate(who_region_pop100k = sum(population_100k),
+     who_region_number = sum(number),
+     who_region_measure_total = sum(measure_total),
+     who_region_gdp = sum(gdp, na.rm=TRUE),
+     who_region_gdp_ppp = sum(gdp_ppp, na.rm=TRUE))%>%
+ mutate(who_region_rate_per_100k = who_region_number/who_region_pop100k,
+     who_region_percent = who_region_number/who_region_measure_total*100,
+     who_region_population = who_region_pop100k * 100000) %>%
+ mutate(who_region_gdp_per_capita = who_region_gdp/who_region_population,
+     who_region_gdp_ppp_per_capita = who_region_gdp_ppp/who_region_population,
+     who_region_cost_cc1 = ifelse(measure_id == 2,
+                   who_region_number * 1000, 0),
+     who_region_cost_cc2 = who_region_cost_cc1 * 5,
+     who_region_cost_who1 = ifelse(measure_id == 2,
+                    who_region_number * who_region_gdp_per_capita, 0),
+     who_region_cost_who2 = who_region_cost_who1 * 3,
+     who_region_cost_who3 = ifelse(measure_id == 2,
+                    who_region_number * who_region_gdp_ppp_per_capita, 0),
+     who_region_cost_who4 = who_region_cost_who3 * 3) %>%
+ ungroup()
 
 data_rev_gbd_who_region<- data_rev %>% filter(estimate_id == 1) %>% 
-  select (c(measure_id, location_id, numeric_name, paf_formula, who_region_number:who_region_cost_who4)) %>%
-  rename(
-    "who_region_number_gbd" = "who_region_number",
-    "who_region_rate_per_100k_gbd" = "who_region_rate_per_100k",
-    "who_region_percent_gbd" = "who_region_percent",
-    "who_region_cost_cc1_gbd" = "who_region_cost_cc1",
-    "who_region_cost_cc2_gbd" = "who_region_cost_cc2",
-    "who_region_cost_who1_gbd" = "who_region_cost_who1",
-    "who_region_cost_who2_gbd" = "who_region_cost_who2",
-    "who_region_cost_who3_gbd" = "who_region_cost_who3",
-    "who_region_cost_who4_gbd" = "who_region_cost_who4"
-  )  %>%
-  select(measure_id, location_id, numeric_name, paf_formula, who_region_number_gbd, who_region_rate_per_100k_gbd, who_region_percent_gbd,
-         who_region_cost_cc1_gbd, who_region_cost_cc2_gbd, who_region_cost_who1_gbd, 
-         who_region_cost_who2_gbd, who_region_cost_who3_gbd, who_region_cost_who4_gbd)
+ select (c(measure_id, location_id, numeric_name, paf_formula, who_region_number:who_region_cost_who4)) %>%
+ rename(
+  "who_region_number_gbd" = "who_region_number",
+  "who_region_rate_per_100k_gbd" = "who_region_rate_per_100k",
+  "who_region_percent_gbd" = "who_region_percent",
+  "who_region_cost_cc1_gbd" = "who_region_cost_cc1",
+  "who_region_cost_cc2_gbd" = "who_region_cost_cc2",
+  "who_region_cost_who1_gbd" = "who_region_cost_who1",
+  "who_region_cost_who2_gbd" = "who_region_cost_who2",
+  "who_region_cost_who3_gbd" = "who_region_cost_who3",
+  "who_region_cost_who4_gbd" = "who_region_cost_who4"
+ ) %>%
+ select(measure_id, location_id, numeric_name, paf_formula, who_region_number_gbd, who_region_rate_per_100k_gbd, who_region_percent_gbd,
+     who_region_cost_cc1_gbd, who_region_cost_cc2_gbd, who_region_cost_who1_gbd, 
+     who_region_cost_who2_gbd, who_region_cost_who3_gbd, who_region_cost_who4_gbd)
 
 data_rev <- left_join(data_rev, data_rev_gbd_who_region, by = c("location_id", "measure_id", "numeric_name", "paf_formula"))
 
 data_rev <- data_rev %>% mutate(
-  who_region_number_diff = who_region_number - who_region_number_gbd,
-  who_region_rate_per_100k_diff = who_region_rate_per_100k - who_region_rate_per_100k_gbd,
-  who_region_percent_diff = who_region_percent - who_region_percent_gbd,
-  who_region_cost_cc1_diff = who_region_cost_cc1 - who_region_cost_cc1_gbd,
-  who_region_cost_cc2_diff = who_region_cost_cc2 - who_region_cost_cc2_gbd,
-  who_region_cost_who1_diff = who_region_cost_who1 - who_region_cost_who1_gbd,
-  who_region_cost_who2_diff = who_region_cost_who2 - who_region_cost_who2_gbd,
-  who_region_cost_who3_diff = who_region_cost_who3 - who_region_cost_who3_gbd,
-  who_region_cost_who4_diff = who_region_cost_who4 - who_region_cost_who4_gbd)
+ who_region_number_diff = who_region_number - who_region_number_gbd,
+ who_region_rate_per_100k_diff = who_region_rate_per_100k - who_region_rate_per_100k_gbd,
+ who_region_percent_diff = who_region_percent - who_region_percent_gbd,
+ who_region_cost_cc1_diff = who_region_cost_cc1 - who_region_cost_cc1_gbd,
+ who_region_cost_cc2_diff = who_region_cost_cc2 - who_region_cost_cc2_gbd,
+ who_region_cost_who1_diff = who_region_cost_who1 - who_region_cost_who1_gbd,
+ who_region_cost_who2_diff = who_region_cost_who2 - who_region_cost_who2_gbd,
+ who_region_cost_who3_diff = who_region_cost_who3 - who_region_cost_who3_gbd,
+ who_region_cost_who4_diff = who_region_cost_who4 - who_region_cost_who4_gbd)
 
 
-# IHME region  map prep
+# IHME region map prep
 
 data_rev <- data_rev %>% group_by(estimate_id, measure_id, numeric_name, paf_formula, ihme_region) %>% 
-  mutate(ihme_region_pop100k = sum(population_100k),
-         ihme_region_number = sum(number),
-         ihme_region_measure_total = sum(measure_total),
-         ihme_region_gdp = sum(gdp, na.rm=TRUE),
-         ihme_region_gdp_ppp = sum(gdp_ppp, na.rm=TRUE))%>%
-  mutate(ihme_region_rate_per_100k = ihme_region_number/ihme_region_pop100k,
-         ihme_region_percent = ihme_region_number/ihme_region_measure_total*100,
-         ihme_region_population = ihme_region_pop100k * 100000) %>%
-  mutate(ihme_region_gdp_per_capita = ihme_region_gdp/ihme_region_population,
-         ihme_region_gdp_ppp_per_capita = ihme_region_gdp_ppp/ihme_region_population,
-         ihme_region_cost_cc1 = ifelse(measure_id == 2,
-                                       ihme_region_number * 1000, 0),
-         ihme_region_cost_cc2 = ihme_region_cost_cc1 * 5,
-         ihme_region_cost_who1 = ifelse(measure_id == 2,
-                                        ihme_region_number * ihme_region_gdp_per_capita, 0),
-         ihme_region_cost_who2 = ihme_region_cost_who1 * 3,
-         ihme_region_cost_who3 = ifelse(measure_id == 2,
-                                        ihme_region_number * ihme_region_gdp_ppp_per_capita, 0),
-         ihme_region_cost_who4 = ihme_region_cost_who3 * 3) %>%
-  ungroup()
+ mutate(ihme_region_pop100k = sum(population_100k),
+     ihme_region_number = sum(number),
+     ihme_region_measure_total = sum(measure_total),
+     ihme_region_gdp = sum(gdp, na.rm=TRUE),
+     ihme_region_gdp_ppp = sum(gdp_ppp, na.rm=TRUE))%>%
+ mutate(ihme_region_rate_per_100k = ihme_region_number/ihme_region_pop100k,
+     ihme_region_percent = ihme_region_number/ihme_region_measure_total*100,
+     ihme_region_population = ihme_region_pop100k * 100000) %>%
+ mutate(ihme_region_gdp_per_capita = ihme_region_gdp/ihme_region_population,
+     ihme_region_gdp_ppp_per_capita = ihme_region_gdp_ppp/ihme_region_population,
+     ihme_region_cost_cc1 = ifelse(measure_id == 2,
+                    ihme_region_number * 1000, 0),
+     ihme_region_cost_cc2 = ihme_region_cost_cc1 * 5,
+     ihme_region_cost_who1 = ifelse(measure_id == 2,
+                    ihme_region_number * ihme_region_gdp_per_capita, 0),
+     ihme_region_cost_who2 = ihme_region_cost_who1 * 3,
+     ihme_region_cost_who3 = ifelse(measure_id == 2,
+                    ihme_region_number * ihme_region_gdp_ppp_per_capita, 0),
+     ihme_region_cost_who4 = ihme_region_cost_who3 * 3) %>%
+ ungroup()
 
 data_rev_gbd_ihme_region<- data_rev %>% filter(estimate_id == 1) %>% 
-  select (c(measure_id, location_id, numeric_name, paf_formula, ihme_region_number:ihme_region_cost_who4)) %>%
-  rename(
-    "ihme_region_number_gbd" = "ihme_region_number",
-    "ihme_region_rate_per_100k_gbd" = "ihme_region_rate_per_100k",
-    "ihme_region_percent_gbd" = "ihme_region_percent",
-    "ihme_region_cost_cc1_gbd" = "ihme_region_cost_cc1",
-    "ihme_region_cost_cc2_gbd" = "ihme_region_cost_cc2",
-    "ihme_region_cost_who1_gbd" = "ihme_region_cost_who1",
-    "ihme_region_cost_who2_gbd" = "ihme_region_cost_who2",
-    "ihme_region_cost_who3_gbd" = "ihme_region_cost_who3",
-    "ihme_region_cost_who4_gbd" = "ihme_region_cost_who4"
-  )  %>%
-  select(measure_id, location_id, numeric_name, paf_formula, ihme_region_number_gbd, ihme_region_rate_per_100k_gbd, ihme_region_percent_gbd,
-         ihme_region_cost_cc1_gbd, ihme_region_cost_cc2_gbd, ihme_region_cost_who1_gbd, 
-         ihme_region_cost_who2_gbd, ihme_region_cost_who3_gbd, ihme_region_cost_who4_gbd)
+ select (c(measure_id, location_id, numeric_name, paf_formula, ihme_region_number:ihme_region_cost_who4)) %>%
+ rename(
+  "ihme_region_number_gbd" = "ihme_region_number",
+  "ihme_region_rate_per_100k_gbd" = "ihme_region_rate_per_100k",
+  "ihme_region_percent_gbd" = "ihme_region_percent",
+  "ihme_region_cost_cc1_gbd" = "ihme_region_cost_cc1",
+  "ihme_region_cost_cc2_gbd" = "ihme_region_cost_cc2",
+  "ihme_region_cost_who1_gbd" = "ihme_region_cost_who1",
+  "ihme_region_cost_who2_gbd" = "ihme_region_cost_who2",
+  "ihme_region_cost_who3_gbd" = "ihme_region_cost_who3",
+  "ihme_region_cost_who4_gbd" = "ihme_region_cost_who4"
+ ) %>%
+ select(measure_id, location_id, numeric_name, paf_formula, ihme_region_number_gbd, ihme_region_rate_per_100k_gbd, ihme_region_percent_gbd,
+     ihme_region_cost_cc1_gbd, ihme_region_cost_cc2_gbd, ihme_region_cost_who1_gbd, 
+     ihme_region_cost_who2_gbd, ihme_region_cost_who3_gbd, ihme_region_cost_who4_gbd)
 
 data_rev <- left_join(data_rev, data_rev_gbd_ihme_region, by = c("location_id", "measure_id", "numeric_name", "paf_formula"))
 
 data_rev <- data_rev %>% mutate(
-  ihme_region_number_diff = ihme_region_number - ihme_region_number_gbd,
-  ihme_region_rate_per_100k_diff = ihme_region_rate_per_100k - ihme_region_rate_per_100k_gbd,
-  ihme_region_percent_diff = ihme_region_percent - ihme_region_percent_gbd,
-  ihme_region_cost_cc1_diff = ihme_region_cost_cc1 - ihme_region_cost_cc1_gbd,
-  ihme_region_cost_cc2_diff = ihme_region_cost_cc2 - ihme_region_cost_cc2_gbd,
-  ihme_region_cost_who1_diff = ihme_region_cost_who1 - ihme_region_cost_who1_gbd,
-  ihme_region_cost_who2_diff = ihme_region_cost_who2 - ihme_region_cost_who2_gbd,
-  ihme_region_cost_who3_diff = ihme_region_cost_who3 - ihme_region_cost_who3_gbd,
-  ihme_region_cost_who4_diff = ihme_region_cost_who4 - ihme_region_cost_who4_gbd)
+ ihme_region_number_diff = ihme_region_number - ihme_region_number_gbd,
+ ihme_region_rate_per_100k_diff = ihme_region_rate_per_100k - ihme_region_rate_per_100k_gbd,
+ ihme_region_percent_diff = ihme_region_percent - ihme_region_percent_gbd,
+ ihme_region_cost_cc1_diff = ihme_region_cost_cc1 - ihme_region_cost_cc1_gbd,
+ ihme_region_cost_cc2_diff = ihme_region_cost_cc2 - ihme_region_cost_cc2_gbd,
+ ihme_region_cost_who1_diff = ihme_region_cost_who1 - ihme_region_cost_who1_gbd,
+ ihme_region_cost_who2_diff = ihme_region_cost_who2 - ihme_region_cost_who2_gbd,
+ ihme_region_cost_who3_diff = ihme_region_cost_who3 - ihme_region_cost_who3_gbd,
+ ihme_region_cost_who4_diff = ihme_region_cost_who4 - ihme_region_cost_who4_gbd)
 
 
 # Import map data
@@ -571,25 +547,25 @@ world$iso_code[world$adm0_a3 == "SDS"] <- "SSD"
 world$iso_code[world$adm0_a3 == "SOL"] <- "SOM"
 
 world <- world %>%
-  group_by(iso_code) %>%
-  st_make_valid() %>% 
-            summarize(geometry = st_union(geometry))
+ group_by(iso_code) %>%
+ st_make_valid() %>% 
+      summarize(geometry = st_union(geometry))
 
 # Re-order estimates: original, Vigo, Walker, composite
 
 data_rev <- data_rev %>% 
-  mutate(estimate_newlab = recode(estimate, 
-                                  'GBD 2019' = "Original approach",                
-                                  '2016 reallocation approach' = "Reallocation approach",
-                                  'PAF method' = "PAF method",              
-                                  'Composite method'= "Composite approach"  
-  ))
+ mutate(estimate_newlab = recode(estimate, 
+                 'GBD 2019' = "Original approach",        
+                 '2016 reallocation approach' = "Reallocation approach",
+                 'PAF method' = "PAF method",       
+                 'Composite method'= "Composite approach" 
+ ))
 
-data_rev$estimate_newlab <- factor(data_rev$estimate_newlab ,      # Reordering group factor levels
-                                   levels = c("Original approach",
-                                              "Reallocation approach",
-                                              "PAF method",
-                                              "Composite approach"))
+data_rev$estimate_newlab <- factor(data_rev$estimate_newlab ,   # Reordering group factor levels
+                  levels = c("Original approach",
+                       "Reallocation approach",
+                       "PAF method",
+                       "Composite approach"))
 # Merging map and dataframe
 data_rev_map <- left_join(world, data_rev, by = "iso_code") %>% filter(numeric_name == "val")
 
@@ -608,67 +584,67 @@ subtitle_4 <- "Value per DALY: 3 X GDP/capita"
 ```{r paper1code_results}
 
 ####################################
-##       REGIONAL CHARTS          ##
+##    REGIONAL CHARTS     ##
 ####################################
 
 who_region_positions <- c("African Region", "Eastern Mediterranean Region", "European Region",
-                          "Region of the Americas", "South-East Asia Region", "Western Pacific Region",  "#NA")
+             "Region of the Americas", "South-East Asia Region", "Western Pacific Region", "#NA")
 
-who_region_pal <-  c("#E74C3C", "#E67E22" , "#F4D03F", "#45B39D", "#5499C7", "#AF7AC5")
+who_region_pal <- c("#E74C3C", "#E67E22" , "#F4D03F", "#45B39D", "#5499C7", "#AF7AC5")
 
 ihme_region_positions <- c("East Asia", "Southeast Asia", "Oceania", "Central Asia", "Eastern Europe", "Central Europe",
-                           "Caribbean", "Central Latin America", "Tropical Latin America", "Andean Latin America", "North Africa and Middle East",
-                           "Southern Sub-Saharan Africa", "Western Sub-Saharan Africa", "Central Sub-Saharan Africa", "Eastern Sub-Saharan Africa",
-                           "South Asia", "Southern Latin America", "Western Europe", "High-income North America",
-                           "Australasia", "High-income Asia Pacific", "#NA")
+              "Caribbean", "Central Latin America", "Tropical Latin America", "Andean Latin America", "North Africa and Middle East",
+              "Southern Sub-Saharan Africa", "Western Sub-Saharan Africa", "Central Sub-Saharan Africa", "Eastern Sub-Saharan Africa",
+              "South Asia", "Southern Latin America", "Western Europe", "High-income North America",
+              "Australasia", "High-income Asia Pacific", "#NA")
 
 ihme_pal_new <- c("#002673", "#005CE6", "#73DFFF", "#E54800", "#E69800", "#FFD37F",
-                  "#216F00", "#33A600", "#4CE600", "#A3FF73", "#4E4E4E", 
-                  "#730000", "#FF0000", "#FF7F7F", "#FFBEBE", 
-                  "#E6E600", "#73004C", "#A80084", "#C500FF", "#E600A9", "#FFBEE8", "#7F7F7F")
+         "#216F00", "#33A600", "#4CE600", "#A3FF73", "#4E4E4E", 
+         "#730000", "#FF0000", "#FF7F7F", "#FFBEBE", 
+         "#E6E600", "#73004C", "#A80084", "#C500FF", "#E600A9", "#FFBEE8", "#7F7F7F")
 
 ihme_region_pal <- c("#8C95F1", "#D7ECFC" , "#B6CDD4", "#EAA144", "#F3DA89", "#F9EFC2", "#B1F585", "#B6F2D5",
-                     "#E3FD8C", "#E2FDD7", "#99ACA4", "#9D5F56", "#E989A9", "#F5DBD8", "#F8EEEF",
-                     "#F4FF7C", "#C42AF1", "#E986F8", "#D7C2FC", "#DD9BE9", "#FAE5FE", "#7F7F7F")
+           "#E3FD8C", "#E2FDD7", "#99ACA4", "#9D5F56", "#E989A9", "#F5DBD8", "#F8EEEF",
+           "#F4FF7C", "#C42AF1", "#E986F8", "#D7C2FC", "#DD9BE9", "#FAE5FE", "#7F7F7F")
 
 ############################
-##        TABLES          ##
+##    TABLES     ##
 ############################
 
 # Table 1: Burden of disease due to mental disorders
 
-data_global <- data_rev %>% filter(location_id == 1)  %>% filter(estimate_id != 3)  %>% select(location_name, measure_name, numeric_name, estimate, number, percent) %>%
-  mutate(number = round(number/1000000, 1),
-         percent = round(percent, 1))
+data_global <- data_rev %>% filter(location_id == 1) %>% filter(estimate_id != 3) %>% select(location_name, measure_name, numeric_name, estimate, number, percent) %>%
+ mutate(number = round(number/1000000, 1),
+     percent = round(percent, 1))
 
-data_regional <- data_rev  %>% filter(estimate_id != 3)  %>% 
-  group_by(ihme_region,measure_name, numeric_name, estimate) %>% mutate(region_total = sum(measure_total),
-                                                                        region_number = sum(number)) %>%
-  mutate(region_percent = round(region_number / region_total * 100, 1)) %>% select(ihme_region, measure_name, numeric_name, estimate, region_number, region_percent) %>%
-  rename("number" = "region_number",
-         "percent" = "region_percent",
-         "location_name" = "ihme_region") %>%
-  ungroup() %>%
-  unique() %>% filter(!is.na(location_name)) %>%
-  mutate(number = round(number/1000000, 1)) %>% arrange((location_name))
+data_regional <- data_rev %>% filter(estimate_id != 3) %>% 
+ group_by(ihme_region,measure_name, numeric_name, estimate) %>% mutate(region_total = sum(measure_total),
+                                    region_number = sum(number)) %>%
+ mutate(region_percent = round(region_number / region_total * 100, 1)) %>% select(ihme_region, measure_name, numeric_name, estimate, region_number, region_percent) %>%
+ rename("number" = "region_number",
+     "percent" = "region_percent",
+     "location_name" = "ihme_region") %>%
+ ungroup() %>%
+ unique() %>% filter(!is.na(location_name)) %>%
+ mutate(number = round(number/1000000, 1)) %>% arrange((location_name))
 
-data_income <- data_rev  %>% filter(estimate_id != 3)  %>% 
-  group_by(income_level,measure_name, numeric_name, estimate) %>% mutate(region_total = sum(measure_total),
-                                                                         region_number = sum(number)) %>%
-  mutate(region_percent = round(region_number / region_total * 100, 1)) %>% select(income_level, measure_name, numeric_name, estimate, region_number, region_percent) %>%
-  rename("number" = "region_number",
-         "percent" = "region_percent",
-         "location_name" = "income_level") %>%
-  ungroup() %>%
-  unique() %>% filter(!is.na(location_name)) %>%
-  mutate(number = round(number/1000000, 1))
+data_income <- data_rev %>% filter(estimate_id != 3) %>% 
+ group_by(income_level,measure_name, numeric_name, estimate) %>% mutate(region_total = sum(measure_total),
+                                     region_number = sum(number)) %>%
+ mutate(region_percent = round(region_number / region_total * 100, 1)) %>% select(income_level, measure_name, numeric_name, estimate, region_number, region_percent) %>%
+ rename("number" = "region_number",
+     "percent" = "region_percent",
+     "location_name" = "income_level") %>%
+ ungroup() %>%
+ unique() %>% filter(!is.na(location_name)) %>%
+ mutate(number = round(number/1000000, 1))
 
 location_name <- c("H","UM","LM","L")
 rank <- c(1,2,3,4)
 fullname <- c("High income",
-              "Upper-middle income",
-              "Lower-middle income",
-              "Low income")
+       "Upper-middle income",
+       "Lower-middle income",
+       "Low income")
 
 
 incomelevels <- data.frame(location_name,rank, fullname)
@@ -676,31 +652,31 @@ incomelevels <- data.frame(location_name,rank, fullname)
 data_income <- left_join(data_income, incomelevels, by = "location_name") %>% arrange(rank) %>% select(!c(location_name, rank)) %>% rename("location_name" = "fullname")
 
 data_table1 <- rbind(data_global, data_income, data_regional) %>% 
-  gather("metric","point","number":"percent" ) %>%  
-  pivot_wider(names_from = c(numeric_name, metric, estimate), values_from = point)
+ gather("metric","point","number":"percent" ) %>% 
+ pivot_wider(names_from = c(numeric_name, metric, estimate), values_from = point)
 
 
 col_order <- c(
-  "measure_name",
-  "location_name",                                    
-  "val_number_GBD 2019",                             
-  "lower_number_GBD 2019",                            
-  "upper_number_GBD 2019",   
-  "val_percent_GBD 2019",                            
-  "lower_percent_GBD 2019",  
-  "upper_percent_GBD 2019",                           
-  "val_number_2016 reallocation approach",   
-  "lower_number_2016 reallocation approach",  
-  "upper_number_2016 reallocation approach",  
-  "val_percent_2016 reallocation approach",  
-  "lower_percent_2016 reallocation approach", 
-  "upper_percent_2016 reallocation approach", 
-  "val_number_Composite method",           
-  "lower_number_Composite method",          
-  "upper_number_Composite method",          
-  "val_percent_Composite method",          
-  "lower_percent_Composite method",  
-  "upper_percent_Composite method")
+ "measure_name",
+ "location_name",                  
+ "val_number_GBD 2019",               
+ "lower_number_GBD 2019",              
+ "upper_number_GBD 2019",  
+ "val_percent_GBD 2019",              
+ "lower_percent_GBD 2019", 
+ "upper_percent_GBD 2019",              
+ "val_number_2016 reallocation approach",  
+ "lower_number_2016 reallocation approach", 
+ "upper_number_2016 reallocation approach", 
+ "val_percent_2016 reallocation approach", 
+ "lower_percent_2016 reallocation approach", 
+ "upper_percent_2016 reallocation approach", 
+ "val_number_Composite method",      
+ "lower_number_Composite method",     
+ "upper_number_Composite method",     
+ "val_percent_Composite method",     
+ "lower_percent_Composite method", 
+ "upper_percent_Composite method")
 
 data_table1 <- data_table1[, col_order]
 
@@ -711,76 +687,76 @@ write.csv(data_table1, file = paste0(resultspath, "/table1.csv"))
 # Table 2: Value of economic welfare estimates 
 
 data_global <- data_rev %>% 
-  filter(location_id == 1)  %>% 
-  filter(measure_id == 2) %>%
-  filter(estimate_id != 3)  %>% 
-  select(location_name, numeric_name, 
-         estimate, cost_cc1, cost_cc2, cost_who1, cost_who2, cost_who3, cost_who4)
+ filter(location_id == 1) %>% 
+ filter(measure_id == 2) %>%
+ filter(estimate_id != 3) %>% 
+ select(location_name, numeric_name, 
+     estimate, cost_cc1, cost_cc2, cost_who1, cost_who2, cost_who3, cost_who4)
 
 data_global$location_name <- "Global"
 
 
-data_regional <- data_rev  %>%   
-  filter(measure_id == 2) %>%
-  filter(estimate_id != 3)  %>% 
-  select(ihme_region,numeric_name, estimate, ihme_region_cost_cc1,
-         ihme_region_cost_cc2, ihme_region_cost_who1, ihme_region_cost_who2, ihme_region_cost_who3, ihme_region_cost_who4) %>%
-  unique() %>%
-  rename("location_name" =ihme_region,
-         "cost_cc1" = ihme_region_cost_cc1,
-         "cost_cc2" = ihme_region_cost_cc2,
-         "cost_who1" = ihme_region_cost_who1,
-         "cost_who2" = ihme_region_cost_who2,
-         "cost_who3" = ihme_region_cost_who3,
-         "cost_who4" = ihme_region_cost_who4) %>%
-  filter(!is.na(location_name)) %>% 
-  arrange((location_name))
+data_regional <- data_rev %>%  
+ filter(measure_id == 2) %>%
+ filter(estimate_id != 3) %>% 
+ select(ihme_region,numeric_name, estimate, ihme_region_cost_cc1,
+     ihme_region_cost_cc2, ihme_region_cost_who1, ihme_region_cost_who2, ihme_region_cost_who3, ihme_region_cost_who4) %>%
+ unique() %>%
+ rename("location_name" =ihme_region,
+     "cost_cc1" = ihme_region_cost_cc1,
+     "cost_cc2" = ihme_region_cost_cc2,
+     "cost_who1" = ihme_region_cost_who1,
+     "cost_who2" = ihme_region_cost_who2,
+     "cost_who3" = ihme_region_cost_who3,
+     "cost_who4" = ihme_region_cost_who4) %>%
+ filter(!is.na(location_name)) %>% 
+ arrange((location_name))
 
-data_income <- data_rev  %>% 
-  filter(measure_id == 2) %>%
-  filter(estimate_id != 3)  %>%  
-  select(income_level, estimate, numeric_name, cost_cc1, cost_cc2, cost_who1, cost_who2,  cost_who3, cost_who4) %>%
-  pivot_longer(cols = cost_cc1:cost_who4) %>%
-  group_by(income_level,numeric_name, name, estimate) %>% 
-  mutate(cost_total = sum(value, na.rm = TRUE)) %>%
-  ungroup() %>%
-  select(income_level, numeric_name, name, cost_total, estimate) %>% unique() %>%
-  rename("location_name" = income_level)
+data_income <- data_rev %>% 
+ filter(measure_id == 2) %>%
+ filter(estimate_id != 3) %>% 
+ select(income_level, estimate, numeric_name, cost_cc1, cost_cc2, cost_who1, cost_who2, cost_who3, cost_who4) %>%
+ pivot_longer(cols = cost_cc1:cost_who4) %>%
+ group_by(income_level,numeric_name, name, estimate) %>% 
+ mutate(cost_total = sum(value, na.rm = TRUE)) %>%
+ ungroup() %>%
+ select(income_level, numeric_name, name, cost_total, estimate) %>% unique() %>%
+ rename("location_name" = income_level)
 
 location_name <- c("H","UM","LM","L")
 rank <- c(1,2,3,4)
 fullname <- c("High income",
-              "Upper-middle income",
-              "Lower-middle income",
-              "Low income")
+       "Upper-middle income",
+       "Lower-middle income",
+       "Low income")
 
 incomelevels <- data.frame(location_name,rank, fullname)
 
 data_income <- left_join(data_income, incomelevels, by = "location_name") %>% 
-  arrange(rank) %>% select(!c(location_name, rank)) %>% rename("location_name" = "fullname")
+ arrange(rank) %>% select(!c(location_name, rank)) %>% rename("location_name" = "fullname")
 
 data_income <- data_income %>% 
-  pivot_wider(values_from = cost_total, names_from = name) %>%
-  filter(!is.na(location_name)) 
+ pivot_wider(values_from = cost_total, names_from = name) %>%
+ filter(!is.na(location_name)) 
 
 #### Pivot wider, change column names, drop NA for income levels
 
 data_table2 <- rbind(data_global, data_income, data_regional) %>% 
-  arrange(factor(numeric_name, levels = c("val", "lower", "upper"))) %>%
-  arrange(factor(estimate, levels = c("GBD 2019", "2016 reallocation approach", "Composite method"))) %>%
-  pivot_longer(cols = cost_cc1:cost_who4) %>%
-  mutate(value = round(value/1000000000000,2)) %>%
-  pivot_wider(names_from = c(numeric_name, estimate), values_from = value) %>%
-  arrange(name) %>%
-  relocate(name, .before = "location_name")
+ arrange(factor(numeric_name, levels = c("val", "lower", "upper"))) %>%
+ arrange(factor(estimate, levels = c("GBD 2019", "2016 reallocation approach", "Composite method"))) %>%
+ pivot_longer(cols = cost_cc1:cost_who4) %>%
+ mutate(value = round(value/1000000000000,2)) %>%
+ pivot_wider(names_from = c(numeric_name, estimate), values_from = value) %>%
+ arrange(name) %>%
+ relocate(name, .before = "location_name")
 
 # write.csv(data_table2, file = paste0(resultspath, "/table2.csv"))
 
 # Appendix 2: Value of economic welfare estimates (CC)
 
-appendix_table <- data_rev %>% filter(location_id == 1) %>%  
-  filter(measure_id == 2) %>% filter(estimate_id != 3) %>% 
-  select(estimate, numeric_name, cost_cc1, cost_cc2, cost_who1, cost_who2, cost_who3, cost_who4)
+appendix_table <- data_rev %>% filter(location_id == 1) %>% 
+ filter(measure_id == 2) %>% filter(estimate_id != 3) %>% 
+ select(estimate, numeric_name, cost_cc1, cost_cc2, cost_who1, cost_who2, cost_who3, cost_who4)
 appendix_table$cost_cc1 <- round(appendix_table$cost_cc1/1000000000000,2)
 appendix_table$cost_cc2 <- round(appendix_table$cost_cc2/1000000000000,2)
 appendix_table$cost_who1 <- round(appendix_table$cost_who1/1000000000000,2)
@@ -800,7 +776,7 @@ rownames(appendix_table_t) <- colnames(appendix_table)
 ```{r paper1code_text}
 
 ############################
-##        VALUES          ##
+##    VALUES     ##
 ############################
 
 # Key values and calculations for Abstract and Results
@@ -808,26 +784,26 @@ rownames(appendix_table_t) <- colnames(appendix_table)
 # Abstract
 
 abstract1 <- data_table1 %>% 
-  filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
-  filter(location_name =="Global") %>% 
-  select("val_number_Composite method") %>% 
-  unique()
+ filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
+ filter(location_name =="Global") %>% 
+ select("val_number_Composite method") %>% 
+ unique()
 abstract1 <- as.numeric(abstract1)
 abstract1 <- round(abstract1, 0)
 
 abstract2 <- data_table1 %>% 
-  filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
-  filter(location_name =="Global") %>% 
-  select("val_percent_Composite method") %>% 
-  unique()
+ filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
+ filter(location_name =="Global") %>% 
+ select("val_percent_Composite method") %>% 
+ unique()
 abstract2 <- as.numeric(abstract2)
 abstract2 <- floor(abstract2)
 
 abstract3 <- data_table1 %>% 
-  filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
-  filter(location_name =="Global") %>% 
-  select("val_number_GBD 2019") %>% 
-  unique()
+ filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
+ filter(location_name =="Global") %>% 
+ select("val_number_GBD 2019") %>% 
+ unique()
 abstract3 <- as.numeric(abstract3)
 abstract3 <- round(abstract3, 0)
 
@@ -835,32 +811,32 @@ abstract3 <- round(abstract3, 0)
 
 
 abstract_sentence1 <- paste0("We estimate that ",
-                             abstract1,
-                             " million disability-adjusted life years (DALYs) could be attributable to mental disorders in 2019 (",
-                             abstract2,
-                             "\\% of global DALYs)",
-                             ifelse(abstract1/abstract3>3,", a more than ",", an approximate "), 
-                             "three-fold increase compared to conventional estimates. ")
+               abstract1,
+               " million disability-adjusted life years (DALYs) could be attributable to mental disorders in 2019 (",
+               abstract2,
+               "\\% of global DALYs)",
+               ifelse(abstract1/abstract3>3,", a more than ",", an approximate "), 
+               "three-fold increase compared to conventional estimates. ")
 
 abstract4 <- data_table2%>% 
-  filter(name == "cost_who1") %>% 
-  filter(location_name == "Global") %>%
-  select(`val_Composite method`) %>%
-  unique()
+ filter(name == "cost_who1") %>% 
+ filter(location_name == "Global") %>%
+ select(`val_Composite method`) %>%
+ unique()
 abstract4 <- as.numeric(abstract4)
 abstract4 <- floor(abstract4*10)/10
 
 abstract_sentence2 <- paste0("The economic value associated with this burden is estimated at about USD ",
-                             abstract4,
-                             " trillion. ")
+               abstract4,
+               " trillion. ")
 
 table3 <- data_rev %>% 
-  filter(numeric_name == "val") %>%
-  select(measure_id, estimate, estimate_id, ihme_region, ihme_region_cost_who1, ihme_region_gdp) %>% 
-  unique %>%
-  filter(measure_id== "2") %>% 
-  filter(estimate_id== "4") %>% mutate(
-    regional_percent = ihme_region_cost_who1 / ihme_region_gdp *100)
+ filter(numeric_name == "val") %>%
+ select(measure_id, estimate, estimate_id, ihme_region, ihme_region_cost_who1, ihme_region_gdp) %>% 
+ unique %>%
+ filter(measure_id== "2") %>% 
+ filter(estimate_id== "4") %>% mutate(
+  regional_percent = ihme_region_cost_who1 / ihme_region_gdp *100)
 
 abstract5 <- table3$ihme_region[table3$regional_percent == max(table3$regional_percent)]
 abstract6 <- round(table3$regional_percent[table3$regional_percent == max(table3$regional_percent)],1)
@@ -869,165 +845,165 @@ abstract7 <- table3$ihme_region[table3$regional_percent == min(table3$regional_p
 abstract8 <- round(table3$regional_percent[table3$regional_percent == min(table3$regional_percent)],1)
 
 abstract_sentence3 <- paste0("At a regional level, the losses account for between ",
-                             abstract8,
-                             "\\% of gross domestic product in ",
-                             abstract7,
-                             " and ",
-                             abstract6,
-                             "\\% in ",
-                             abstract5,
-                             ". ")
+               abstract8,
+               "\\% of gross domestic product in ",
+               abstract7,
+               " and ",
+               abstract6,
+               "\\% in ",
+               abstract5,
+               ". ")
 
 # Results
 
 results1 <- data_table1 %>% 
-  filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
-  filter(location_name =="Global") %>% 
-  select("val_number_GBD 2019") %>% 
-  unique()
+ filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
+ filter(location_name =="Global") %>% 
+ select("val_number_GBD 2019") %>% 
+ unique()
 results1 <- as.numeric(results1)
 results1 <- floor(results1)
 
 results2 <- data_table1 %>% 
-  filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
-  filter(location_name =="Global") %>% 
-  select("val_percent_GBD 2019") %>% 
-  unique()
+ filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
+ filter(location_name =="Global") %>% 
+ select("val_percent_GBD 2019") %>% 
+ unique()
 results2 <- as.numeric(results2)
 results2 <- round(results2,0)
 
 results3 <- data_table1 %>% 
-  filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
-  filter(location_name =="Global") %>% 
-  select("val_percent_2016 reallocation approach") %>% 
-  unique()
+ filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
+ filter(location_name =="Global") %>% 
+ select("val_percent_2016 reallocation approach") %>% 
+ unique()
 results3 <- as.numeric(results3)
 results3 <- floor(results3)
 
 results4 <- data_table1 %>% 
-  filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
-  filter(location_name =="Global") %>% 
-  select("val_number_2016 reallocation approach") %>% 
-  unique()
+ filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
+ filter(location_name =="Global") %>% 
+ select("val_number_2016 reallocation approach") %>% 
+ unique()
 results4 <- as.numeric(results4)
 results4 <- floor(results4)
 
 results5 <- data_table1 %>% 
-  filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
-  filter(location_name =="High income") %>% 
-  select("val_number_Composite method") %>% 
-  unique()
+ filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
+ filter(location_name =="High income") %>% 
+ select("val_number_Composite method") %>% 
+ unique()
 results5 <- as.numeric(results5)
 results5 <- round(results5, 0)
 
 results6 <- data_table1 %>% 
-  filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
-  filter(location_name =="Low income") %>% 
-  select("val_number_Composite method") %>% 
-  unique()
+ filter(measure_name=="DALYs (Disability-Adjusted Life Years)") %>% 
+ filter(location_name =="Low income") %>% 
+ select("val_number_Composite method") %>% 
+ unique()
 results6 <- as.numeric(results6)
 results6 <- round(results6, 0)
 
 
 
 results_sentence1 <- paste0(
-  "Under GBD 2019, over ",
-  results1,
-  " million DALYs were attributed to mental disorders, or roughly ",
-  results2,
-  "\\% of the global burden. After including alcohol and drug use, neurological disorders, chronic pain, suicide, and self-harm, the share due to mental disorders rose to ",
-  results3,
-  "\\% of global DALYs (approximately ",
-  results4,
-  " million DALYs). Under the composite approach, an additional  ",
-  abstract1-results4,
-  " million DALYs were attributed to mental disorders, encompassing, in total, over ",
-  abstract2,
-  "\\% of global DALYs (Figure 1). Under all three methods, the burden of mental disorders (in DALYs) exhibited a country-income gradient, with mental disorders comprising ",
-  ifelse(results5/results6 > 2.4, "over twice", ifelse(results5/results6> 2, "roughly twice", "approximately twice")),
-  " the burden of disease in high-income countries compared to low-income countries.")
+ "Under GBD 2019, over ",
+ results1,
+ " million DALYs were attributed to mental disorders, or roughly ",
+ results2,
+ "\\% of the global burden. After including alcohol and drug use, neurological disorders, chronic pain, suicide, and self-harm, the share due to mental disorders rose to ",
+ results3,
+ "\\% of global DALYs (approximately ",
+ results4,
+ " million DALYs). Under the composite approach, an additional ",
+ abstract1-results4,
+ " million DALYs were attributed to mental disorders, encompassing, in total, over ",
+ abstract2,
+ "\\% of global DALYs (Figure 2). Under all three methods, the burden of mental disorders (in DALYs) exhibited a country-income gradient, with mental disorders comprising ",
+ ifelse(results5/results6 > 2.4, "over twice", ifelse(results5/results6> 2, "roughly twice", "approximately twice")),
+ " the burden of disease in high-income countries compared to low-income countries.")
 
 
 results7 <- data_table2%>% 
-  filter(name == "cost_who1") %>% 
-  filter(location_name == "Global") %>%
-  select(`val_Composite method`) %>%
-  unique()
+ filter(name == "cost_who1") %>% 
+ filter(location_name == "Global") %>%
+ select(`val_Composite method`) %>%
+ unique()
 results7 <- as.numeric(results7)
 
 results8 <- data_table2%>% 
-  filter(name == "cost_who1") %>% 
-  filter(location_name == "Global") %>%
-  select(`val_2016 reallocation approach`) %>%
-  unique()
+ filter(name == "cost_who1") %>% 
+ filter(location_name == "Global") %>%
+ select(`val_2016 reallocation approach`) %>%
+ unique()
 results8 <- as.numeric(results8)
 
 results9 <- data_table2%>% 
-  filter(name == "cost_who1") %>% 
-  filter(location_name == "Global") %>%
-  select(`val_GBD 2019`) %>%
-  unique()
+ filter(name == "cost_who1") %>% 
+ filter(location_name == "Global") %>%
+ select(`val_GBD 2019`) %>%
+ unique()
 results9 <- as.numeric(results9)
 
 results_sentence2 <- paste0(
-  "Using GDP per capita as a proxy for the value per DALY, economic losses due to mental disorders were estimated at ",
-  abstract4,
-  " trillion USD using our composite approach. This estimate is ",
-  floor((results7 - results8)*10)/10,
-  " trillion USD larger than that reached using the 2016 reallocation approach and over ",
-  floor((results7 - results9)*10)/10,
-  " trillion USD larger than that reached from the unadjusted GBD 2019 estimates.")
+ "Using GDP per capita as a proxy for the value per DALY, economic losses due to mental disorders were estimated at ",
+ abstract4,
+ " trillion USD using our composite approach. This estimate is ",
+ floor((results7 - results8)*10)/10,
+ " trillion USD larger than that reached using the 2016 reallocation approach and over ",
+ floor((results7 - results9)*10)/10,
+ " trillion USD larger than that reached from the unadjusted GBD 2019 estimates.")
 
 results_sentence3 <- paste0(
-  "Under the relative GDP-per-capita values the economic burden would account for between ",
-  abstract8,
-  "\\% of gross domestic product in ",
-  abstract7,
-  " and ",
-  abstract6,
-  "\\% in ",
-  abstract5,
-  " under our composite approach.")
+ "Under the relative GDP-per-capita values the economic burden would account for between ",
+ abstract8,
+ "\\% of gross domestic product in ",
+ abstract7,
+ " and ",
+ abstract6,
+ "\\% in ",
+ abstract5,
+ " under our composite approach.")
 
 # Discussion
 
 
 
 discussion_sentence1 <- paste0(
-  "This approach suggests that the global DALYs attributable to mental disorders could exceed ",
-  abstract1,
-  " million per year, or ",
-  abstract2,
-  "\\% of the total burden.")
+ "This approach suggests that the global DALYs attributable to mental disorders could exceed ",
+ abstract1,
+ " million per year, or ",
+ abstract2,
+ "\\% of the total burden.")
 
 
 discussion1 <- data_table2%>% 
-  filter(name == "cost_who1") %>% 
-  filter(location_name == "Global") %>%
-  select(`lower_Composite method`) %>%
-  unique()
+ filter(name == "cost_who1") %>% 
+ filter(location_name == "Global") %>%
+ select(`lower_Composite method`) %>%
+ unique()
 discussion1 <- as.numeric(discussion1)
 
 
 discussion2 <- data_table2%>% 
-  filter(name == "cost_who1") %>% 
-  filter(location_name == "Global") %>%
-  select(`upper_Composite method`) %>%
-  unique()
+ filter(name == "cost_who1") %>% 
+ filter(location_name == "Global") %>%
+ select(`upper_Composite method`) %>%
+ unique()
 discussion2 <- as.numeric(discussion2)
 
 discussion_sentence2 <- paste0(
-  "When applied against an economic value per DALY of one times GDP per capita, this approach further suggests that the per year losses associated with this burden could exceed ",
-  abstract4,
-  " trillion USD in 2019. When adjusting for the uncertainty in estimates of the attributable burden of disease, the losses could range from ",
-  floor((discussion1)*10)/10,
-  " trillion to more than ",
-  floor((discussion2)*10)/10,
-  " trillion USD.")
+ "When applied against an economic value per DALY of one times GDP per capita, this approach further suggests that the per year losses associated with this burden could exceed ",
+ abstract4,
+ " trillion USD in 2019. When adjusting for the uncertainty in estimates of the attributable burden of disease, the losses could range from ",
+ floor((discussion1)*10)/10,
+ " trillion to more than ",
+ floor((discussion2)*10)/10,
+ " trillion USD.")
 
 discussion_sentence3 <- paste0("We estimate that in 2019, the losses would already be over ",
-                               floor((abstract4 - 2.9)*10)/10,
-                               " trillion USD greater than Bloom and colleagues’ global losses projections for 2030 (2.9 trillion 2019 USD, using the same value per DALY approach).")
+                floor((abstract4 - 2.9)*10)/10,
+                " trillion USD greater than Bloom and colleagues’ global losses projections for 2030 (2.9 trillion 2019 USD, using the same value per DALY approach).")
 
 
 
@@ -1038,7 +1014,7 @@ discussion_sentence3 <- paste0("We estimate that in 2019, the losses would alrea
 
 \begin{centering}
 
-\emph{Daniel Arias, Shekhar Saxena, Stéphane Verguet}
+\emph{Daniel Arias, Shekhar Saxena, and Stéphane Verguet}
 
 \vspace{6pt}
 
@@ -1046,7 +1022,7 @@ discussion_sentence3 <- paste0("We estimate that in 2019, the losses would alrea
 
 \begin{spacing}{1}
 
-A version of this paper was accepted for publication by \emph{eClinicalMedicine} on September 9, 2022 and was published in Volume 54, Issue 101675 in December 2022.  
+An earlier version of this paper was published by \emph{eClinicalMedicine} in Volume 54, Issue 101675 in December 2022.
 
 \end{spacing}
 
@@ -1081,11 +1057,11 @@ Evaluating the economic burden of mental illness is a critical part in making th
 
 While the estimates presented from this paper remain staggering and salient, new studies estimating the morbidity and mortality associated with mental illness have since become available.[@gbd2019mentaldisorderscollaboratorsGlobalRegionalNational2022; @vigoEstimatingTrueGlobal2016; @walkerMortalityMentalDisorders2015] These studies suggest that previous (and current) estimates of the global burden of mental disorders may be considerably underestimated, which, in turn, has implications for estimating the true economic burden of mental illness.
 
-The most recent estimates of morbidity and mortality due to mental disorders come from the Global Burden of Disease (GBD) 2019 study.[@vosGlobalBurden3692020a] The GBD study provides disease burden estimates using DALYs, years of life lost (YLLs), and years lived with disability (YLDs), which are then aggregated within a hierarchical grouping scheme that classifies causes of disability and death at different levels of mutually exclusive and completely exhaustive categories. (Mental disorders are a Level 2 condition, nested under NCDs; see Table S1.3.)
+The most recent estimates of morbidity and mortality due to mental disorders come from the Global Burden of Disease (GBD) 2019 study.[@vosGlobalBurden3692020a] The GBD study provides disease burden estimates using DALYs, years of life lost (YLLs), and years lived with disability (YLDs), which are then aggregated within a hierarchical grouping scheme that classifies causes of disability and death at different levels of mutually exclusive and completely exhaustive categories. (Mental disorders are a Level 2 condition, nested under noncommunicable diseases (NCDs); see Table S1.3.)
 
-While GBD remains the gold standard for global epidemiologic estimation, the nature of the GBD scheme—in particular, the rationale for grouping certain conditions under mental disorders or not—has been the subject of debate in the literature.[@atunChallengesEstimatingTrue2016; @vigoEstimatingTrueGlobal2016; @whitefordChallengesEstimatingTrue2016] In particular, work by Vigo et al. (2016) published in The Lancet Psychiatry argues for an expanded classification of mental disorders under the GBD classification scheme to account for underestimation of the burden of mental disorders.[@vigoEstimatingTrueGlobal2016] The authors attribute this underestimation to five main causes: 1) the distinction drawn between mental and neurological diseases; 2) the categorization of self-harm and suicide under injuries; 3) the classification of all chronic pain and somatoform disorders under musculoskeletal disorders; 4) the exclusion of personality disorders; and 5) the exclusion of premature mortality due to mental disorders. Using data from the 2013 GBD study, Vigo and colleagues re-allocated the entire burden of dementias, epilepsy, migraine, tension-type headache, and self-harm to mental disorders. In addition, a third of the burden of musculoskeletal disorders without anatomical correlate (i.e., somatoform disorders with prominent pain) was attributed to mental disorders.[@vigoEstimatingTrueGlobal2016] This reallocation attributed 13% of DALYs to mental disorders, a 6 percentage point increase from the GBD estimate of 7%.
+While GBD remains the gold standard for global epidemiologic estimation, the nature of the GBD scheme—in particular, the rationale for grouping certain conditions under mental disorders or not—has been the subject of debate in the literature.[@atunChallengesEstimatingTrue2016; @vigoEstimatingTrueGlobal2016; @whitefordChallengesEstimatingTrue2016] In particular, work by Vigo et al. (2016) published in \emph{The Lancet Psychiatry} argues for an expanded classification of mental disorders under the GBD classification scheme to account for underestimation of the burden of mental disorders.[@vigoEstimatingTrueGlobal2016] The authors attribute this underestimation to five main causes: 1) the distinction drawn between mental and neurological diseases; 2) the categorization of self-harm and suicide under injuries; 3) the classification of all chronic pain and somatoform disorders under musculoskeletal disorders; 4) the exclusion of personality disorders; and 5) the exclusion of premature mortality due to mental disorders. Using data from the 2013 GBD study, Vigo and colleagues re-allocated the entire burden of dementias, epilepsy, migraine, tension-type headache, and self-harm to mental disorders. In addition, a third of the burden of musculoskeletal disorders without anatomical correlate (i.e., somatoform disorders with prominent pain) was attributed to mental disorders.[@vigoEstimatingTrueGlobal2016] This reallocation attributed 13% of DALYs to mental disorders, a 6 percentage point increase from the GBD estimate of 7%.
 
-In this paper, we attempt to revisit the estimation of the global burden of mental disorders and of its associated economic value. Our aim is to characterize potential underestimation of the burden of mental disorders and to quantify the economic value of this burden under different estimation approaches. Specifically, we expand on Vigo et al.[@vigoEstimatingTrueGlobal2016] by capturing premature mortality due to mental disorders using pooled risk ratios of mortality from a systematic review of mental disorders[@walkerMortalityMentalDisorders2015] to determine the population attributable fraction (PAF) of premature mortality. Inclusion of premature mortality through the PAF presents a novel composite approach that can more broadly capture attributable morbidity and mortality. Using this approach on GBD 2019 estimates, we then apply monetary values to DALYs to reach estimates of the global economic value of the mental burden of disease using a value of a statistical life (VSL) approach similar to that of Bloom and colleagues,[@bloomGlobalEconomicBurden2011] which attempts to capture a population’s willingness to pay to reduce morbidity and mortality associated with illness. The VSL approach—in contrast alternatives such as cost of illness and value of lost output approaches—includes an economic valuation of mortality risk reductions in monetary terms, and thus enables comparison across sectors (beyond the sole health sector) which can motivate decision-making toward ameliorating welfare and societal mental health. Our findings suggest that both the epidemiological and economic burden of mental disorders could be larger than previously estimated, and that underestimation would be larger among regions where premature mortality due to mental disorders is greater.
+In this paper, we attempt to revisit the estimation of the global burden of mental disorders and of its associated economic value. Our aim is to characterize potential underestimation of the burden of mental disorders and to quantify the economic value of this burden under different estimation approaches. Specifically, we expand on Vigo et al.[@vigoEstimatingTrueGlobal2016] by capturing premature mortality due to mental disorders using pooled risk ratios of mortality from a systematic review of mental disorders[@walkerMortalityMentalDisorders2015] to determine the population attributable fraction (PAF) of premature mortality. Inclusion of premature mortality through the PAF presents a novel composite approach that can more broadly capture attributable morbidity and mortality. Using this approach on GBD 2019 estimates, we then apply monetary values to DALYs to reach estimates of the global economic value of the mental burden of disease using a value of a statistical life (VSL) approach similar to that of Bloom and colleagues,[@bloomGlobalEconomicBurden2011] which attempts to capture a population’s willingness to pay to reduce morbidity and mortality associated with illness. The VSL approach—in contrast to alternatives such as cost of illness and value of lost output approaches—includes an economic valuation of mortality risk reductions in monetary terms, and thus enables comparison across sectors (beyond the sole health sector) which can motivate decision-making toward ameliorating welfare and societal mental health. Our findings suggest that both the epidemiological and economic burden of mental disorders could be larger than previously estimated, and that underestimation would be larger among regions where premature mortality due to mental disorders is greater.
 
 ## Methods
 
@@ -1133,7 +1109,7 @@ Consistent with previous approaches, we use GDP per capita (USD 2019) for our ba
 
 The primary focus of this paper concerns structural uncertainty in determining the burden of mental illness, resulting in the evaluation of three different estimation approaches. To address parameter uncertainty within each approach, we apply a three-way sensitivity analysis. First, following a simple intuitive approach, we incorporate the upper and lower uncertainty intervals (UIs) provided by GBD 2019 for YLLs, YLDs, and DALYs to account for parameter uncertainty. Second, we use the upper and lower values of prevalence estimates and of the 95% confidence intervals (CIs) of the pooled relative risk of all-cause mortality from Walker and colleagues in our composite approach.[@walkerMortalityMentalDisorders2015] Third, our lower bound estimates are set to reallocate one sixth of the burden of musculoskeletal disorders proposed by Vigo and colleagues,[@vigoEstimatingTrueGlobal2016] while our upper bound estimates are set to reallocate one half of this burden.
 
-In addition to our base-case economic valuation, we further report our VSL estimates using three times GDP per capita as the value of a DALY. (Alternative valuations using values of $1,000 and $5,000, as well as purchasing power parity (PPP)-adjusted GDP per capita, are reported in Tables S1.5 and S1.6 of Appendix 1)
+In addition to our base-case economic valuation, we further report our VSL estimates using three times GDP per capita as the value of a DALY. (Alternative valuations using values of $1,000 and $5,000, as well as purchasing power parity (PPP)-adjusted GDP per capita, are reported in Tables S1.5 and S1.6 of Appendix 1.)
 
 ### Statistical analysis
 
@@ -1141,11 +1117,7 @@ All analyses were completed using R (version 4.2.1).[@rcoreteamLanguageEnvironme
 
 ### Ethics statement
 
-The research draws exclusively on secondary country-level data reported at the national or subnational level. As such, it does not involve data collection, experimentation, or investigation concerning human subjects. The Institutional Review Board (IRB) of the Harvard T.H. Chan School of Public Health determined that the study was not human subjects research, and that additional review was not required (protocol number: IRB20-1946, determined on November 13, 2020).
-
-### Role of funding source
-
-This study received no funding. All authors (DA, SV, and SS) had access to the data and shared in the decision to submit this article for publication.
+The Institutional Review Board (IRB) of the Harvard T.H. Chan School of Public Health determined that this study was not human subjects research and that additional review was not required (protocol number: IRB20-1946, determined on November 13, 2020).
 
 \blandscape
 
@@ -1182,26 +1154,26 @@ knitr::include_graphics("table1_3.png")
 
 \blandscape
 
-```{r figure_dalys_nation, include = TRUE, echo = FALSE, warnings = FALSE, fig.scap="DALYs attributable to mental disorders in 2019, by estimation approach, as a share of all DALYs.", out.extra='', fig.cap=paste0("\\label{figure_dalys_nation}DALYs attributable to mental disorders in 2019, by estimation approach, as a share of all DALYs. ATG: Antigua and Barbuda; DALYs: disability-adjusted life years; FSM: Federated States of Micronesia; LCA: Saint Lucia; TLS: East Timor; TTO: Trinidad and Tobago; VCT: Saint Vincent and the Grenadines."), fig.width = 13.7, fig.height = 7.5, fig.align='center', out.width = '98%'}
+```{r figure_dalys_nation, include = TRUE, echo = FALSE, warnings = FALSE, fig.scap="Disability-adjusted life years (DALYs) attributable to mental disorders in 2019, by estimation approach, as a share of all DALYs.", out.extra='', fig.cap=paste0("\\label{figure_dalys_nation}Disability-adjusted life years (DALYs) attributable to mental disorders in 2019, by estimation approach, as a share of all DALYs. ATG: Antigua and Barbuda. FSM: Federated States of Micronesia. LCA: Saint Lucia. TLS: East Timor. TTO: Trinidad and Tobago. VCT: Saint Vincent and the Grenadines."), fig.width = 13.7, fig.height = 7.5, fig.align='center', out.width = '98%'}
 
 sf_use_s2(FALSE)
 
 lancet_pal <- c("#5A56A4", 
-                "#318ABF",
-                "#62C2A4",
-                "#9DD1A4",
-                "#DBE79A",
-                "#FCDA8B",
-                '#FCAA66',
-                "#F2744C",
-                "#D84858",
-                "#9A154C")
+        "#318ABF",
+        "#62C2A4",
+        "#9DD1A4",
+        "#DBE79A",
+        "#FCDA8B",
+        '#FCAA66',
+        "#F2744C",
+        "#D84858",
+        "#9A154C")
 
 data_temporary <- data_rev_map %>% 
-  filter(measure_id == 2) %>% 
-  filter(estimate_id == 4) %>%
-  st_drop_geometry() %>%
-  select(iso_code, percent)
+ filter(measure_id == 2) %>% 
+ filter(estimate_id == 4) %>%
+ st_drop_geometry() %>%
+ select(iso_code, percent)
 
 world_map <- ne_countries(scale = "large", returnclass = "sf")
 # world <- ne_countries(scale = "medium", returnclass = "sf")
@@ -1211,217 +1183,217 @@ world_map <- left_join(world_map, data_temporary, by = "iso_code")
 
 # First, we make the main map
 fun_create_map_helper <- function(data){
+ 
+ data_temp <- data %>% 
+ mutate(var_cut = cut(percent, 
+            breaks =c(0,
+                 6,
+                 7,
+                 8, 
+                 10,
+                 12,
+                 15,
+                 20, 
+                 25, 
+                 30,
+                 35))) 
+ 
+ data_temp %>%
+  filter(admin != "Antarctica") %>%
+  # group_by(iso_code) %>%
+  # st_make_valid() %>% 
+  # summarize(geometry = st_union(geometry)) %>%
+  # mutate(var_cut = cut(gdp_md_est/1000000, 
+  #           breaks =c(0, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100))) %>%
+  ggplot(aes(geometry = geometry, fill = var_cut)) +
+  geom_sf(color = col_grey_dark, linewidth = 0.15) +
+  scale_fill_manual(values=setNames(lancet_pal, levels(data_temp$var_cut))) +
   
-  data_temp <- data %>% 
-  mutate(var_cut = cut(percent, 
-                       breaks =c(0,
-                                 6,
-                                 7,
-                                 8, 
-                                 10,
-                                 12,
-                                 15,
-                                 20, 
-                                 25, 
-                                 30,
-                                 35))) 
-  
-  data_temp %>%
-    filter(admin != "Antarctica") %>%
-    # group_by(iso_code) %>%
-    # st_make_valid() %>% 
-    # summarize(geometry = st_union(geometry)) %>%
-    # mutate(var_cut = cut(gdp_md_est/1000000, 
-    #                      breaks =c(0, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100))) %>%
-    ggplot(aes(geometry = geometry, fill = var_cut)) +
-    geom_sf(color = col_grey_dark, linewidth = 0.15) +
-    scale_fill_manual(values=setNames(lancet_pal, levels(data_temp$var_cut))) +
-    
-    # scale_fill_viridis(option = "mako", discrete = TRUE) +
-    theme_void()
+  # scale_fill_viridis(option = "mako", discrete = TRUE) +
+  theme_void()
 }
 
 fun_create_map <- function(data, x_1 = -180, x_2 = 180, y_1 = -90, y_2 = 90){
-  
-  if(x_1 == -180 &
-     x_2 == 180  & 
-     y_1 == -90  &
-     y_2 == 90 ){
-  
-    fun_create_map_helper(data) +
-    theme(legend.position = "bottom") +
-      labs(fill = "% of DALYs") +
-      guides(fill = guide_legend(override.aes =
-                                   list(size = 0.5),
-                                 nrow = 1, 
-                                 byrow = TRUE))
-  
-  }else{
-
-    # print(paste0("The x limits of this map are c(",
-    #              min(x_1, x_2),", ",
-    #              max(x_1, x_2)," and the y limits are c(",
-    #              min(y_1, y_2), ", ",
-    #              max(y_1, y_2)))
-
-  
-    fun_create_map_helper(data) + theme(legend.position = "",
-            panel.border = element_rect(colour = "black", fill = NA, linewidth=.5))   +
-      xlim(min(x_1, x_2), max(x_1, x_2)) +
-      ylim(min(y_1, y_2), max(y_1, y_2))
-    
  
-  }
+ if(x_1 == -180 &
+   x_2 == 180 & 
+   y_1 == -90 &
+   y_2 == 90 ){
+ 
+  fun_create_map_helper(data) +
+  theme(legend.position = "bottom") +
+   labs(fill = "% of DALYs") +
+   guides(fill = guide_legend(override.aes =
+                  list(size = 0.5),
+                 nrow = 1, 
+                 byrow = TRUE))
+ 
+ }else{
+
+  # print(paste0("The x limits of this map are c(",
+  #       min(x_1, x_2),", ",
+  #       max(x_1, x_2)," and the y limits are c(",
+  #       min(y_1, y_2), ", ",
+  #       max(y_1, y_2)))
+
+ 
+  fun_create_map_helper(data) + theme(legend.position = "",
+      panel.border = element_rect(colour = "black", fill = NA, linewidth=.5))  +
+   xlim(min(x_1, x_2), max(x_1, x_2)) +
+   ylim(min(y_1, y_2), max(y_1, y_2))
   
+ 
+ }
+ 
 }
 
 main_map_upper <- world_map %>%
-  fun_create_map()
+ fun_create_map()
 
 
 ##### Generate band of countries under neath in blocks
 
 distance <- function(measure, coord1, coord2){
+ 
+ if(measure == "width"){
+  a = coord1[2]
+  b = coord2[2]
   
-  if(measure == "width"){
-    a = coord1[2]
-    b = coord2[2]
-    
-  } 
-  
-  if(measure == "height"){
-    a = coord1[1]
-    b = coord2[1]
-    
-    
-  }
+ } 
+ 
+ if(measure == "height"){
+  a = coord1[1]
+  b = coord2[1]
   
   
-  ifelse(a >= 0 & b >= 0, abs(a - b),
-         ifelse(a < 0 & b < 0, 
-                max(abs(a), abs(b)) - min(abs(a), abs(b)),
-                
-                abs(abs(a) + abs(b))))
-  
+ }
+ 
+ 
+ ifelse(a >= 0 & b >= 0, abs(a - b),
+     ifelse(a < 0 & b < 0, 
+        max(abs(a), abs(b)) - min(abs(a), abs(b)),
+        
+        abs(abs(a) + abs(b))))
+ 
 }
 
 
 fun_lower_block <- function(country = "all", y1 = -90, x1 = -180, y2 = 90, x2 = 180, 
-                            ratio_h_over_w = (0.72/.6), padding = 0.15,
-                            nudge = -9, label = country, 
-                            text_size = 8, orientation = 0.5){
+              ratio_h_over_w = (0.72/.6), padding = 0.15,
+              nudge = -9, label = country, 
+              text_size = 8, orientation = 0.5){
+ 
+ if(length(country) == 1){
   
-  if(length(country) == 1){
-    
-    if(country == "all")
-    {country = world_map$admin}
+  if(country == "all")
+  {country = world_map$admin}
 
-    
-  }
-    
-    
+  
+ }
+  
+  
 
-  coord1 <- c(y1, x1) 
-  coord2 <- c(y2, x2)
-  
-  
-  
-  
-  # Calculate the width and width of the original rectangle
-  width <- distance("width", coord1 = coord1, coord2 = coord2)
-  height <- distance("height", coord1 = coord1, coord2 = coord2)
-  
+ coord1 <- c(y1, x1) 
+ coord2 <- c(y2, x2)
+ 
+ 
+ 
+ 
+ # Calculate the width and width of the original rectangle
+ width <- distance("width", coord1 = coord1, coord2 = coord2)
+ height <- distance("height", coord1 = coord1, coord2 = coord2)
+ 
 # 
-#   print(paste('Height is ', height,
-#               "and width is ", width))
+#  print(paste('Height is ', height,
+#        "and width is ", width))
 
-  
-  # Determine the center point of the rectangle
-  center_lat <- mean(c(coord1[1], coord2[1]))
-  center_lon <- mean(c(coord1[2], coord2[2]))
-  
-  ratio = height/width
-  
-  x1_new = max(x1, x2)
-  x2_new = min(x1, x2)
-  y1_new = max(y1, y2)
-  y2_new = min(y1, y2)
-  
-  # print(paste('Midpoint is ', center_lon,
-  #             ", ", center_lat,
-  #       ". Ratio is ", 
-  #       ratio,
-  #       ". The target is ",
-  #       ratio_h_over_w))
+ 
+ # Determine the center point of the rectangle
+ center_lat <- mean(c(coord1[1], coord2[1]))
+ center_lon <- mean(c(coord1[2], coord2[2]))
+ 
+ ratio = height/width
+ 
+ x1_new = max(x1, x2)
+ x2_new = min(x1, x2)
+ y1_new = max(y1, y2)
+ y2_new = min(y1, y2)
+ 
+ # print(paste('Midpoint is ', center_lon,
+ #       ", ", center_lat,
+ #    ". Ratio is ", 
+ #    ratio,
+ #    ". The target is ",
+ #    ratio_h_over_w))
 
-  if (ratio != ratio_h_over_w) {
-    
-    # If our ratio is not on target...
-    
-    if (ratio > ratio_h_over_w) {
-      
-      # and if the height is greater than width, then our figure
-      # is too tall, so we will widen our coordinates...
-      
-      width_new_half = (height / ratio_h_over_w)/2
-      
-      x1_new = center_lon + width_new_half
-      x2_new = center_lon - width_new_half
-      
-      
-    }
-    
-    if (ratio < ratio_h_over_w) {
-      
-      # but if the height is less than width, then
-      height_new_half = ((width * ratio_h_over_w))/2
-      
-      y1_new = center_lat + height_new_half
-      y2_new = center_lat - height_new_half
-      
-    }
-    
-  } else {
-    
-    # print("Ratio is perfect!")
-    
+ if (ratio != ratio_h_over_w) {
+  
+  # If our ratio is not on target...
+  
+  if (ratio > ratio_h_over_w) {
+   
+   # and if the height is greater than width, then our figure
+   # is too tall, so we will widen our coordinates...
+   
+   width_new_half = (height / ratio_h_over_w)/2
+   
+   x1_new = center_lon + width_new_half
+   x2_new = center_lon - width_new_half
+   
+   
   }
   
+  if (ratio < ratio_h_over_w) {
+   
+   # but if the height is less than width, then
+   height_new_half = ((width * ratio_h_over_w))/2
+   
+   y1_new = center_lat + height_new_half
+   y2_new = center_lat - height_new_half
+   
+  }
   
-  coord1_new <- c(y1_new, x1_new) 
-  coord2_new <- c(y2_new, x2_new)
+ } else {
   
+  # print("Ratio is perfect!")
   
-  
-  
-  # Calculate the width and width of the original rectangle
-  width <- distance("width", coord1 = coord1_new, coord2 = coord2_new)
-  height <- distance("height", coord1 = coord1_new, coord2 = coord2_new)
-  
-  # print(paste0("New ratio is ", height/width))
-  
-  
-  # print("Making map")
-  
-  map <- world_map %>%
-    filter(admin %in% country) %>%
-    fun_create_map(y_1 = y1_new,  x_1 = x1_new, y_2 = y2_new, x_2 = x2_new) +
-    labs(x = label) +
-    theme(plot.margin = margin(padding, padding, padding, padding, "cm"),
-          panel.border = element_rect(colour = "black", fill = NA, linewidth=.5), 
-          axis.title.x =  element_text(size= text_size,
-                                       margin = margin(t = nudge),
-                                       hjust = orientation),
-          text = element_text(family = "Source Sans Pro")
-          
-    )
-          # ,
-          # aspect.ratio=1)
-  
-  # print(map)
-  
-  return(map)
-  
+ }
+ 
+ 
+ coord1_new <- c(y1_new, x1_new) 
+ coord2_new <- c(y2_new, x2_new)
+ 
+ 
+ 
+ 
+ # Calculate the width and width of the original rectangle
+ width <- distance("width", coord1 = coord1_new, coord2 = coord2_new)
+ height <- distance("height", coord1 = coord1_new, coord2 = coord2_new)
+ 
+ # print(paste0("New ratio is ", height/width))
+ 
+ 
+ # print("Making map")
+ 
+ map <- world_map %>%
+  filter(admin %in% country) %>%
+  fun_create_map(y_1 = y1_new, x_1 = x1_new, y_2 = y2_new, x_2 = x2_new) +
+  labs(x = label) +
+  theme(plot.margin = margin(padding, padding, padding, padding, "cm"),
+     panel.border = element_rect(colour = "black", fill = NA, linewidth=.5), 
+     axis.title.x = element_text(size= text_size,
+                    margin = margin(t = nudge),
+                    hjust = orientation),
+     text = element_text(family = "Source Sans Pro")
+     
+  )
+     # ,
+     # aspect.ratio=1)
+ 
+ # print(map)
+ 
+ return(map)
+ 
 }
 
 
@@ -1430,133 +1402,133 @@ fun_lower_block <- function(country = "all", y1 = -90, x1 = -180, y2 = 90, x2 = 
 
 
 
-lower_block_1 <-  fun_lower_block(country = "all",
-                                  23.688123201320412, -86.03651405368969,
-                                  18.26121082729241, -67.8554147013031, 
-                                  label = "Caribbean",
-                                  ratio_h_over_w = 2.5/3.35)
+lower_block_1 <- fun_lower_block(country = "all",
+                 23.688123201320412, -86.03651405368969,
+                 18.26121082729241, -67.8554147013031, 
+                 label = "Caribbean",
+                 ratio_h_over_w = 2.5/3.35)
 
 ## Second block: Islands in Caribbean
 
 
 
-lower_block_2_1 <- fun_lower_block("Antigua and Barbuda",  17.78141711279741, -62.2022030527118,
-                                   16.79458198479592, -61.39269148570997, label = "ATG")
+lower_block_2_1 <- fun_lower_block("Antigua and Barbuda", 17.78141711279741, -62.2022030527118,
+                  16.79458198479592, -61.39269148570997, label = "ATG")
 
 lower_block_2_2 <- fun_lower_block("Saint Vincent and the Grenadines",
-                                     12.391456412985622, -61.60886995955927,
-                                     13.419487110651687, -60.88102575796276, label = "VCT")
+                   12.391456412985622, -61.60886995955927,
+                   13.419487110651687, -60.88102575796276, label = "VCT")
 lower_block_2_3 <- fun_lower_block("Barbados", 13.467115495468354, -59.85117377289456,
-                                     12.990476644508814, -59.33382541849154)
+                   12.990476644508814, -59.33382541849154)
 lower_block_2_4 <- fun_lower_block("Comoros", -11.24866626955447, 43.00637992019884,
-                                     -12.442325445847862, 44.68437738632322)
+                   -12.442325445847862, 44.68437738632322)
 lower_block_2_5 <- fun_lower_block("Dominica", 15.680375533672533, -61.55835363143402,
-                                    15.069402810985572, -61.143539270458746)
+                  15.069402810985572, -61.143539270458746)
 lower_block_2_6 <- fun_lower_block("Grenada", 12.54522173412346, -61.87752420403268,
-                                     11.883716350869527, -61.371600190809104)
+                   11.883716350869527, -61.371600190809104)
 lower_block_2_7 <- fun_lower_block("Maldives", -0.7281644242049007, 73.00822457449168,
-                                     -0.5575134138293779, 73.29728811799717)
+                   -0.5575134138293779, 73.29728811799717)
 lower_block_2_8 <- fun_lower_block("Mauritius", -20.620191444040987, 57.15892632861276, 
-                                     -19.903825092697055, 58.00959028441021)
+                   -19.903825092697055, 58.00959028441021)
 lower_block_2_9 <- fun_lower_block("Saint Lucia", 14.16262019208292, -61.164375443799265,
-                                     13.539415451808365, -60.76138414727761, label = "LCA")
+                   13.539415451808365, -60.76138414727761, label = "LCA")
 lower_block_2_10 <- fun_lower_block("Trinidad and Tobago",11.332779122191509, -61.96117584168811,
-                                    9.724954484064446, -60.4948421071539, label = "TTO")
+                  9.724954484064446, -60.4948421071539, label = "TTO")
 lower_block_2_11 <- fun_lower_block("all", -8.055776256847395, 127.5033419027598, 
-                                      -10.365527592170913, 123.86686747667004, label = "TLS")
+                   -10.365527592170913, 123.86686747667004, label = "TLS")
 
 lower_block_2_12 <- fun_lower_block("Seychelles", -4.164500664831933, 55.08971811357248,
-                                      -4.87593984585334, 56.013554481127436)
+                   -4.87593984585334, 56.013554481127436)
 
 lower_block_2 <- cowplot::plot_grid(lower_block_2_1,
-                                    lower_block_2_2,
-                                    lower_block_2_3,
-                                    lower_block_2_4,
-                                    lower_block_2_5,
-                                    lower_block_2_6,
-                                    lower_block_2_7,
-                                    lower_block_2_8,
-                                    lower_block_2_9,
-                                    lower_block_2_10,
-                                    lower_block_2_11,
-                                    lower_block_2_12,
-                                    rel_heights  = c(1,1,1,1,
-                                                   1,1,1,1,
-                                                   1,1,1,1),
-                                    rel_widths = c(1,1,1,1,
-                                                   1,1,1,1,
-                                                   1,1,1,1),
-                                     # align='h', 
-                                     ncol= 4,
-                                     axis='t') 
+                  lower_block_2_2,
+                  lower_block_2_3,
+                  lower_block_2_4,
+                  lower_block_2_5,
+                  lower_block_2_6,
+                  lower_block_2_7,
+                  lower_block_2_8,
+                  lower_block_2_9,
+                  lower_block_2_10,
+                  lower_block_2_11,
+                  lower_block_2_12,
+                  rel_heights = c(1,1,1,1,
+                          1,1,1,1,
+                          1,1,1,1),
+                  rel_widths = c(1,1,1,1,
+                          1,1,1,1,
+                          1,1,1,1),
+                   # align='h', 
+                   ncol= 4,
+                   axis='t') 
 
 # print(lower_block_2)
 
 ## Third block: 
 
-lower_block_3_1 <-  fun_lower_block(country = "all",
-                                    label = "West \nAfrica",
-                                    15.333951130672313, -20.03959428947879,
-                                    8.941590169786489, -7.402043441729575,
-                                    ratio_h_over_w = 0.69/0.95,
-                                    nudge = 1) 
+lower_block_3_1 <- fun_lower_block(country = "all",
+                  label = "West \nAfrica",
+                  15.333951130672313, -20.03959428947879,
+                  8.941590169786489, -7.402043441729575,
+                  ratio_h_over_w = 0.69/0.95,
+                  nudge = 1) 
 
 
-lower_block_3_2 <-  fun_lower_block(country = "all",
-                                    label = "Persian Gulf",
-                                    31.578724269583038, 46.68534937362107,
-                                    22.201628755387656, 57.91919943035645,
-                                    ratio_h_over_w = 1.34/0.89) 
+lower_block_3_2 <- fun_lower_block(country = "all",
+                  label = "Persian Gulf",
+                  31.578724269583038, 46.68534937362107,
+                  22.201628755387656, 57.91919943035645,
+                  ratio_h_over_w = 1.34/0.89) 
 
-lower_block_3_3 <-  fun_lower_block(country = "all",
-                                    label = "Eastern \nMediterranean",
-                                    35.84337817700235, 32.93408225309256, 
-                                    29.953432571862056, 36.94230952794229,
-                                    ratio_h_over_w = 0.99/0.82,
-                                    nudge = 1) +  theme(aspect.ratio = 1)
+lower_block_3_3 <- fun_lower_block(country = "all",
+                  label = "Eastern \nMediterranean",
+                  35.84337817700235, 32.93408225309256, 
+                  29.953432571862056, 36.94230952794229,
+                  ratio_h_over_w = 0.99/0.82,
+                  nudge = 1) + theme(aspect.ratio = 1)
 
-  
+ 
 
-lower_block_3_4 <-  fun_lower_block(country = "Malta",
-                                    36.11205138041496, 14.109153467789213,
-                                    35.749543918885365, 14.641990358572649,
-                                    ratio_h_over_w = 0.66/0.82) +  
-  theme(aspect.ratio = 1)
+lower_block_3_4 <- fun_lower_block(country = "Malta",
+                  36.11205138041496, 14.109153467789213,
+                  35.749543918885365, 14.641990358572649,
+                  ratio_h_over_w = 0.66/0.82) + 
+ theme(aspect.ratio = 1)
 
 
-lower_block_3_5 <-  fun_lower_block(country = "Singapore",
-                                    1.562021407805435, 103.52835737520651, 
-                                    1.1508368937798996, 104.17655070980254,
-                                    ratio_h_over_w = 0.8/0.82) 
+lower_block_3_5 <- fun_lower_block(country = "Singapore",
+                  1.562021407805435, 103.52835737520651, 
+                  1.1508368937798996, 104.17655070980254,
+                  ratio_h_over_w = 0.8/0.82) 
 
 
 lower_block_3a <- cowplot::plot_grid(lower_block_3_1,
-                                     lower_block_3_2,
-                                    
-                                     rel_heights  = c(1.1,1.72),
-                                     rel_widths = c(1.1,1),
-                                     align='h',
-                                     nrow= 2,
-                                     axis='t') 
+                   lower_block_3_2,
+                  
+                   rel_heights = c(1.1,1.72),
+                   rel_widths = c(1.1,1),
+                   align='h',
+                   nrow= 2,
+                   axis='t') 
 
 lower_block_3b <- cowplot::plot_grid(lower_block_3_3,
-                                     lower_block_3_4,
-                                     lower_block_3_5,
-                                     rel_heights  = c(1,
-                                                      0.8,
-                                                      0.8),
-                                     rel_widths = c(1,1,1),
-                                     align='h',
-                                     nrow= 3,
-                                     axis='t') 
+                   lower_block_3_4,
+                   lower_block_3_5,
+                   rel_heights = c(1,
+                           0.8,
+                           0.8),
+                   rel_widths = c(1,1,1),
+                   align='h',
+                   nrow= 3,
+                   axis='t') 
 
 lower_block_3 <- cowplot::plot_grid(lower_block_3a,
-                                    lower_block_3b,
-                                    rel_widths =  c(0.89,0.82),
-                                    rel_heights = c(1,1),
-                                    align='h',
-                                    ncol= 2,
-                                    axis='t') 
+                  lower_block_3b,
+                  rel_widths = c(0.89,0.82),
+                  rel_heights = c(1,1),
+                  align='h',
+                  ncol= 2,
+                  axis='t') 
 
 # print(lower_block_3)
 
@@ -1564,88 +1536,88 @@ lower_block_3 <- cowplot::plot_grid(lower_block_3a,
 
 ## Fourth block: Balkans
 
-lower_block_4 <-  fun_lower_block(country = "all",
-                                  51.618805792153864, 32.14547175934774, 
-                                  35.76671479197162, 12.574073798467166, 
-                                  label = "Balkan Peninsula",
-                                  ratio_h_over_w = 2.47/2.75) +
-  theme(aspect.ratio = 1)
+lower_block_4 <- fun_lower_block(country = "all",
+                 51.618805792153864, 32.14547175934774, 
+                 35.76671479197162, 12.574073798467166, 
+                 label = "Balkan Peninsula",
+                 ratio_h_over_w = 2.47/2.75) +
+ theme(aspect.ratio = 1)
 
 # print(lower_block_4)
 
 ## Fifth block: Pacific Islands
-lower_block_5_1 <-  fun_lower_block(country = "Marshall Islands",
-                                    7.271576767058141, 170.97346175839462,
-                                    7.0021405106753924, 171.43254628562116,
-                                  label = "Marshall Isl",
-                                  ratio_h_over_w = 0.67/0.72) 
+lower_block_5_1 <- fun_lower_block(country = "Marshall Islands",
+                  7.271576767058141, 170.97346175839462,
+                  7.0021405106753924, 171.43254628562116,
+                 label = "Marshall Isl",
+                 ratio_h_over_w = 0.67/0.72) 
 
-lower_block_5_2 <-  fun_lower_block(country = "Solomon Islands",
-                                    -6.19982314293495, 156.2033043837379,
-                                    -12.305942792508677, 162.7810192195895,
-                                    label = "Solomon Isl",
-                                    ratio_h_over_w = 0.43/0.72) 
+lower_block_5_2 <- fun_lower_block(country = "Solomon Islands",
+                  -6.19982314293495, 156.2033043837379,
+                  -12.305942792508677, 162.7810192195895,
+                  label = "Solomon Isl",
+                  ratio_h_over_w = 0.43/0.72) 
 
-lower_block_5_3 <-  fun_lower_block(country = "Vanuatu",
-                                    -12.522849273606965, 164.09680570696634,
-                                    -21.865505295764667, 170.85928793776827,
-                                    ratio_h_over_w = 0.43/0.72) 
+lower_block_5_3 <- fun_lower_block(country = "Vanuatu",
+                  -12.522849273606965, 164.09680570696634,
+                  -21.865505295764667, 170.85928793776827,
+                  ratio_h_over_w = 0.43/0.72) 
 
-lower_block_5_4 <-  fun_lower_block(country = "Fiji",
-                                    -16.016715539187006, 177.43916612705263,
-                                    -19.202928284064122, 180,
-                                    ratio_h_over_w = 0.55/0.72) 
+lower_block_5_4 <- fun_lower_block(country = "Fiji",
+                  -16.016715539187006, 177.43916612705263,
+                  -19.202928284064122, 180,
+                  ratio_h_over_w = 0.55/0.72) 
 
-lower_block_5_5 <-  fun_lower_block(country = "Kiribati",
-                                    1.6783742083055109, 172.8245591145513,
-                                    1.2886789414361417, 173.1873840281737,
-                                    ratio_h_over_w = 0.67/0.69) 
+lower_block_5_5 <- fun_lower_block(country = "Kiribati",
+                  1.6783742083055109, 172.8245591145513,
+                  1.2886789414361417, 173.1873840281737,
+                  ratio_h_over_w = 0.67/0.69) 
 
-lower_block_5_6 <-  fun_lower_block(country = "Federated States of Micronesia",
-                                    7.123620054481302, 157.66021976354537,
-                                    6.527385048863808, 158.46395741107983,
-                                    label = "FSM",
-                                    ratio_h_over_w = 0.43/0.69) 
+lower_block_5_6 <- fun_lower_block(country = "Federated States of Micronesia",
+                  7.123620054481302, 157.66021976354537,
+                  6.527385048863808, 158.46395741107983,
+                  label = "FSM",
+                  ratio_h_over_w = 0.43/0.69) 
 
-lower_block_5_7 <-  fun_lower_block(country = "Samoa",
-                                   -13.245725830105162, -173.15052189891833,
-                                   -14.849661425405092, -171.1345307337241,
-                                    ratio_h_over_w = 0.43/0.69) 
+lower_block_5_7 <- fun_lower_block(country = "Samoa",
+                  -13.245725830105162, -173.15052189891833,
+                  -14.849661425405092, -171.1345307337241,
+                  ratio_h_over_w = 0.43/0.69) 
 
-lower_block_5_8 <-  fun_lower_block(country = "Tonga",
-                                    -20.999167868460994, -175.48041913403475,
-                                    -21.50983734571705, -174.8335990873945,
-                                    ratio_h_over_w = 0.55/0.69) 
+lower_block_5_8 <- fun_lower_block(country = "Tonga",
+                  -20.999167868460994, -175.48041913403475,
+                  -21.50983734571705, -174.8335990873945,
+                  ratio_h_over_w = 0.55/0.69) 
 
 
 lower_block_5a <- cowplot::plot_grid(lower_block_5_1,
-                                     lower_block_5_2,
-                                     lower_block_5_3,
-                                     lower_block_5_4,
-                                    rel_heights  = c(0.67,0.43,
-                                                     0.43, 0.55),
-                                    rel_widths = c(1,1,1,1),
-                                    align='h',
-                                    nrow= 4,
-                                    axis='t') 
+                   lower_block_5_2,
+                   lower_block_5_3,
+                   lower_block_5_4,
+                  rel_heights = c(0.67,0.43,
+                           0.43, 0.55),
+                  rel_widths = c(1,1,1,1),
+                  align='h',
+                  nrow= 4,
+                  axis='t') 
 lower_block_5b <- cowplot::plot_grid(lower_block_5_5,
-                                     lower_block_5_6,
-                                     lower_block_5_7,
-                                     lower_block_5_8,
-                                     rel_heights  = c(0.67,0.43,
-                                                      0.43, 0.55),
-                                     rel_widths = c(1,1,1,1),
-                                     align='h',
-                                     nrow= 4,
-                                     axis='t') 
+                   lower_block_5_6,
+                   lower_block_5_7,
+                   lower_block_5_8,
+                   rel_heights = c(0.67,0.43,
+                           0.43, 0.55),
+                   rel_widths = c(1,1,1,1),
+                   align='h',
+                   nrow= 4,
+                   axis='t') 
 
 lower_block_5 <- cowplot::plot_grid(lower_block_5a,
-                                    lower_block_5b,
-                                    rel_widths =  c(0.72,0.69),
-                                    rel_heights = c(1,1),
-                                    align='h',
-                                    ncol= 2,
-                                     axis='t') 
+                  lower_block_5b,
+                  rel_widths = c(0.72,0.69),
+                  rel_heights = c(1,1),
+                  align='h',
+                  ncol= 2,
+                   axis='t') 
 
 # print(lower_block_5)
 
@@ -1653,30 +1625,30 @@ lower_block_5 <- cowplot::plot_grid(lower_block_5a,
 ### Joining all blocks together
 
 main_map_lower <- cowplot::plot_grid(lower_block_1,
-                                     lower_block_2,
-                                     lower_block_3,
-                                     lower_block_4,
-                                     lower_block_5,
-                                     rel_widths = c(3.32,
-                                                    3.24,
-                                                    2,
-                                                    2.73,
-                                                    1.83),
-                                     rel_heights = c(1,1,1,1,1),
-                                     align='h', 
-                                     ncol=5, 
-                                     axis='t') 
+                   lower_block_2,
+                   lower_block_3,
+                   lower_block_4,
+                   lower_block_5,
+                   rel_widths = c(3.32,
+                          3.24,
+                          2,
+                          2.73,
+                          1.83),
+                   rel_heights = c(1,1,1,1,1),
+                   align='h', 
+                   ncol=5, 
+                   axis='t') 
 
 ### Joining upper and lower blocks together
 
 main_map_combined <- cowplot::plot_grid(main_map_upper,
-                                        main_map_lower,
-                                        rel_heights = c(5.9, 
-                                                        2.7),
-                                        rel_widths = c(1.2,1),
-                                        align='v', 
-                                        nrow = 2,
-                                        axis='l')
+                    main_map_lower,
+                    rel_heights = c(5.9, 
+                            2.7),
+                    rel_widths = c(1.2,1),
+                    align='v', 
+                    nrow = 2,
+                    axis='l')
 main_map_combined
 
 ```
@@ -1686,15 +1658,15 @@ main_map_combined
 \end{raggedright}
 
 
-```{r figure_gbd_adjusted, include = TRUE, echo=FALSE, warnings = FALSE, fig.scap="DALYs, YLDs, YLLs, and deaths attributable to mental disorders in 2019, by estimation approach, per 100,000 population.", out.extra='', fig.cap=paste0("\\label{figure_gbd_adjusted}DALYs, YLDs, YLLs, and deaths attributable to mental disorders in 2019, by estimation approach, per 100,000 population. Values are aggregated by GBD region. DALYs: Disability-adjusted life years; YLDs: years lived with disability; YLLs: years of life lost; GBD: Global Burden of Disease."), fig.width = 11, fig.height = 11, fig.align='center', out.width = '97%'}
+```{r figure_gbd_adjusted, include = TRUE, echo=FALSE, warnings = FALSE, fig.scap="DALYs, YLDs, YLLs, and deaths attributable to mental disorders in 2019, by estimation approach, per 100,000 population.", out.extra='', fig.cap=paste0("\\label{figure_gbd_adjusted}DALYs, YLDs, YLLs, and deaths attributable to mental disorders in 2019, by estimation approach, per 100,000 population. Values are aggregated by GBD region. DALYs: Disability-adjusted life years. YLDs: years lived with disability. YLLs: years of life lost. GBD: Global Burden of Disease."), fig.width = 11, fig.height = 11, fig.align='center', out.width = '97%'}
 
 # Figure 1
 sf_use_s2(FALSE)
 
 
 data_temporary <- data_rev_map %>% 
-  filter(estimate_id %in%  c(1,2,4)) %>%
-  st_drop_geometry() 
+ filter(estimate_id %in% c(1,2,4)) %>%
+ st_drop_geometry() 
 
 world_map <- ne_countries(scale = "large", returnclass = "sf")
 # world <- ne_countries(scale = "medium", returnclass = "sf")
@@ -1708,263 +1680,262 @@ j = 1
 
 
 temp <- data_rev_map %>% 
-  filter(measure_id == j) %>% 
-  filter(estimate_id %in%  c(1,2,4))
+ filter(measure_id == j) %>% 
+ filter(estimate_id %in% c(1,2,4))
 
 deaths <- data_rev_map %>% 
-  filter(measure_id == j) %>% 
-  filter(estimate_id %in%  c(1,2,4)) %>% 
-  mutate(var_cut = cut(ihme_region_rate_per_100k, 
-                       breaks =c(0, 1, 20, 40, 60, 80, 100, 120, 130, 140, max(temp$ihme_region_rate_per_100k)))) %>%
-  ggplot() +
-  geom_sf(mapping = aes(fill = var_cut), color = "grey95", size = 0.001) +
-  geom_sf(data = . %>%   group_by(ihme_region) %>% 
-            st_make_valid() %>% 
-            summarize(geometry = st_union(geometry)), fill = "transparent", color = 'black', size = 0.02) +
-  theme(panel.grid.major = element_blank(), 
-        panel.background = element_blank(),
-        axis.title = element_blank(), 
-        axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        text = element_text(family = "Source Sans Pro")) + 
-  labs(subtitle = "D: Deaths",
-    fill=
-      ifelse(j == 1,ifelse(k == "rate_per_100k", "Deaths", "% of deaths"),
-             ifelse(j == 2, ifelse(k == "rate_per_100k", "DALYs", "% of DALYs"),
-                    ifelse(j == 3, ifelse(k == "rate_per_100k", "YLDs", "% of YLDs"), 
-                           ifelse(k == "rate_per_100k", "YLLs", "% of YLLs"))))) +
-  scale_fill_manual(values=setNames(lancet_pal, levels(data_rev_map$var_cut))) +
-  coord_sf(ndiscr = F) + 
-  facet_grid(~estimate_newlab) +
-  theme(legend.position = "bottom",
-        legend.title = element_text(size = 11),
-        legend.text =  element_text(size = 10),
-        plot.subtitle=element_text(size=15),
-        text = element_text(family = "Source Sans Pro"),
-        strip.background = element_rect(colour="white",
-                                        fill="white")
-        ,
-        strip.text = element_text(size=14)
-  ) +
-  guides(fill = guide_legend(override.aes =
-                               list(size = 0.5),
-                             nrow = 1, 
-                             byrow = TRUE))
-  
-  
+ filter(measure_id == j) %>% 
+ filter(estimate_id %in% c(1,2,4)) %>% 
+ mutate(var_cut = cut(ihme_region_rate_per_100k, 
+            breaks =c(0, 1, 20, 40, 60, 80, 100, 120, 130, 140, max(temp$ihme_region_rate_per_100k)))) %>%
+ ggplot() +
+ geom_sf(mapping = aes(fill = var_cut), color = "grey95", size = 0.001) +
+ geom_sf(data = . %>%  group_by(ihme_region) %>% 
+      st_make_valid() %>% 
+      summarize(geometry = st_union(geometry)), fill = "transparent", color = 'black', size = 0.02) +
+ theme(panel.grid.major = element_blank(), 
+    panel.background = element_blank(),
+    axis.title = element_blank(), 
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    text = element_text(family = "Source Sans Pro")) + 
+ labs(subtitle = "D: Deaths",
+  fill=
+   ifelse(j == 1,ifelse(k == "rate_per_100k", "Deaths", "% of deaths"),
+       ifelse(j == 2, ifelse(k == "rate_per_100k", "DALYs", "% of DALYs"),
+          ifelse(j == 3, ifelse(k == "rate_per_100k", "YLDs", "% of YLDs"), 
+              ifelse(k == "rate_per_100k", "YLLs", "% of YLLs"))))) +
+ scale_fill_manual(values=setNames(lancet_pal, levels(data_rev_map$var_cut))) +
+ coord_sf(ndiscr = F) + 
+ facet_grid(~estimate_newlab) +
+ theme(legend.position = "bottom",
+    legend.title = element_text(size = 11),
+    legend.text = element_text(size = 10),
+    plot.subtitle=element_text(size=15),
+    text = element_text(family = "Source Sans Pro"),
+    strip.background = element_rect(colour="white",
+                    fill="white")
+    ,
+    strip.text = element_text(size=14)
+ ) +
+ guides(fill = guide_legend(override.aes =
+                list(size = 0.5),
+               nrow = 1, 
+               byrow = TRUE))
+ 
+ 
 
 j = 2 
 
 temp <- data_rev_map %>% 
-  filter(measure_id == j) %>% 
-  filter(estimate_id %in%  c(1,2,4))
+ filter(measure_id == j) %>% 
+ filter(estimate_id %in% c(1,2,4))
 
 dalys <- data_rev_map %>% 
-  filter(measure_id == j) %>% 
-  filter(estimate_id %in%  c(1,2,4)) %>% 
-  mutate(var_cut = cut(ihme_region_rate_per_100k/1000, 
-                       breaks =c(1, 1.5,
-                                 2, 2.5, 3, 4, 5, 6, 7, 7.5, 
-                                 max(temp$ihme_region_rate_per_100k)/1000))) %>% 
-  ggplot() +
-  geom_sf(mapping = aes(fill = var_cut), color = "grey95", size = 0.001) +
-  geom_sf(data = . %>%   group_by(ihme_region) %>% 
-            st_make_valid() %>% 
-            summarize(geometry = st_union(geometry)), fill = "transparent", color = 'black', size = 0.02) +
-  theme(panel.grid.major = element_blank(), 
-        panel.background = element_blank(),
-        axis.title = element_blank(), 
-        axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        text = element_text(family = "Source Sans Pro")) + 
-  labs(subtitle = "A: Disability-adjusted life years",
-       fill=
-         ifelse(j == 1,ifelse(k == "rate_per_100k", "Deaths", "% of deaths"),
-                ifelse(j == 2, ifelse(k == "rate_per_100k", "DALYs, thousands", "% of DALYs"),
-                       ifelse(j == 3, ifelse(k == "rate_per_100k", "YLDs, thousands", "% of YLDs"), 
-                              ifelse(k == "rate_per_100k", "YLLs, thousands", "% of YLLs"))))) +
-  scale_fill_manual(values=setNames(lancet_pal, levels(data_rev_map$var_cut))) +
-  coord_sf(ndiscr = F) + 
-  facet_grid(~estimate_newlab) +
-  theme(legend.position = "bottom",
-        legend.title = element_text(size = 11),
-        legend.text =  element_text(size = 10),
-        plot.subtitle=element_text(size=15),
-        text = element_text(family = "Source Sans Pro"),
-        strip.background = element_rect(colour="white",
-                                        fill="white")
-        ,
-        strip.text = element_text(size=14)
-  ) +
-  guides(fill = guide_legend(override.aes =
-                               list(size = 0.5),
-                             nrow = 1, 
-                             byrow = TRUE))
+ filter(measure_id == j) %>% 
+ filter(estimate_id %in% c(1,2,4)) %>% 
+ mutate(var_cut = cut(ihme_region_rate_per_100k/1000, 
+            breaks =c(1, 1.5,
+                 2, 2.5, 3, 4, 5, 6, 7, 7.5, 
+                 max(temp$ihme_region_rate_per_100k)/1000))) %>% 
+ ggplot() +
+ geom_sf(mapping = aes(fill = var_cut), color = "grey95", size = 0.001) +
+ geom_sf(data = . %>%  group_by(ihme_region) %>% 
+      st_make_valid() %>% 
+      summarize(geometry = st_union(geometry)), fill = "transparent", color = 'black', size = 0.02) +
+ theme(panel.grid.major = element_blank(), 
+    panel.background = element_blank(),
+    axis.title = element_blank(), 
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    text = element_text(family = "Source Sans Pro")) + 
+ labs(subtitle = "A: Disability-adjusted life years",
+    fill=
+     ifelse(j == 1,ifelse(k == "rate_per_100k", "Deaths", "% of deaths"),
+        ifelse(j == 2, ifelse(k == "rate_per_100k", "DALYs, thousands", "% of DALYs"),
+            ifelse(j == 3, ifelse(k == "rate_per_100k", "YLDs, thousands", "% of YLDs"), 
+               ifelse(k == "rate_per_100k", "YLLs, thousands", "% of YLLs"))))) +
+ scale_fill_manual(values=setNames(lancet_pal, levels(data_rev_map$var_cut))) +
+ coord_sf(ndiscr = F) + 
+ facet_grid(~estimate_newlab) +
+ theme(legend.position = "bottom",
+    legend.title = element_text(size = 11),
+    legend.text = element_text(size = 10),
+    plot.subtitle=element_text(size=15),
+    text = element_text(family = "Source Sans Pro"),
+    strip.background = element_rect(colour="white",
+                    fill="white")
+    ,
+    strip.text = element_text(size=14)
+ ) +
+ guides(fill = guide_legend(override.aes =
+                list(size = 0.5),
+               nrow = 1, 
+               byrow = TRUE))
 
 j = 3
 
 temp <- data_rev_map %>% 
-  filter(measure_id == j) %>% 
-  filter(estimate_id %in%  c(1,2,4))
+ filter(measure_id == j) %>% 
+ filter(estimate_id %in% c(1,2,4))
 
 ylds <- data_rev_map %>% 
-  filter(measure_id == j) %>% 
-  filter(estimate_id %in%  c(1,2,4)) %>% 
-  mutate(var_cut = cut(ihme_region_rate_per_100k/1000, 
-                       breaks =c(1, 1.25, 1.5,
-                                 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 
-                                 max(temp$ihme_region_rate_per_100k)/1000))) %>% 
-  ggplot() +
-  geom_sf(mapping = aes(fill = var_cut), color = "grey95", size = 0.001) +
-  geom_sf(data = . %>%   group_by(ihme_region) %>% 
-            st_make_valid() %>% 
-            summarize(geometry = st_union(geometry)), fill = "transparent", color = 'black', size = 0.02) +
-  theme(panel.grid.major = element_blank(), 
-        panel.background = element_blank(),
-        axis.title = element_blank(), 
-        axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        text = element_text(family = "Source Sans Pro")) + 
-  labs(subtitle = "B: Years lived with disability",
-       fill=
-         ifelse(j == 1,ifelse(k == "rate_per_100k", "Deaths", "% of deaths"),
-                ifelse(j == 2, ifelse(k == "rate_per_100k", "DALYs, thousands", "% of DALYs"),
-                       ifelse(j == 3, ifelse(k == "rate_per_100k", "YLDs, thousands", "% of YLDs"), 
-                              ifelse(k == "rate_per_100k", "YLLs, thousands", "% of YLLs"))))) +
-  scale_fill_manual(values=setNames(lancet_pal, levels(data_rev_map$var_cut))) +
-  coord_sf(ndiscr = F) + 
-  facet_grid(~estimate_newlab) +
-  theme(legend.position = "bottom",
-        legend.title = element_text(size = 11),
-        legend.text =  element_text(size = 10),
-        plot.subtitle=element_text(size=15),
-        text = element_text(family = "Source Sans Pro"),
-        strip.background = element_rect(colour="white",
-                                        fill="white")
-        ,
-        strip.text = element_text(size=14)
-  ) +
-  guides(fill = guide_legend(override.aes =
-                               list(size = 0.5),
-                             nrow = 1, 
-                             byrow = TRUE))
+ filter(measure_id == j) %>% 
+ filter(estimate_id %in% c(1,2,4)) %>% 
+ mutate(var_cut = cut(ihme_region_rate_per_100k/1000, 
+            breaks =c(1, 1.25, 1.5,
+                 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 
+                 max(temp$ihme_region_rate_per_100k)/1000))) %>% 
+ ggplot() +
+ geom_sf(mapping = aes(fill = var_cut), color = "grey95", size = 0.001) +
+ geom_sf(data = . %>%  group_by(ihme_region) %>% 
+      st_make_valid() %>% 
+      summarize(geometry = st_union(geometry)), fill = "transparent", color = 'black', size = 0.02) +
+ theme(panel.grid.major = element_blank(), 
+    panel.background = element_blank(),
+    axis.title = element_blank(), 
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    text = element_text(family = "Source Sans Pro")) + 
+ labs(subtitle = "B: Years lived with disability",
+    fill=
+     ifelse(j == 1,ifelse(k == "rate_per_100k", "Deaths", "% of deaths"),
+        ifelse(j == 2, ifelse(k == "rate_per_100k", "DALYs, thousands", "% of DALYs"),
+            ifelse(j == 3, ifelse(k == "rate_per_100k", "YLDs, thousands", "% of YLDs"), 
+               ifelse(k == "rate_per_100k", "YLLs, thousands", "% of YLLs"))))) +
+ scale_fill_manual(values=setNames(lancet_pal, levels(data_rev_map$var_cut))) +
+ coord_sf(ndiscr = F) + 
+ facet_grid(~estimate_newlab) +
+ theme(legend.position = "bottom",
+    legend.title = element_text(size = 11),
+    legend.text = element_text(size = 10),
+    plot.subtitle=element_text(size=15),
+    text = element_text(family = "Source Sans Pro"),
+    strip.background = element_rect(colour="white",
+                    fill="white")
+    ,
+    strip.text = element_text(size=14)
+ ) +
+ guides(fill = guide_legend(override.aes =
+                list(size = 0.5),
+               nrow = 1, 
+               byrow = TRUE))
 
 
 j = 4
 
 temp <- data_rev_map %>% 
-  filter(measure_id == j) %>% 
-  filter(estimate_id %in%  c(1,2,4))
+ filter(measure_id == j) %>% 
+ filter(estimate_id %in% c(1,2,4))
 
 ylls <- data_rev_map %>% 
-  filter(measure_id == j) %>% 
-  filter(estimate_id %in%  c(1,2,4)) %>% 
-  mutate(var_cut = cut(ihme_region_rate_per_100k/1000, 
-                       breaks =c(0, 0.25, 0.5, 0.75, 1, 1.5,
-                                 2, 2.5, 3, 3.5, 
-                                 max(temp$ihme_region_rate_per_100k)/1000))) %>% 
-  ggplot() +
-  geom_sf(mapping = aes(fill = var_cut), color = "grey95", size = 0.001) +
-  geom_sf(data = . %>%   group_by(ihme_region) %>% 
-            st_make_valid() %>% 
-            summarize(geometry = st_union(geometry)), fill = "transparent", color = 'black', size = 0.02) +
-  theme(panel.grid.major = element_blank(), 
-        panel.background = element_blank(),
-        axis.title = element_blank(), 
-        axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        text = element_text(family = "Source Sans Pro")) + 
-  labs(subtitle = "C: Years of life lost",
-       fill=
-         ifelse(j == 1,ifelse(k == "rate_per_100k", "Deaths", "% of deaths"),
-                ifelse(j == 2, ifelse(k == "rate_per_100k", "DALYs, thousands", "% of DALYs"),
-                       ifelse(j == 3, ifelse(k == "rate_per_100k", "YLDs, thousands", "% of YLDs"), 
-                              ifelse(k == "rate_per_100k", "YLLs, thousands", "% of YLLs"))))) +
-  scale_fill_manual(values=setNames(lancet_pal, levels(data_rev_map                 $var_cut))) +
-  coord_sf(ndiscr = F) + 
-  facet_grid(~estimate_newlab) +
-  theme(legend.position = "bottom",
-        legend.title = element_text(size = 11),
-        legend.text =  element_text(size = 10),
-        plot.subtitle=element_text(size=15),
-        text = element_text(family = "Source Sans Pro"),
-        strip.background = element_rect(colour="white",
-                                        fill="white")
-         ,
-         strip.text = element_text(size=14)
-  ) +
-  guides(fill = guide_legend(override.aes =
-                               list(size = 0.5),
-                             nrow = 1, 
-                             byrow = TRUE))
+ filter(measure_id == j) %>% 
+ filter(estimate_id %in% c(1,2,4)) %>% 
+ mutate(var_cut = cut(ihme_region_rate_per_100k/1000, 
+            breaks =c(0, 0.25, 0.5, 0.75, 1, 1.5,
+                 2, 2.5, 3, 3.5, 
+                 max(temp$ihme_region_rate_per_100k)/1000))) %>% 
+ ggplot() +
+ geom_sf(mapping = aes(fill = var_cut), color = "grey95", size = 0.001) +
+ geom_sf(data = . %>%  group_by(ihme_region) %>% 
+      st_make_valid() %>% 
+      summarize(geometry = st_union(geometry)), fill = "transparent", color = 'black', size = 0.02) +
+ theme(panel.grid.major = element_blank(), 
+    panel.background = element_blank(),
+    axis.title = element_blank(), 
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    text = element_text(family = "Source Sans Pro")) + 
+ labs(subtitle = "C: Years of life lost",
+    fill=
+     ifelse(j == 1,ifelse(k == "rate_per_100k", "Deaths", "% of deaths"),
+        ifelse(j == 2, ifelse(k == "rate_per_100k", "DALYs, thousands", "% of DALYs"),
+            ifelse(j == 3, ifelse(k == "rate_per_100k", "YLDs, thousands", "% of YLDs"), 
+               ifelse(k == "rate_per_100k", "YLLs, thousands", "% of YLLs"))))) +
+ scale_fill_manual(values=setNames(lancet_pal, levels(data_rev_map         $var_cut))) +
+ coord_sf(ndiscr = F) + 
+ facet_grid(~estimate_newlab) +
+ theme(legend.position = "bottom",
+    legend.title = element_text(size = 11),
+    legend.text = element_text(size = 10),
+    plot.subtitle=element_text(size=15),
+    text = element_text(family = "Source Sans Pro"),
+    strip.background = element_rect(colour="white",
+                    fill="white")
+     ,
+     strip.text = element_text(size=14)
+ ) +
+ guides(fill = guide_legend(override.aes =
+                list(size = 0.5),
+               nrow = 1, 
+               byrow = TRUE))
 
 
 ggarrange(dalys, ylds, ylls, deaths, 
-          ncol = 1, nrow = 4)
+     ncol = 1, nrow = 4)
 
 ggsave(filename = paste0("Figure_1.png"), 
-       plot = last_plot(), 
-       path = resultspath)
-       
-       # ,
-       # width = 1689,
-       # height = 1153,
-       # units = "px",
-       # dpi = 320)
+    plot = last_plot(), 
+    path = resultspath)
+    
+    # ,
+    # width = 1689,
+    # height = 1153,
+    # units = "px",
+    # dpi = 320)
 
 
 ```
 
 
-```{r figure_cost_by_region, fig.width = 8, fig.height = 6, fig.align='center', out.width = '95%',  fig.scap="Economic burden of mental disorders, as a percent of GDP.", out.extra='', fig.cap="\\label{figure_cost_by_region}Economic burden of mental disorders, as a percent of GDP. The economic value is determined by using GDP per capita (USD 2019) as the value of a DALY. Values are aggregated by GBD region. GDP: gross domestic product; USD: United States dollar; DALY: disability-adjusted life year; GBD: Global Burden of Disease.", echo = FALSE, include = TRUE}
+```{r figure_cost_by_region, fig.width = 8, fig.height = 6, fig.align='center', out.width = '95%', fig.scap="Economic burden of mental disorders, as a percent of GDP.", out.extra='', fig.cap="\\label{figure_cost_by_region}Economic burden of mental disorders, as a percent of GDP. The economic value is determined by using GDP per capita (USD 2019) as the value of a DALY. Values are aggregated by GBD region. GDP: gross domestic product. USD: United States dollar. DALY: disability-adjusted life year. GBD: Global Burden of Disease.", echo = FALSE, include = TRUE}
 
 l = "cost_who1"
 m = "abs"
 i = "ihme_region"
 
-
 data_rev %>%
-  filter(numeric_name == "val") %>%
-  {if(i == "who_region") select(.,measure_id,estimate, estimate_id,estimate_newlab,  who_region, who_region_pop100k:who_region_cost_who2_diff)
-    else select(.,measure_id, estimate, estimate_id, estimate_newlab, ihme_region, ihme_region_pop100k:ihme_region_cost_who2_diff)} %>% unique %>%
-  filter(measure_id== "2") %>%
-  filter(estimate_id %in%  c(ifelse(m =="diff","",1), 2,4)) %>%
-  filter(!is.na(get(i))) %>%
-  mutate(region = factor(get(i) , levels =  get(paste0(i,"_positions")))) %>%
-  ggplot(aes(y = region, fill=region, x=get(paste0(i,"_",l,ifelse(m =="diff", "_diff","")))/ get(paste0(i,"_","gdp")) * 100)) +
-  geom_bar(stat="identity") +
-  labs(x="% of GDP") +
-  facet_wrap(~estimate_newlab) +
-  geom_text(aes(label=round(get(paste0(i,"_",l,ifelse(m =="diff", "_diff","")))/ get(paste0(i,"_","gdp"))
-                            * 100,1)),
-            position=position_dodge(width=0.9),
-            hjust=-0.25, color="grey10",
-            size = 3,
-            family = "Source Sans Pro") +
-  scale_fill_manual(name = "Region", values = get(paste0(i,"_pal"))) +
-  scale_x_continuous(expand = expansion(mult = c(0, .1)), limits = c(0,8)) +
-  geom_vline(xintercept = 0, size = 0.25)+
-  theme(panel.grid.major.x =  element_line(color = "grey90",
-                                           linewidth = 0.15,
-                                           linetype = "dashed"),
-        panel.background = element_blank(),
-        axis.line=element_line(size = 0.2),
-        axis.line.y=element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.ticks.x = element_line(linewidth = 0.2),
-        axis.title.y = element_blank(),
-        # axis.text.y = element_blank(),
-        legend.position = "none",
-        text = element_text(family = "Source Sans Pro"),
-        strip.background = element_rect(colour="white",
-                                        fill="white"),
-        strip.text = element_text(size=10))
+ filter(numeric_name == "val") %>%
+ {if(i == "who_region") select(.,measure_id,estimate, estimate_id,estimate_newlab, who_region, who_region_pop100k:who_region_cost_who2_diff)
+  else select(.,measure_id, estimate, estimate_id, estimate_newlab, ihme_region, ihme_region_pop100k:ihme_region_cost_who2_diff)} %>% unique %>%
+ filter(measure_id== "2") %>%
+ filter(estimate_id %in% c(ifelse(m =="diff","",1), 2,4)) %>%
+ filter(!is.na(get(i))) %>%
+ mutate(region = factor(get(i) , levels = get(paste0(i,"_positions")))) %>%
+ ggplot(aes(y = region, fill=region, x=get(paste0(i,"_",l,ifelse(m =="diff", "_diff","")))/ get(paste0(i,"_","gdp")) * 100)) +
+ geom_bar(stat="identity") +
+ labs(x="% of GDP") +
+ facet_wrap(~estimate_newlab) +
+ geom_text(aes(label=round(get(paste0(i,"_",l,ifelse(m =="diff", "_diff","")))/ get(paste0(i,"_","gdp"))
+              * 100,1)),
+      position=position_dodge(width=0.9),
+      hjust=-0.25, color="grey10",
+      size = 3,
+      family = "Source Sans Pro") +
+ scale_fill_manual(name = "Region", values = get(paste0(i,"_pal"))) +
+ scale_x_continuous(expand = expansion(mult = c(0, .1)), limits = c(0,8)) +
+ geom_vline(xintercept = 0, size = 0.25)+
+ theme(panel.grid.major.x = element_line(color = "grey90",
+                      linewidth = 0.15,
+                      linetype = "dashed"),
+    panel.background = element_blank(),
+    axis.line=element_line(size = 0.2),
+    axis.line.y=element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.ticks.x = element_line(linewidth = 0.2),
+    axis.title.y = element_blank(),
+    # axis.text.y = element_blank(),
+    legend.position = "none",
+    text = element_text(family = "Source Sans Pro"),
+    strip.background = element_rect(colour="white",
+                    fill="white"),
+    strip.text = element_text(size=10))
 
 
 ggsave(filename = paste0("Figure_2.png"),
-       path = resultspath,
-       width = 8,
-       height = 6)
+    path = resultspath,
+    width = 8,
+    height = 6)
 
 
 
@@ -2001,7 +1972,11 @@ We thank David Bloom, Goodarz Danaei, and Daniel Vicente Vigo for their feedback
 
 ### Author contributions
 
-All authors contributed to study conception, methodology, and interpretation. DA oversaw data acquisition, programming, formal analysis, visualization, the first draft of the manuscript. All authors contributed to critical revision of the manuscript, with responses to reviewers and subsequent revisions led by DA. All authors had access to and verified all the data and accept responsibility for the decision to submit for publication.
+All authors contributed to study conception, methodology, and interpretation. DA oversaw data acquisition, programming, formal analysis, visualization, and the first draft of the manuscript. All authors contributed to critical revision of the manuscript, with responses to reviewers and subsequent revisions led by DA. 
+
+### Funding statement
+
+This study received no funding.
 
 ### Declaration of interests
 
@@ -2011,7 +1986,6 @@ We declare no competing interests.
 
 GBD estimates are available for download from the Global Health Data Exchange and are available freely for non-commercial users under the Open Data Commons Attribution License (https://ghdx.healthdata.org/gbd-2019). All codes used for the analysis in this article are available on GitHub (https://github.com/darias5/gmh_econ).
 
-\newpage
 
 
 

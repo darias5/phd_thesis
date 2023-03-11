@@ -213,14 +213,14 @@ ifelse(require("RPushbullet") == TRUE,
        "")
 
 n_facilities_name <- data_mh %>% dplyr::select(clinic_name) %>% unique %>% nrow()
-n_facilities <- data_mh %>% unique %>% nrow()
+n_facilities_overall <- data_mh %>% unique %>% nrow()
 
 ```
 \paragraph*{Overview of Madagascar's health sector}
 
 \addcontentsline{toc}{paragraph}{Overview of Madagascar's health sector}
 
-In Madagascar, public health facilities can be broadly classified under four types:
+In Madagascar, public health facilities can broadly be classified under four types:
 
 * **Basic** health facilities (*centre santé de base*, or CSB)
 * **District** referral hospitals (*centre hospitalier de référence de district*, or CHD/CHRD)
@@ -235,12 +235,12 @@ In addition to these public facilities, private primary health facilities (*form
 
 \addcontentsline{toc}{paragraph}{Sample of health facilities}
 
-The sample of health facilities in our study was obtained from health facility data from Madagascar's *Gestion du Système d'Information Sanitaire* (GESIS). While the format of outputs from GESIS vary across years and facility type, there are four variables which uniquely identify facilities.
+The sample of health facilities in our study was obtained from health facility data from Madagascar's *Gestion du Système d'Information Sanitaire* (GESIS). While the format of outputs from GESIS varied across years and facility type, there were four variables which uniquely identified facilities.
 
-* **Region**: The region of Madagascar that contains the facility's catchment area. All facilities have a value for this variable.
-* **District**: The district of Madagascar (2nd largest administrative unit) that contains the facility's catchment area. Only district- and commune-level facilities will have a value for this variable; regional-level hospitals  have an "*NA*" for this variable.
-* **Commune**: The commune of Madagascar (3rd largest unit) that contains the facility's catchment area. District- and regional-level hospitals have an "*NA*" for this variable.
-* **FS**: The facility type and name. The facility type will typically be identified with an acronym (e.g., CSB2, CHD1, etc.), with the facility name following thereafter. The facility name will occasionally be the same as the commune, district, or region that corresponds with the facility's catchment area (e.g., CHRR Alaotra Mangoro). Some facilities are named for the village (*fokontany*) that they are located in. Other facilities are named for the groups that operate them (e.g., facilities named "EKAR" are operated by the *Eglizy Katôlika Apôstôlika Rômanina*, or the Roman Catholic Church).
+* **Region**: The region of Madagascar that contained the facility's catchment area. All facilities had a value for this variable.
+* **District**: The district of Madagascar (2nd largest administrative unit) that contained the facility's catchment area. Only district- and commune-level facilities had a value for this variable.
+* **Commune**: The commune of Madagascar (3rd largest unit) that contained the facility's catchment area. Only basic health facility had a value for this variable.
+* **FS**: The facility type and name. The facility type would typically be identified with an acronym (e.g., CSB2, CHD1, etc.), with the facility name following thereafter. The facility name would occasionally be the same as the commune, district, or region that corresponded with the facility's catchment area (e.g., CHRR Alaotra Mangoro). Some facilities were named for the village (*fokontany*) that they were located in. Other facilities were named for the groups that operated them (e.g., facilities named "EKAR" are operated by the *Eglizy Katôlika Apôstôlika Rômanina*, or the Roman Catholic Church).
 
 Before beginning to geolocate our sample, we began by identifying the unique facilities therein. At first pass, our sample included `r  prettyNum(n_facilities_name, big.mark = ",", scientific = FALSE)` uniquely named facilities. We observed, however, several instances where facilities in different regions shared the same facility name: for example, there is a CSB2 facility named "Ambalabe" in both the Sava and Atsimo Atsinanana regions, which are located at the northern and southern ends of Madagascar, respectively. 
 
@@ -276,9 +276,9 @@ duplicates <- data_mh_dup_names$clinic_name[duplicated(data_mh_dup_names$clinic_
 
 These cases indicated that identifying unique facilities would require catchment area information (as well as facility name and type) to avoid erroneously classifying unique facilities as duplicates. 
 
-Using facility name, type, and catchment area to uniquely identify facilities in our sample, we identified `r  prettyNum(n_facilities, big.mark = ",", scientific = FALSE)` unique facilities. In order to classify these facilities by type, we extracted the relevant data from the "FS' variable; in doing so, we observed slight orthographic variations in the classification of facilities types (e.g., "CSB 1" vs. "CSB1") that required standardization.
+Using facility name, type, and catchment area to uniquely identify facilities in our sample, we identified `r  prettyNum(n_facilities_overall, big.mark = ",", scientific = FALSE)` unique facilities. In order to classify these facilities by type, we extracted the relevant data from the "FS' variable; in doing so, we observed slight orthographic variations in the classification of facilities types (e.g., "CSB 1" vs. "CSB1") that required standardization.
 
-We further standardized region, district, and commune names in our sample against reference shapefiles to address variations in translation (e.g., "Atsimo" and "Sud" being the Malagasy and French words for "South"), abbreviation (e.g., "St." as an abbreviation for "Saint"), transposition (e.g., "Bevoay Beretra" transposed as "Beretra Bevoay"), accent marks (e.g., "Tovòna" vs. "Tovona"), spacing (e.g., "AmbalapaisoII" vs. "Ambalapaiso II"), separation vs. combination of names (e.g., "Tanambaovatrakaka" vs. "Tanambao Vahatrakaka"), hyphenation (e.g, "Ankiabe Salohy" and "Ankiabe-Salohy"), and spelling (e.g., "Mizilo Gare" vs.	"Mizilo Gara"). 
+We standardized region, district, and commune names in our sample against reference shapefiles to address variations in translation (e.g., "Atsimo" and "Sud" being the Malagasy and French words for "South"), abbreviation (e.g., "St." as an abbreviation for "Saint"), transposition (e.g., "Bevoay Beretra" transposed as "Beretra Bevoay"), accent marks (e.g., "Tovòna" vs. "Tovona"), spacing (e.g., "AmbalapaisoII" vs. "Ambalapaiso II"), separation vs. combination of names (e.g., "Tanambaovatrakaka" vs. "Tanambao Vahatrakaka"), hyphenation (e.g, "Ankiabe Salohy" and "Ankiabe-Salohy"), and spelling (e.g., "Mizilo Gare" vs.	"Mizilo Gara"). 
 
 
 ```{r facility-name-standardization-function_1,  warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
@@ -1505,14 +1505,9 @@ facilities_all_gps <- facilities_all_nogps[-(1:nrow(facilities_all_nogps)),]
 facilities_all_gps <- facilities_all_gps %>% mutate(source ="") %>% mutate(geometry ="")
 ```
 
-After standardizing facility types and catchment areas, the sample consisted of `r  prettyNum(n_facilities_combined, big.mark = ",", scientific = FALSE)` unique facilities. This list of facilities was then manually inspected for any remaining duplicates. From reviewing this list, we observed that in the Diana region, the regional hospitals named "Hopitaly MANARA-PENITRA" and "Hopitaly Manara-Penitra Antsiranana" are duplicates, but appear separately because the later name contains the city the hospital is located in, Antsiranana. We standardized the names of those facilities, which resolved `r  prettyNum(n_dif, big.mark = ",", scientific = FALSE)` duplicate(s).
+After standardizing facility types and catchment areas, the sample consisted of `r  prettyNum(n_facilities_combined, big.mark = ",", scientific = FALSE)` unique facilities. This list of facilities was then manually inspected for any remaining duplicates. From reviewing this list, we observed that in the Diana region, the regional hospitals named "Hopitaly MANARA-PENITRA" and "Hopitaly Manara-Penitra Antsiranana" were duplicates, but appeared separately because the latter name contained the city the hospital is located in, Antsiranana. We standardized the names of those facilities, which resolved `r  prettyNum(n_dif, big.mark = ",", scientific = FALSE)` `r ifelse(n_dif > 1, "duplicates","duplicate")`).
 
-The final sample of `r  prettyNum(n_facilities_new, big.mark = ",", scientific = FALSE)` unique facilities consisted of:
-
-*  `r  prettyNum(n_CSB +n_CSB1 +n_CSB2, big.mark = ",", scientific = FALSE)` CSB facilities, including `r  prettyNum(n_CSB1, big.mark = ",", scientific = FALSE)` CSB1s, `r  prettyNum(n_CSB2, big.mark = ",", scientific = FALSE)` CSB2s, and `r  prettyNum(n_CSB, big.mark = ",", scientific = FALSE)` of unknown level;
-*   `r  prettyNum(n_FSP, big.mark = ",", scientific = FALSE)`  FSP facilities;
-*  `r  prettyNum(n_CHD + n_CHD1 + n_CHD2, big.mark = ",", scientific = FALSE)`  district hospitals, including `r  prettyNum(n_CHD1, big.mark = ",", scientific = FALSE)` CHD1 facilities, `r  prettyNum(n_CHD2, big.mark = ",", scientific = FALSE)` CHD2 facilities, and `r  prettyNum(n_CHD, big.mark = ",", scientific = FALSE)` facilities of unknown level, and
-*  `r  prettyNum(n_CHRR +n_CHU +n_CHRRCHU, big.mark = ",", scientific = FALSE)` regional hospitals, including `r  prettyNum(n_CHRR, big.mark = ",", scientific = FALSE)` CHRRs, `r  prettyNum(n_CHU, big.mark = ",", scientific = FALSE)` CHUs, and `r  prettyNum(n_CHRRCHU, big.mark = ",", scientific = FALSE)` of unknown type.
+The final sample of `r  prettyNum(n_facilities_new, big.mark = ",", scientific = FALSE)` unique facilities consisted of:  `r  prettyNum(n_CSB +n_CSB1 +n_CSB2, big.mark = ",", scientific = FALSE)` CSB facilities, including `r  prettyNum(n_CSB1, big.mark = ",", scientific = FALSE)` CSB1s, `r  prettyNum(n_CSB2, big.mark = ",", scientific = FALSE)` CSB2s, and `r  prettyNum(n_CSB, big.mark = ",", scientific = FALSE)` of unknown level; `r  prettyNum(n_FSP, big.mark = ",", scientific = FALSE)`  FSP facilities; `r  prettyNum(n_CHD + n_CHD1 + n_CHD2, big.mark = ",", scientific = FALSE)`  district hospitals, including `r  prettyNum(n_CHD1, big.mark = ",", scientific = FALSE)` CHD1 facilities, `r  prettyNum(n_CHD2, big.mark = ",", scientific = FALSE)` CHD2 facilities, and `r  prettyNum(n_CHD, big.mark = ",", scientific = FALSE)` facilities of unknown level, and `r  prettyNum(n_CHRR +n_CHU +n_CHRRCHU, big.mark = ",", scientific = FALSE)` regional hospitals, including `r  prettyNum(n_CHRR, big.mark = ",", scientific = FALSE)` CHRRs, `r  prettyNum(n_CHU, big.mark = ",", scientific = FALSE)` CHUs, and `r  prettyNum(n_CHRRCHU, big.mark = ",", scientific = FALSE)` of unknown type.
 
 \newpage
 
@@ -2133,7 +2128,7 @@ approximate_string_match_bind_centroid <- function(max_distance) {
 
 ```
 
-**Step 1: Matching to validated spatial inventory of public facilities in Sub-Saharan Africa (Maina et al.)**
+**Step 1: Matching to validated spatial inventory of public facilities in Sub-Saharan Africa**
 ``` {r step_1-loading_data, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
 
 step = "step_1"
@@ -2208,7 +2203,7 @@ The similarity between two strings of text can be measured numerically using the
 
 To identify the closest matches between the full, standardized facility names in our sample and the spatial inventory, we calculated a matrix identifying the pair-wise Levenshtein distance between all possible combinations. For each member of our sample, we then selected the facility in the spatial inventory with the lowest Levenshtein distance (i.e., the nearest pair). 
 
-To maximize pair accuracy, we separately conducting matching among primary health facilities (i.e., FSPs and CSBs) and among hospitals (i.e., CHDs, CHRRs, and CHUs). For primary health facilities, the full, standardized facility names included the facility's region, district, and commune; for hospitals, the full name included the region and district only. To apply a conservative matching approach, we restricted matches to those with a Levenshtein distance no greater than 2.
+To maximize pair accuracy, we separately conducted matching among primary health facilities (i.e., FSPs and CSBs) and among hospitals (i.e., CHDs, CHRRs, and CHUs). For primary health facilities, the full, standardized facility names included the facility's region, district, and commune; for hospitals, the full name included the region and district only. To apply a conservative matching approach, we restricted matches to those with a Levenshtein distance no greater than 2.
 
 ```{r step_1-approximate-string-matches-1, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
 
@@ -2340,9 +2335,11 @@ Following visual inspection of the nearest approximate pairs, we retained matche
 
 approximate_string_match_bind(3)
 
+library(english)
+
 ```
 
-Using this approach, `r format(as.numeric(n_matched_facilities_rhino), big.mark = ",")` facilities were matched to coordinates in the RHINoVision spatial inventory, of which `r format(as.numeric(n_adist_rhino_0), big.mark = ",")` facilities were matched based on identical string matches,  `r format(as.numeric(n_adist_rhino_1), big.mark = ",")` facilities were matched based on string matches with a Levenshtein distance of 1, `r format(as.numeric(n_adist_rhino_2), big.mark = ",")` facilities were matched based on string matches with a Levenshtein distance of 2, and `r format(as.numeric(n_adist_rhino_3), big.mark = ",")` facilities were matched based on string matches with a Levenshtein distance of 3. (`r format(as.numeric(n_adist_rhino_0+n_adist_rhino_1+n_adist_rhino_2+n_adist_rhino_3 - n_matched_facilities_rhino), big.mark = ",")` matches were duplicates and were removed.)
+Using this approach, `r format(as.numeric(n_matched_facilities_rhino), big.mark = ",")` facilities were matched to coordinates in the RHINoVision spatial inventory, of which `r format(as.numeric(n_adist_rhino_0), big.mark = ",")` facilities were matched based on identical string matches,  `r format(as.numeric(n_adist_rhino_1), big.mark = ",")` facilities were matched based on string matches with a Levenshtein distance of 1, `r format(as.numeric(n_adist_rhino_2), big.mark = ",")` facilities were matched based on string matches with a Levenshtein distance of 2, and `r format(as.numeric(n_adist_rhino_3), big.mark = ",")` facilities were matched based on string matches with a Levenshtein distance of 3. (`r str_to_sentence(english(as.numeric(n_adist_rhino_0+n_adist_rhino_1+n_adist_rhino_2+n_adist_rhino_3 - n_matched_facilities_rhino)))` matches were duplicates and were removed.)
 
 In total, matching to our expanded inventory in Step 2 led to `r format(as.numeric(n_matched_facilities_step_2), big.mark = ",")` facilities (`r round(as.numeric(n_matched_facilities_step_2)/n_facilities_new * 100,0)`% of our sample) being geolocated.
 
@@ -2619,11 +2616,13 @@ tab_step_3 <- tab_step_3 %>%
 facilities_gps_any <- facilities_gps_any %>% filter(clinic_type != "Pharmacy")
 n_gps_facilities_new <- facilities_gps_any %>% nrow()
 
+facilities_gps_any_test <- facilities_gps_any
+
 ```
 
 We removed pharmacies from our spatial inventory, as pharmacies were not included in our sample. Removing pharmacies from our expanded spatial inventory resulted in `r format(as.numeric(n_gps_facilities_new), big.mark = ",")` coordinates available for matching. 
 
-Most of the coordinates in this expanded inventory were duplicates (i.e., the same facility will appear in different sources). Importantly, coordinates for the same facility could be slightly different across sources, due to variation in precision and geolocation. 
+Most of the coordinates in this expanded inventory were duplicates, as the same facility would appear in different sources. Importantly, coordinates for the same facility could be slightly different across sources, due to variation in precision and geolocation. 
 
 Using the same approach to uniquely identifying facilities in our sample, we grouped coordinates in our expanded inventory by facility name, type, and geographic information (namely, which commune, district, and region a coordinate fell within). In other words, in order to be grouped together, coordinates would need to be of the same facility type and name, and would need to be located in the same region and in the boundaries of the same district (for hospitals) or commune (for all other facilities). 
 
@@ -2635,7 +2634,7 @@ Using the same approach to uniquely identifying facilities in our sample, we gro
 # same facility, and not similarly named facilities in different districts.
 # 
 
-# 
+sf_use_s2(TRUE)
 
 facilities_gps_any <- facilities_gps_any %>%
   map_clean_arrondis() %>%
@@ -2664,21 +2663,16 @@ facilities_gps_any <- facilities_gps_any %>%
   mutate(shape_type = ifelse(length == 0 & area_km == 0, 
                              "point",
                              ifelse(length != 0 & area_km == 0, 
-                                    "line", "polygon"))) %>%
-                                    
-                                    # 
-                                    # 
-                                    # ifelse(length == 0,
-                                    #        "polygon", "other")))) %>%
+                                    "line",
+                                    "polygon"))) %>%
   
   # Let's apply our thresholds from the PARENT file
-  mutate(retain = ifelse(length == 0 & area_km == 0, 
-                         "Within threshold",
-                         ifelse(length <= length_lim & area_km == 0, 
-                                "Within threshold",
-                                ifelse(length == 0 & area_km <= area_lim,
+  mutate(retain = 
+           ifelse(shape_type == "point" |
+                    (shape_type == "line" & length <= length_lim) |
+                    (shape_type == "polygon" & area_km <= area_lim),
                                        "Within threshold", 
-                                       "Above threshold")))) %>%
+                                       "Above threshold")) %>%
   ungroup()
 
 
@@ -2732,7 +2726,7 @@ Grouping resulted in `r format(as.numeric(n_groups), big.mark = ",")` coordinate
 
 In order to evaluate whether groups of two coordinates (which we referred to as "line groups") and groups of three or more coordinate ("polygon groups") were internally consistent (i.e., the points within a group were not geographically far apart, suggesting uncertainty in the location of a facility), we calculated the length (for line groups) and area (for polygon groups) of groups with more than one coordinate. 
 
-We applied an arbitrary restriction to line and polygon groups, such that the length or area, respectively, would not exceed a particular threshold. The threshold for length (`r format(as.numeric(length_lim), big.mark = ",")` km.) was selected to be approximately half the distance of one side of a spatial climate resolution tile (~31 km for ERA-5 data). The threshold for area (`r format(as.numeric(area_lim), big.mark = ",")` square km.) was assigned to be the length threshold, squared. Groups that exceeded their respective thresholds were discarded.
+We applied an arbitrary restriction to line and polygon groups, such that the length or area, respectively, would not exceed a particular threshold. The threshold for length (`r format(as.numeric(length_lim), big.mark = ",")` km.) was selected to be approximately half the distance of one side of a spatial climate resolution tile (~30 km for ERA-5 data). The threshold for area (`r format(as.numeric(area_lim), big.mark = ",")` km²) was assigned to be the length threshold, squared. Groups that exceeded their respective thresholds were discarded.
 
 ```{r step_3-histogram-prep, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
 
@@ -2835,7 +2829,7 @@ ggsave(filename = "gps_data_lines.jpg", plot = last_plot(),
 
 <!-- ``` -->
 
-Among polygon groups, the mean area was `r format(round(n_mean_area_polygons,2), big.mark = ",")` km², with a maximum area of `r format(round(n_max_area_polygons), big.mark = ",")` km². At the threshold of `r format(as.numeric(area_lim), big.mark = ",")` square km., all polygon groups fell within the cut-off. Among line groups, the mean distance between coordinates was `r format(round(n_mean_length,2), big.mark = ",")` km, with a maximum distance of `r format(round(n_max_length), big.mark = ",")` km. At the threshold of `r format(as.numeric(length_lim), big.mark = ",")` km,  `r format(round(n_length_retained), big.mark = ",")` line groups fell within the cut-off (`r round(as.numeric(n_length_retained)/n_line * 100,0)`% of line groups).
+Among polygon groups, the mean area was `r format(round(n_mean_area_polygons,2), big.mark = ",")` km², with a maximum area of `r format(round(n_max_area_polygons), big.mark = ",")` km². At the threshold of `r format(as.numeric(area_lim), big.mark = ",")` km², all polygon groups fell within the cut-off. Among line groups, the mean distance between coordinates was `r format(round(n_mean_length,2), big.mark = ",")` km, with a maximum distance of `r format(round(n_max_length), big.mark = ",")` km. At the threshold of `r format(as.numeric(length_lim), big.mark = ",")` km,  `r format(round(n_length_retained), big.mark = ",")` line groups fell within the cut-off (`r round(as.numeric(n_length_retained)/n_line * 100,0)`% of line groups).
 
 ```{r step_3-retaining-coordinates-within-threshold, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
 
@@ -3281,9 +3275,9 @@ label = "Centroid"
 
 ```
 
-While it would be ideal to obtain precise locations for each facility in our sample, for the purposes of our analysis, an approximate location would be sufficient, given the spatial resolution of the climate data we used. The spatial resolution of ERA-5 and ESA-CCI data is approximately 30 km., meaning that all coordinates within a spatial tile of 30 km² will have the same time series for a given variable. Furthermore, neighboring tiles are unlikely to have extraordinarily different time series, underscoring that close approximate locations would likely result in minimal impact to the analysis versus exact coordinates.
+While it would be ideal to obtain precise locations for each facility in our sample, for the purposes of our analysis, an approximate location would be sufficient, given the spatial resolution of the climate data we used. The spatial resolution of ERA-5 and ESA-CCI data is approximately 30 km., meaning that all coordinates within a spatial tile of 900 km² will have the same time series for a given variable. Furthermore, neighboring tiles are unlikely to have extraordinarily different time series, underscoring that close approximate locations would likely result in minimal impact to the analysis versus exact coordinates.
 
-For commune-level facilities, knowing the catchment area may therefore be just as informative as knowing the facility's precise location if the catchment area was sufficiently small. Determining a cut-off was, again, arbitrary; to adopt a conservative threshold, we considered a catchment area small if its area was  no greater than `r format(as.numeric(area_lim), big.mark = ",")` square km, which corresponded to approximately `r round(as.numeric(area_lim)/(30*30) * 100,0)`% of the area of a climate data spatial resolution tile (Figure \ref{figure_communes_fokontany}).
+For commune-level facilities, knowing the catchment area may therefore be just as informative as knowing the facility's precise location if the catchment area was sufficiently small. Determining a cut-off was, again, arbitrary; to adopt a conservative threshold, we considered a catchment area small if its area was  no greater than `r format(as.numeric(area_lim), big.mark = ",")` km², which corresponded to approximately `r round(as.numeric(area_lim)/(30*30) * 100,0)`% of the area of a climate data spatial resolution tile (Figure \ref{figure_communes_fokontany}).
 
 
 ```{r figure_communes_fokontany, include = TRUE, results = TRUE, warning = FALSE, message = FALSE, echo = FALSE, fig.width = 9, fig.height = 8.5, fig.align='center', out.width = '95%',  fig.scap="Communes and fokontany in Madagascar, by area.", out.extra='',  fig.cap="\\label{figure_communes_fokontany}Communes and fokontany in Madagascar, by area. Units colored in teal are within the 225 km² threshold for use in Step 5 of the matching process."}
@@ -3375,7 +3369,7 @@ ggarrange(map_a, map_b, ncol = 2, common.legend = TRUE, legend = "bottom")
 
 ```
 
-To exploit all available information for geolocation, we first attempted to match commune-level facilities to known *fokontany* based on the facility name and catchment area. We used approximate string matching to link facilities named for their locations in our sample to known villages; if the village area was smaller than our threshold, the centroid of the village was used as a proxy for the facility location. We then applied the same approach to unmatched commune-level facilities to known communes.
+To exploit all available information for geolocation, we first used approximate string matching to link facilities named for their locations in our sample to known *fokontany*, based on the facility name and catchment area; if the village area was smaller than our threshold, the centroid of the village was used as a proxy for the facility location. We then applied the same approach to unmatched commune-level facilities to known communes.
 
 ```{r step_5-approximate-matches, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
 
@@ -3392,8 +3386,6 @@ approximate_string_match_bind_centroid(1)
 Visual inspection of village and commune matches indicated that likely matches had a Levenshtein distance no greater than 1. Using approximate string matching, we linked  `r format(as.numeric(n_adist_fokontany_0), big.mark = ",")` facilities to *fokontany* with identical string matches and  `r format(as.numeric(n_adist_fokontany_1), big.mark = ",")` facilities with near identical matches. After applying our threshold,  `r format(as.numeric(n_matched_facilities_fokontany), big.mark = ",")` facilities in our sample were matched to *fokontany* centroids. We were then able to link `r format(as.numeric(n_adist_commune_0), big.mark = ",")` facilities to communes with identical string matches and  `r format(as.numeric(n_adist_commune_1), big.mark = ",")` facilities with near identical matches. After applying our threshold,  `r format(as.numeric(n_matched_facilities_commune), big.mark = ",")` facilities in our sample were matched to commune centroids.
 
 Altogether, matching to centroids of communes and *fokontany* in Step 5 led to `r format(as.numeric(n_matched_facilities_step_5), big.mark = ",")` facilities (`r round(as.numeric(n_matched_facilities_step_5)/n_facilities_new * 100,0)`% of our sample) being geolocated.
-
-\newpage
 
 **Step 6: Targeted searches**
 
@@ -3710,9 +3702,7 @@ n_facilities_sample <- facilities_sample %>% nrow()
 
 ```
 
-To verify the accuracy of the geolocating process, we randomly selected `r round(as.numeric(sample_fraction * 100,0))`% of our sample of geolocated facilities (n = `r format(as.numeric(n_facilities_sample), big.mark = ",")`) and independently identified coordinates for each facility. We then compared these coordinates to those identified from our geolocating process. We then calculated the physical distance between the independently identified coordinates and the coordinates identified from our geolocating process for each facility.
-
-Table S2.10 provides the list of facilities in the validation sample.
+To verify the accuracy of the geolocating process, we randomly selected `r round(as.numeric(sample_fraction * 100,0))`% of our sample of geolocated facilities (n = `r format(as.numeric(n_facilities_sample), big.mark = ",")`) and independently identified coordinates for each facility. We then compared these coordinates to those identified from our geolocating process. We then calculated the physical distance between the independently identified coordinates and the coordinates identified from our geolocating process for each facility. Table S2.10 provides the list of facilities in the validation sample.
 
 \newpage
 
@@ -3862,7 +3852,7 @@ Translations:
 * *Atsimo*: south (Malagasy)
 * *Atsinanana*: east (Malagasy)
 * *Avaratra*: north (Malagasy)
-* *Est*: west (French)
+* *Est*: east (French)
 * *Haute*: high (French)
 * *Nord*: north (French)
 * *Ouest*: west (French)

@@ -5,13 +5,13 @@
 
 Mental health is an essential part of human flourishing. As defined by the World Health Organization (WHO), it encompasses “a state of well-being in which every individual realizes [their] own potential, can cope with the normal stresses of life, can work productively and fruitfully, and is able to make a contribution to [their] community”.[@worldhealthorganizationComprehensiveMentalHealth2013] 
 
-For much of the global population, however, attaining this state of mental health is an enduring challenge, with over one billion people worldwide living with a mental or addictive disorder.[@rehmGlobalBurdenDisease2019] Mental disorders are a leading cause of disability,[@charlsonExcessMortalityMental2015; @rehmGlobalBurdenDisease2019] with the Global Burden of Disease (GBD) 2019 study estimating that 4.9% of disability-adjusted life years (DALYs) and 14.6% of years lived with disability (YLDs) are attributable to mental disorders.[@vosGlobalBurden3692020a] Mental disorders are closely linked to physical health, and can be a significant risk factor for premature mortality.[@walkerMortalityMentalDisorders2015] Among patients living with the most severe mental illnesses, premature mortality may reduce life expectancy by as much as 10 to 20 years.[@demooijDyingTooSoon2019] 
+For much of the global population, however, attaining this state of mental health is an enduring challenge, with over one billion people worldwide living with a mental or addictive disorder.[@rehmGlobalBurdenDisease2019] Mental disorders are a leading cause of disability,[@charlsonExcessMortalityMental2015; @rehmGlobalBurdenDisease2019] with the Global Burden of Disease (GBD) study estimating that 4.9% of disability-adjusted life years (DALYs) and 14.6% of years lived with disability (YLDs) were attributable to mental disorders in 2019.[@vosGlobalBurden3692020a] Mental disorders are also closely linked to physical health and can be a significant risk factor for premature mortality.[@walkerMortalityMentalDisorders2015] Among patients living with the most severe mental illnesses, premature mortality may reduce life expectancy by as much as 10 to 20 years.[@demooijDyingTooSoon2019] 
 
-At all levels of sociodemographic development, this burden of morbidity and mortality is rising.[@patelLancetCommissionGlobal2018] Yet despite this global scale and despite a growing evidence base for impactful, cost-effective interventions that may help,[@patelMentalNeurologicalSubstance2016] the profound impact of mental disorders has been met by a profound treatment gap.[@demyttenaerePrevalenceSeverityUnmet2004] The majority of people living with a mental disorder do not have access to adequate care (Figure \ref{figure_service_gap}),[@bassUnitedNationsGeneral2012a; @demyttenaerePrevalenceSeverityUnmet2004] and many face stigma,[@alonsoPerceivedStigmaIndividuals2009; @angermeyerStigmaMentalIllness2003] discrimination,[@stuartMentalIllnessEmployment2006; @thornicroftDiscriminationHealthCare2007] and abuse.[@humanrightswatchDeathSentenceAbuses2012; @mfoafo-mcarthyHumanRightsViolations2014; @rahmanMentalDistressHuman2021] 
+At all levels of sociodemographic development, this burden is rising.[@patelLancetCommissionGlobal2018] Yet despite this global scale and despite a growing evidence base for impactful, cost-effective interventions that may help,[@patelMentalNeurologicalSubstance2016] the profound impact of mental disorders has been met by a profound treatment gap.[@demyttenaerePrevalenceSeverityUnmet2004] A majority of the world's population lives in countries with fewer than 10 psychiatrists for every 100,000 people (Figure \ref{figure_service_gap}). Most of those living with a mental disorder do not have access to adequate care,[@bassUnitedNationsGeneral2012a; @demyttenaerePrevalenceSeverityUnmet2004] and many face stigma,[@alonsoPerceivedStigmaIndividuals2009; @angermeyerStigmaMentalIllness2003] discrimination,[@stuartMentalIllnessEmployment2006; @thornicroftDiscriminationHealthCare2007] and abuse.[@humanrightswatchDeathSentenceAbuses2012; @mfoafo-mcarthyHumanRightsViolations2014; @rahmanMentalDistressHuman2021] 
 
 \blandscape
 
-```{r figure_service_gap, include = TRUE, echo=FALSE, warnings = FALSE, fig.width = 11, fig.height = 6.5, fig.align='center', out.width = '97%',  fig.scap="Countries where fewer than 10 psychiastrists per 100,000 capita were working in the health sector, 2013-2017.", out.extra='',  fig.cap="\\label{figure_all_diseases}Countries where fewer than 10 psychiastrists per 100,000 capita were working in the health sector between 2013-2017, average. Data from the Globa Health Observator (GHO) of the World Health Organization (WHO)."}
+```{r figure_service_gap, include = TRUE, echo=FALSE, warnings = FALSE, fig.width = 11, fig.height = 6.5, fig.align='center', out.width = '97%', fig.scap="Countries where fewer than 10 psychiatrists per 100,000 capita were working in the health sector, 2013-2017.", out.extra='', fig.cap="\\label{figure_service_gap}Countries where fewer than 10 psychiatrists per 100,000 capita were working in the health sector between 2013-2017, average. Data from the Global Health Observatory (GHO) of the World Health Organization (WHO)."} 
 
 # Loading libraries
 library(readxl)
@@ -34,7 +34,7 @@ library(showtext)
 font_add_google("Source Sans Pro")
 library(gridExtra)
 showtext_auto() 
-showtext_opts(dpi = 300)  
+showtext_opts(dpi = 300) 
 library(rnaturalearthhires) # install.packages("rnaturalearthhires", repos = "http://packages.ropensci.org", type = "source")
 library(ggtext)
 
@@ -42,8 +42,8 @@ library(ggtext)
 world_map <- ne_countries(scale = "large", returnclass = "sf")
 
 who_gho_data <- read.csv("C:/Users/danie/Dropbox (Harvard University)/Important Files/3. PhD/Thesis/3. Draft/1. RMarkdown/phd_thesis/who_gho_data.csv") %>% rename_with(~ gsub("_working_in_mental_health_sector_.per_100_000_population.", "", .), 
-              contains("_working_in_mental_health_sector_.per_100_000_population.")) %>%
-    pivot_longer(cols = -country, 
+                                                                                                                                                                        contains("_working_in_mental_health_sector_.per_100_000_population.")) %>%
+  pivot_longer(cols = -country, 
                names_to = c("type", "year"), 
                names_pattern = "(.*)_(.*)",
                values_to = "value") %>%
@@ -73,7 +73,7 @@ col_light_grey = "#F2F2F2"
 world_map <- world_map %>%
   st_as_sf() %>%
   st_transform(CRS("+proj=robin")) 
-  
+
 map <- world_map %>%
   filter(admin != "Antarctica") %>%
   full_join(who_gho_data, by = "adm0_a3") %>%
@@ -82,29 +82,29 @@ map <- world_map %>%
                        "Others")) %>%
   mutate(fill = ifelse(is.na(fill), "No data", fill)) %>%
   mutate(fill = factor(fill, 
-                                   levels = c("Fewer than 10 psychiatrists per 100,000 capita", 
-                                              "Others",
-                                              "No data"))) %>%
+                       levels = c("Fewer than 10 psychiatrists per 100,000 capita", 
+                                  "Others",
+                                  "No data"))) %>%
   ggplot(aes(geometry = geometry, fill = fill)) +
   geom_sf(color = NA) +
   theme_void() +
   # labs(title = "Availability of psychiastrists",
-  #      subtitle = " ") +
+  #  subtitle = " ") +
   scale_fill_manual(name = "",
-                    values  = c(col_light_blue, col_grey, col_light_grey)) +
+                    values = c(col_light_blue, col_grey, col_light_grey)) +
   theme(legend.position = "bottom",
         legend.justification='center',
         legend.direction='horizontal',
         text = element_text(family = "Arial"),
-        # plot.title =element_text(size=18,   
-        #                            face = "bold",
-        #                            hjust = 0),
+        # plot.title =element_text(size=18, 
+        #       face = "bold",
+        #       hjust = 0),
         axis.title.x = element_text(color=col_grey, size=10, hjust = 0),
         plot.caption = element_text(hjust = 0, 
-                                          vjust = 1,
+                                    vjust = 1,
                                     face = "bold",
                                     size=10))
-        
+
 
 data <- world_map %>%
   filter(admin != "Antarctica") %>%
@@ -118,7 +118,7 @@ data <- world_map %>%
   mutate(count = sum(as.numeric(pop_est), na.rm = TRUE)) %>%
   select(category, count) %>%
   ungroup() %>%
-  unique()  %>%
+  unique() %>%
   mutate(category = ifelse(is.na(category), "B", category)) %>%
   mutate(category = factor(category, 
                            levels = c("A", 
@@ -144,7 +144,7 @@ circle <- data %>%
                     y = 0),
                 label = paste0(round(data$fraction[data$category == "A"]*100,0),
                                "%"),
-                color = "black",  
+                color = "black", 
                 fill = NA,
                 label.color = NA,
                 size = 10 / .pt,
@@ -168,51 +168,51 @@ text <- ggplot() +
                                ",",
                                "**<br>",
                                paste0(round(data$count[data$category == "A"]/1000000000,1),
-                                            " billion")),
-                color = "black",  
+                                      " billion")),
+                color = "black", 
                 fill = NA,
                 label.color = NA,
                 size = 12 / .pt,
                 hjust = 0,
                 vjust = 0.5) 
-  
 
-  
+
+
 circle_text <- cowplot::plot_grid(circle, text, 
-                     ncol = 2,
-                     rel_heights =    c(7,1.3)) 
-  
+                                  ncol = 2,
+                                  rel_heights = c(7,1.3)) 
+
 # title <- ggplot() +
-#   geom_segment(aes(x = 0, y = 0, xend = .25, yend = 0), linewidth = .9, color = col_grey) +
-#   # annotate("text", x = 0, y = 0, size=12, label = "Average, 2013-2017",
-#   #          hjust = 0, vjust = -0.3,
-#   #          color = "black", fontface = 'bold', family = "Martel") + 
-#   theme_void() +
-#   xlim(0, 0.25) +
-#   ylim(-0.01, 0.04)
+# geom_segment(aes(x = 0, y = 0, xend = .25, yend = 0), linewidth = .9, color = col_grey) +
+# # annotate("text", x = 0, y = 0, size=12, label = "Average, 2013-2017",
+# #   hjust = 0, vjust = -0.3,
+# #   color = "black", fontface = 'bold', family = "Martel") + 
+# theme_void() +
+# xlim(0, 0.25) +
+# ylim(-0.01, 0.04)
 
 # combo <- cowplot::plot_grid(title, circle_text, 
-#                             nrow = 2,
-#                             rel_heights =  c(1.2,3)) 
+#        nrow = 2,
+#        rel_heights = c(1.2,3)) 
 # 
 
 # ggsave(map,
-#        filename = paste0("gdp_",
-#                          year,
-#                          ".png"),
-#        path = "C:/Users/danie/Dropbox (Harvard University)/Important Files/7. Data Science/mckinsey",
-#        height = 7.5,
-#        width= 12,
-# #        bg = "white")
+#  filename = paste0("gdp_",
+#       year,
+#       ".png"),
+#  path = "C:/Users/danie/Dropbox (Harvard University)/Important Files/7. Data Science/mckinsey",
+#  height = 7.5,
+#  width= 12,
+# #  bg = "white")
 # 
 # ggsave(combo,
-#        filename = paste0("gdp_pie_",
-#                          year,
-#                          ".png"),
-#        path = "C:/Users/danie/Dropbox (Harvard University)/Important Files/7. Data Science/mckinsey",
-#        height = 2.05,
-#        width= 2.25,
-#        bg = "white")
+#  filename = paste0("gdp_pie_",
+#       year,
+#       ".png"),
+#  path = "C:/Users/danie/Dropbox (Harvard University)/Important Files/7. Data Science/mckinsey",
+#  height = 2.05,
+#  width= 2.25,
+#  bg = "white")
 
 
 final_figure <- cowplot::ggdraw(map) +
@@ -237,16 +237,16 @@ print(final_figure)
 
 \elandscape
 
-In addition to the long-standing challenges of these unmet needs, new and emerging dangers such as climate change and COVID-19 reveal additional stressors that threaten to exacerbate this burden. Global climate change—an accelerating existential threat to planetary health that the United Nations considers the “defining crisis of our time”—is already manifesting profound impacts on mental health.[@worldhealthorganizationMentalHealthClimate2022] The impacts are shaped both by the disastrous upheaval caused by worsening extreme weather events and by the incremental change rising temperatures and sea levels have wrought on livelihoods and means of living—altering the availability and access to natural resources, land use, infrastructure, and community.[@atwoliMentalHealthClimate2022; @hayesClimateChangeMental2018] This essential connections between mental health and human wellbeing have been further underscored by the devastating impacts of the COVID-19 pandemic, which continues to deal psychological and psychiatric harm to patients, health care workers, and the public overall.[@vindegaardCOVID19PandemicMental2020]
+In addition to the long-standing challenges of these unmet needs, new and emerging dangers such as climate change and COVID-19 reveal additional stressors that threaten to exacerbate this burden. Global climate change—an accelerating existential threat to planetary health that the United Nations considers the “defining crisis of our time”—is already manifesting profound impacts on mental health.[@worldhealthorganizationMentalHealthClimate2022] These impacts are shaped both by the disastrous upheaval caused by worsening extreme weather events and by the incremental change rising temperatures and sea levels have wrought on livelihoods and means of living—altering the availability and access to natural resources, land use, infrastructure, and community.[@atwoliMentalHealthClimate2022; @hayesClimateChangeMental2018] The essential connections between mental health and human well-being have been further underscored by the devastating impacts of the COVID-19 pandemic, which continues to deal psychological and psychiatric harm to patients, health care workers, and the public overall.[@vindegaardCOVID19PandemicMental2020]
 
-The extant and evolving challenges of global mental health, in turn, entail jeopardy to health systems and to the three intrinsic goals of improving health, responsiveness, and financial protection. According to the WHO’s Mental Health Atlas report from 2020, mental health system governance, capacity, and integration into routine service delivery is fundamentally lacking across nations of all levels of economic development, with only 15% of countries having functional integration of mental health into primary health care.[@worldhealthorganizationMentalHealthAtlas2021] This lack of service delivery echoes a lack of basic epidemiological data,[@steinCrossnationalEpidemiologySocial2017] constraining researching and frustrating efforts to respond to mental health needs. Among nations, the Atlas report highlights widening disparities in health system indicators, with worsened gaps in service availability and public health expenditure for mental health between low- and middle-income countries and high-income peers. With respect to health spending in many countries, mental health care services have relied primarily or exclusively on out-of-pocket payments,[@dixonFinancingMentalHealth2006] resulting in a greater risk of catastrophic health expenditure among households with patients living with a mental disorder. These direct costs, when coupled with the indirect costs of diminished due to disability, may exacerbate conditions of poverty, [@patelPovertyCommonMental2003] which, in turn, may lead to worsening mental health[@lundPovertyCommonMental2010]—exacerbating a vicious cycle that harms households and nations alike. 
+The extant and evolving challenges of global mental health, in turn, entail jeopardy to health systems and to the three intrinsic goals of improving health, responsiveness, and financial protection.[@robertsGettingHealthReform2008] According to the WHO’s Mental Health Atlas report from 2020, mental health system governance, capacity, and integration into routine service delivery is fundamentally lacking across nations of all levels of economic development, with only 15% of countries having functional integration of mental health into primary health care.[@worldhealthorganizationMentalHealthAtlas2021] This lack of service delivery echoes a lack of basic epidemiological data,[@steinCrossnationalEpidemiologySocial2017] constraining research and frustrating efforts to respond to mental health needs. Among nations, the Atlas report highlights widening disparities in health system indicators, with worsened gaps in service availability and public health expenditure for mental health between low- and middle-income countries and high-income peers. With respect to health spending, mental health care services in many countries have traditionally relied primarily or exclusively on out-of-pocket payments,[@dixonFinancingMentalHealth2006] resulting in a greater risk of catastrophic health expenditure among households with patients living with a mental disorder. These direct costs, when coupled with the indirect costs of diminished earnings due to disability, may exacerbate conditions of poverty, [@patelPovertyCommonMental2003] which, in turn, may lead to worsening mental health[@lundPovertyCommonMental2010]—feeding a vicious cycle that harms households and nations alike. 
 
-A better understanding of the evolving burden and dynamics of global mental health may thus have broad consequence to strengthening of health system responses to mental disorders and improving health outcomes for millions of individuals worldwide. Contributing to such an understanding has motivated this dissertation, which takes as its focus different quantitative aspects of the global burden of mental illness—how we measure and evaluate it, how it may be changing, and how novel data sources may help in characterizing it, particularly in the absence of robust, high-frequency epidemiological surveillance. The papers presented in the subsequent three chapters echo the interdisciplinary nature of global mental health, drawing on a broad range of quantitative methods and applying analytic tools and insights from epidemiology, health economics, and econometrics. 
+A better understanding of the evolving burden and dynamics of global mental health may thus have broad consequences to strengthening health system responses to mental disorders and improving health outcomes for millions of individuals worldwide. Contributing to such an understanding has motivated this dissertation, which takes as its focus different quantitative aspects of the global burden of mental illness—how we measure and evaluate it, how it may be changing, and how novel data sources may help in characterizing it, particularly in the absence of robust, high-frequency epidemiological surveillance. The papers presented in the subsequent three chapters echo the interdisciplinary nature of global mental health, drawing on a broad range of quantitative methods and applying analytic tools and insights from epidemiology, health economics, and econometrics. 
 
-In Chapter 1, we investigated the share of the global burden of disease attributable to mental disorders and its associated economic value. We reviewed recent efforts to estimate both the epidemiologic and economic burden of mental disorders, and we propose a composite approach to estimation to capture a broader share of attributable morbidity and mortality.[@bloomGlobalEconomicBurden2011; @charlsonExcessMortalityMental2015; @vigoEstimatingTrueGlobal2016; @vosGlobalBurden3692020a; @walkerMortalityMentalDisorders2015; @whitefordGlobalBurdenDisease2013] Applying this approach using the most recently available GBD data, we estimated that the global burden of mental disorders is likely much higher than previously estimated, encompassing 16% of disability-adjusted life years in the year 2019. Using value of statistical life approaches, we estimated that the economic value of this mental health burden would exceed 4.7 trillion USD.
+In Chapter 1, we investigated the share of the global burden of disease attributable to mental disorders and its associated economic value. We reviewed recent efforts to estimate both the epidemiologic and economic burden of mental disorders, and we propose a composite approach to estimation to capture a broader share of attributable morbidity and mortality.[@bloomGlobalEconomicBurden2011; @charlsonExcessMortalityMental2015; @vigoEstimatingTrueGlobal2016; @vosGlobalBurden3692020a; @walkerMortalityMentalDisorders2015; @whitefordGlobalBurdenDisease2013] Applying this approach using the most recently available GBD data, we estimated that the global burden of mental disorders is likely much higher than previously estimated, encompassing 16% of disability-adjusted life years in 2019. Using value of statistical life approaches, we estimated that the economic value of this burden would exceed 4.7 trillion USD.
 
-In Chapter 2, we investigated how health system visits for mental disorders in Madagascar may be shifting in respond to changes in climate. Madagascar has little to no mental health surveillance data and is among the nations most vulnerable to climate change. To address these gaps, we studied the impact of three climate change exposures—temperature, soil moisture, and duration of cyclones and tropical storms—by leveraging meteorologic, geospatial, and health system data reported by 3,413 facilities in Madagascar from 2010 to 2020. We found a statistically significant reduction in monthly cases reported associated with temperature, primarily localized to facilities in the central highlands, where cooler temperatures are more prevalent. We further found that higher soil moisture may be associated with higher case counts in the future, after a three month lag; this increase was primarily found in the eastern lowlands and the northern dry deciduous forests, consistent with the geographic concentration of flood risk in Madagascar. Our findings point to suggest potential heterogeneity in how changing climate conditions will impact mental health needs and system responses.
+In Chapter 2, we investigated how health system visits for mental disorders in Madagascar may be shifting in respond to changes in climate. Madagascar has little to no mental health surveillance data and is among the nations most vulnerable to climate change. To address these gaps, we studied the impact of three climate change exposures—temperature, soil moisture, and duration of cyclones and tropical storms—by leveraging meteorologic, geospatial, and health system data reported by 3,413 facilities from 2010 to 2020. We found a statistically significant reduction in monthly mental health related visits associated with each degree Celcius increase in temperature, primarily localized to facilities in the central highlands, where cooler temperatures are more prevalent. We further found that higher soil moisture may be associated with more mental health visits in the future, after a three month lag; this increase was primarily found in the eastern lowlands and the northern dry deciduous forests, consistent with the geographic concentration of flood risk in Madagascar. Our findings point to potential heterogeneity in how changing climate conditions will impact mental health needs and system responses.
 
-In Chapter 3, we investigated how internet search data for health symptoms might provide high frequency insight into the state of population mental health during the COVID-19 pandemic. Using search data from U.S. counties, states, and international trends, we explored how announcements of COVID-19 vaccine safety and efficacy data in November 2020 impacted Google search trends for mental health symptoms. We found evidence of statistically significant immediate and sustained declines in searches for anxiety, depression, and major depressive disorder throughout the 40 days following these announcements. The findings underscore the importance of timely and transparent communication and illustrate the potential application of high frequency internet search data for population mental health surveillance.
+In Chapter 3, I investigated how internet search data for health symptoms might provide high frequency insight into the state of population mental health during the COVID-19 pandemic. Using search data from U.S. counties, states, and international trends, I explored how announcements of COVID-19 vaccine safety and efficacy data in November 2020 impacted Google search trends for mental health symptoms. I found evidence of statistically significant immediate and sustained declines in searches for anxiety, depression, and major depressive disorder throughout the 40 days following these announcements. The findings underscore the importance of timely and transparent communication and illustrate the potential application of high frequency internet search data for population mental health surveillance.
 
 Overall, these three chapters highlight different facets of the global burden of mental disorders and speak to the interconnectedness of mental health and human well-being, as well as the urgent need for greater research and resources to better illuminate such pathways. Taken together, they contribute to a growing effort to generate a more comprehensive understanding of the challenges posed by this burden—as well as opportunities for improving mental health at local, regional, and global levels.

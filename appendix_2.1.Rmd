@@ -206,13 +206,13 @@ mh_english_disease <- read_excel(
 
 \addcontentsline{toc}{paragraph}{Overview of health system data}
 
-The health facility data used in our study was obtained from Madagascar's *Gestion du Système d'Information Sanitaire* (GESIS), a Microsoft Access electronic health management information systems database. 
+The health facility data used in our study were obtained from Madagascar's *Gestion du Système d'Information Sanitaire* (GESIS), a Microsoft Access electronic health management information systems database. 
 
-While primary, district-level, and regional referral facilities in Madagascar all report monthly case counts of mental disorders in GESIS, case definitions vary across facilities of different levels. Disaggregated data by specific condition (e.g., depression, schizophrenia, etc.) are only reported among regional referral hospitals and university hospitals; for all other facilities, cases are reported in aggregate (e.g., "Neuro-psychic diseases" for district hospitals).
+While primary, district, and regional referral facilities in Madagascar all reported monthly visits related to mental disorders in GESIS, case definitions varied across facilities of different levels. Disaggregated data by specific condition (e.g., depression, schizophrenia, etc.) were only reported among regional referral hospitals and university hospitals; for all other facilities, visit by type of mental heath complaint were reported in aggregate (e.g., "Neuro-psychic diseases" for district hospitals).
 
-Disaggregated data is available by age; among adults, however, disaggregated data for adults ages 25 to 59 and adults 60 years and older has only been reported by primary health facilities since 2015. For all other years and all other facilities, these age categories are not separately reported. Similarly, data by sex is only reported for primary health facilities since 2015. Referrals are reported by primary health facilities and district hospitals.
+Disaggregated data was available by age; among adults, however, disaggregated data for adults ages 25 to 59 and adults 60 years and older was only reported by primary health facilities after 2015. For all other years and all other facilities, these age categories were not separately reported. Similarly, data by sex was only reported for primary health facilities after 2015. Referrals were reported by primary health facilities and district hospitals.
 
-A summary of the GESIS data availability is provided in Table S2.1.
+A summary of GESIS data availability is provided in Table S2.1.
 
 \begin{raggedright}
 
@@ -225,9 +225,11 @@ knitr::include_graphics("table_s_2_1.png")
 ```
 \end{raggedright}
 
-\vspace{24 pt}
+\vspace{6 pt}
 
 After compiling the GESIS data, we translated the case definitions from French to English. The translations are provided in Table S2.2.
+
+\vspace{24 pt}
 
 \begin{spacing}{1}
 
@@ -318,42 +320,42 @@ n_chu <- chu_data %>% dplyr::select(disease) %>% unique() %>% nrow
 
 \vspace{24 pt}
 
-We then conducted exploratory data analysis to gauge data availability by condition, year, and facility level, which are reported in Tables S2.3-5. These tables show yearly cumulative cases of mental and neurological disorders, by facility level.
+We then conducted exploratory data analysis to gauge data availability by condition, year, and facility level, which are reported in Tables S2.3-5. These tables show yearly cumulative visits for mental and neurological disorders, by facility level.
 
 Among primary health facilities, we observed that the case definition for mental disorders changed during 2015, alongside the changes in GESIS that enabled disaggregated reporting by sex and greater disaggregation for data by age.
 
-Among district hospitals, reporting of mental disorders has been consistent between 2010 and 2020.
+Among district hospitals, reporting of mental disorders was consistent between 2010 and 2020.
 
-Reporting of mental disorders is most detailed among regional referral hospitals (CHRRs) and university hospitals (CHUs), with case counts reported for `r  prettyNum(n_chu, big.mark = ",", scientific = FALSE)` unique conditions.
+Reporting of mental disorders was most detailed among regional referral hospitals (CHRRs) and university hospitals (CHUs), with visit counts reported for `r  prettyNum(n_chu, big.mark = ",", scientific = FALSE)` unique conditions.
 
 \newpage
 
 \begin{spacing}{1}
 
-\addcontentsline{lot}{table}{Table S2.3: Yearly cumulative cases of mental and neurological disorders reported at primary facilities.}
+\addcontentsline{lot}{table}{Table S2.3: Yearly cumulative visits for mental and neurological disorders reported at primary facilities.}
 
 
 ```{r  reporting_tables1a, warning = FALSE, message = FALSE, echo = FALSE, include = TRUE}
 
-reporting_table(csb_data, "Table S2.3: Yearly cumulative cases of mental and neurological disorders reported at primary facilities")
+reporting_table(csb_data, "Table S2.3: Yearly cumulative visits for mental and neurological disorders reported at primary facilities")
 
 ```
 
-\addcontentsline{lot}{table}{Table S2.4: Yearly cumulative cases of mental and neurological disorders reported at district hospitals.}
+\addcontentsline{lot}{table}{Table S2.4:  Yearly cumulative visits for mental and neurological disorders reported at district hospitals.}
 
 ```{r  reporting_tables1b, warning = FALSE, message = FALSE, echo = FALSE, include = TRUE}
 
-reporting_table(chd_data, "Table S2.4: Yearly cumulative cases of mental and neurological disorders reported at district hospitals")
+reporting_table(chd_data, "Table S2.4: Yearly cumulative visits for mental and neurological disorders reported at district hospitals")
 
 ```
 
 \newpage
 
-\addcontentsline{lot}{table}{Table S2.5: Yearly cumulative cases of mental and neurological disorders reported at regional hospitals.}
+\addcontentsline{lot}{table}{Table S2.5: Yearly cumulative visits for mental and neurological disorders reported at regional hospitals.}
 
 ```{r  reporting_tables2, warning = FALSE, message = FALSE, echo = FALSE, include = TRUE}
 
-reporting_table(chu_data, "Table S2.5: Yearly cumulative cases of mental and neurological disorders reported at regional hospitals")
+reporting_table(chu_data, "Table S2.5: Yearly cumulative visits for mental and neurological disorders reported at regional hospitals")
 
 ```
 
@@ -1469,7 +1471,7 @@ data_mh <- data_mh %>%
 \addcontentsline{toc}{paragraph}{Data cleaning approach}
 
 
-To address heterogeneity in reporting across primary, district-level, and regional-level facilities, our analysis constructed a single, summary outcome measure: any mental or neurological disorders reported in a given month by a given facility, irrespective of age and sex. This outcome measure was constructed by grouping our count data by facility and month-year, and then summing the incidence of mental and neurological disorders reported in GESIS within groups, preventing double counting and the inclusion of referrals in the summary measure.
+To address heterogeneity in reporting across primary, district, and regional facilities, our analysis constructed a single, summary outcome measure: any mental or neurological disorders reported in a given month by a given facility, irrespective of age and sex. This outcome measure was constructed by grouping our count data by facility and month-year, and then summing the incidence of mental and neurological disorders reported in GESIS within groups, preventing double counting and the inclusion of referrals in the summary measure.
 
 <!-- The distribution of monthly case counts by facility type is shown below: -->
 
@@ -1486,7 +1488,7 @@ data_mh %>%
                                         fill="white"),
         text = element_text(family = "Source Sans Pro")) +
   theme(legend.position = "none") +
-  labs(x = "Date", y = "Monthly count of cases") +
+  labs(x = "Date", y = "Monthly count of visits") +
   facet_wrap(~clinic_type_clean, nrow = 3) +
   scale_color_manual(values = c(col_CHD, col_CHR, col_CSB))
 
@@ -1500,7 +1502,7 @@ n_obs <- data_mh %>%  filter(cleaning_status == "count_raw") %>%
  nrow()
 ```
 
-Visual inspect of our data showed potential outliers. which may have arisen due to data entry mistakes, synchronization errors, and other sources. To address outliers, monthly observations of the outcome were arranged separately for each facility into a unique time series. The nonparametric Friedman’s super smoother regression estimator [@friedmanVariableSpanScatterplot1984] was applied to each time series to identify outlier observations and replace them through linear interpolation [@hyndmanAutomaticTimeSeries2008]. By considering outliers on a facility-by-facility basis, the data cleaning approach preserves extreme values that may reflect true variances in incidence (for example, incidences reported by a large, regional reference hospital) while addressing potential errors in data entry. Interpolated values were coerced to the nearest integer. 
+Visual inspect of our data showed potential outliers, which may have arisen due to data entry mistakes, synchronization errors, and other sources. To address outliers, monthly observations of the outcome were arranged separately for each facility into a unique time series. The nonparametric Friedman’s super smoother regression estimator [@friedmanVariableSpanScatterplot1984] was applied to each time series to identify outlier observations and replace them through linear interpolation [@hyndmanAutomaticTimeSeries2008]. By considering outliers on a facility-by-facility basis, the data cleaning approach preserved extreme values that may habe reflected true variances in visit counts (for example, visits reported by a large, regional reference hospital) while addressing potential errors in data entry. Interpolated values were coerced to the nearest integer. 
 
 Linear interpolation ultimately only impacted `r format(as.numeric(n_changed), big.mark = ",")` of `r format(as.numeric(n_obs), big.mark = ",")` observations of our summary outcome measure, leaving approximately `r round(as.numeric(n_unchanged)/as.numeric(n_obs) * 100,0)`% of observations unadjusted. 
 

@@ -155,7 +155,7 @@ col_search <- "coral"
 
 col_CH <- "coral"
 col_CHD <- "coral1"
-col_CHR <- "coral3"
+col_CHR <- "deeppink3"
 col_CSB <- "steelblue2"
 col_CSB1 <- "steelblue1"
 col_CSB2 <- "steelblue3"

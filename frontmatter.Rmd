@@ -10,27 +10,25 @@ indent: true
 
 I am grateful to the many individuals who have supported and encouraged me throughout my doctoral studies
 
-First and foremost, I would like to thank the members of my dissertation committee, Stéphane Verguet, Jessica Cohen, Karestan Koenen, and Margaret McConnell. I thank the committee chair, Stéphane Verguet, for his service, and for his exceptional mentorship as my academic advisor. Throughout the last four years, he has consistently offered unwavering support and insightful guidance throughout my academic journey, and in the moments where I faltered or doubted myself most, his confidence and cheer always helped see me through. 
+First and foremost, I would like to thank the members of my dissertation committee, Stéphane Verguet, Jessica Cohen, Karestan Koenen, and Margaret McConnell. I thank the committee chair, Stéphane Verguet, for his service, and for his extraordinary mentorship as my academic advisor. Throughout the last four years, he has consistently offered unwavering support and insightful guidance throughout my academic journey, and in the moments where I faltered or doubted myself most, his confidence and cheer always helped see me through. 
 
-Jessica Cohen has been a constant source of joy and inspiration throughout my studies, and her exceptional teaching and scholarship have set a standard to aspire to. In addition to being a brilliant scholar, she is an incredible mentor and instructor, bringing genuine joy to the rigorous study of challenging questions. Her enthusiasm for econometrics and public health is infectious, and I feel extremely grateful to have learned so much by her example. 
+Jessica Cohen has been a constant source of joy and inspiration throughout my studies, and her teaching and scholarship have set a standard to aspire to. In addition to being a brilliant scholar, she is an incredible mentor and instructor, bringing genuine joy to the rigorous study of challenging questions. I feel extremely grateful to have learned so much from her example and from her enthusiasm for econometrics and public health. 
 
 Karestan Koenen has my deepest gratitude for inviting me to join her research collaboration on climate and mental health in Madagascar, an invitation which transformed the arc of my research and led to subject of this thesis. Despite the incredible demands on her schedule as an accomplished scholar and public health leader, she generously shared her expertise with me and her fellow committee members. Her insights and suggestions were instrumental in shaping this research, and her encouragement kept me motivated throughout the entire process. 
 
 Margaret McConnell has been an exceptional teacher, mentor, and colleague, and is one of the most dependable people I know. She manages a myriad of commitments with grace, always finding the time to kindle excitement for discovery and to share her thoughts and guidance. So many individuals in our department have been fortunate to have her in their corner, and I am ever grateful to be one of them.
 
-I am also deeply grateful to my coauthors, without whom the research in these pages would be immeasurably lessened, and to the reviewers whose thoughtful reflections strengthened every page. I thank Shekhar Saxena for his guiding leadership in global mental health and for welcoming me into the field when I first arrived at Harvard, and I thank Christopher Golden for welcoming me into his lab and providing every opportunity, guidance, and support a student could wish for throughout the development of the second paper of this thesis. 
+I am also deeply grateful to my coauthors and reviewers, whose thoughtful reflections strengthened every page. I thank Shekhar Saxena for his guiding leadership in global mental health and for welcoming me into the field when I first arrived at Harvard, and I thank Christopher Golden for welcoming me into his lab and providing every opportunity, guidance, and support a student could wish for throughout the development of the second paper of this thesis. 
 
 <!-- I also wish to express my gratitude to Judith Bass, who graciously offered to serve as the External Reader for this dissertation, and who fostered my interest in mental health while undertaking my Masters of Public Health degree at Johns Hopkins. -->
 
-The community in the Department of Global Health and Population has been a treasured home away from home, and I am grateful to so many of its members for the opportunity to learn at their side. My deep appreciation goes to David Bloom, David Canning, Margaret Kruk, and Vikram Patel, whose classes and coffee chats all have shaped my interests and the course of my career. 
+The community in the Department of Global Health and Population has been a treasured home away from home, and I am grateful to so many of its members for the opportunity to learn at their side. My deep appreciation goes to David Bloom, David Canning, Margaret Kruk, and Vikram Patel, whose classes and coffee chats all have shaped my interests and the course of my career. I also owe a debt of gratitude to Barbara Heil and Allison Conary for all the mountains they have moved and the uphill struggles they have seen me soundly through.
 
-Among the acknowledgements of our department's dissertations past, two people who have tirelessly worked to support students on their journeys are highlighted, without fail. This dissertation is no exception: to Barbara Heil and Allison Conary, I owe a debt of gratitude for all the mountains they have moved and the uphill struggles they have seen me soundly through.
-
-I also would like to thank the many other individuals at the School of Public Health who have made the last four years so memorable and full of warm memories. I am thankful to Claudette Agustin, Matthew Boccuzzi, Jarvis Chen, and Bruce Villineau for all the care and welcome they have shared with me and with each cohort of students in the Population Health Sciences program. 
+I also would like to thank the many other individuals at the School of Public Health who have made the last four years so full of warm memories. I am thankful to Claudette Agustin, Matthew Boccuzzi, Jarvis Chen, and Bruce Villineau for all the care and welcome they have shared with me and with each cohort of students in the Population Health Sciences program. 
 
 <!--For MIP: Eric Di'Giovanni and Deborah Blacker -->
 
-Across the Charles River are many dear colleagues who have dedicated themselves to ensuring that Harvard feel like home to all its students. To Jackie Yun and Janet Daniels at the GSAS Student Center, and to Sheila Thomas, Katie Saibara, and Karina Gonzalez Herrera of the GSAS Office of Equity, Diversity, Inclusion & Belonging, I wish to express my deepest admiration and appreciation.
+Across the Charles River are many dear colleagues who have dedicated themselves to ensuring that Harvard feels like home to all its students. To Jackie Yun and Janet Daniels at the GSAS Student Center, and to Sheila Thomas, Katie Saibara, and Karina Gonzalez Herrera of the GSAS Office of Equity, Diversity, Inclusion & Belonging, I wish to express my deepest admiration and appreciation.
 
 I am also thankful to the Harvard Center for Population and Development Studies for allowing me to be a part of a vibrant research community, and to Bobby and Johnny Lamont for welcoming me into their home through many trips to Cambridge. 
 
@@ -56,15 +54,15 @@ With all my love and wholehearted gratitude, I dedicate this work to my parents,
 
 \vspace{12pt}
 
-To my parents, your \emph{hijito} hopes that this work honors your lifelong commitment to the pursuit of knowledge and a better world—a devotion only exceeded by the love and support you have shared with me every day of my life.
+To my parents, your \emph{hijito} hopes that this work honors your lifelong commitment to the pursuit of knowledge and of a better world—a devotion only exceeded by the love and support you have shared with me every day of my life.
 
 \vspace{12pt}
 
-To John, my partner, words cannot express how much it has meant to me to call you that. Every step on this journey, love, has been easier with you at my side, with your hand in mine.
+To John, my partner, words cannot express how much it has meant to me to call you that. Every step on this journey has been easier with you at my side, with your hand in mine.
 
 \vspace{12pt}
 
-\emph{To the steps we have taken already, and to the many we have ahead.}
+\emph{To the steps we have taken already, love, and to the many we have ahead.}
 
 \end{raggedright}
 

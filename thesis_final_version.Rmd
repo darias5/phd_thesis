@@ -32,22 +32,118 @@ header-includes:
   # - \addbibresource{bibliography.bib}  
   
 bibliography: main.bib
-# natbiboptions: "numbers"
-csl: https://www.zotero.org/styles/the-lancet 
-
-  # intro: intro.bib
-  # ch1: chapter1.bib
-  # 
-
+csl: https://www.zotero.org/styles/the-lancet
 acronyms:
   insert_loa: false
-  loa_title: ""
-
-  # loa_title: "List of Acronyms"
+  insert_links: false
+  loa_title: ''
   keys:
-    - shortname: LMIC
-      longname: low and middle income country
-
+    - shortname: DALYs
+      longname: disability-adjusted life years
+    - shortname: YLLs
+      longname: years of life lost 
+    - shortname: YLDs
+      longname: years of healthy life lost due to disability 
+    - shortname: LMICs
+      longname: low- and middle-incomee countries
+    - shortname: WHO
+      longname: World Health Organization
+    - shortname: USD
+      longname: United States dollars
+    - shortname: GBD
+      longname: Global Burden of Disease
+    - shortname: GBO
+      longname: Global Health Observatory
+    - shortname: GDP
+      longname: gross domestic product
+    - shortname: NCDs
+      longname: noncommunicable diseases
+    - shortname: PAF
+      longname: population attributable fraction
+    - shortname: VSL
+      longname: value of a statistical life
+    - shortname: IRB
+      longname: Institutional Review Board 
+    - shortname: UIs
+      longname: uncertainty intervals
+    - shortname: CIs
+      longname: confidence intervals
+    - shortname: PPP
+      longname: purchasing power parity
+    - shortname: CCEs
+      longname: climate change-related exposures
+    - shortname: HMIS
+      longname: health management information system
+    - shortname: ESA CCI
+      longname: European Space Agency’s Climate Change Initiative
+    - shortname: ESA CCI SM
+      longname: ESA CCI soil moisture dataset
+    - shortname: ERA5
+      longname: 'European ReAnalysis 5' 
+    - shortname: NOAA
+      longname: United States National Oceanic and Atmospheric Administration
+    - shortname: GESIS
+      longname: Gestion du Système d'Information Sanitaire
+    - shortname: DHIS2
+      longname: 'District Health Information Software 2'
+    - shortname: CSB
+      longname: centre santé de base
+    - shortname: FSB
+      longname: formation sanitaires privées de dase
+    - shortname: CHD/CHRD
+      longname: centre hospitalier de référence de district
+    - shortname: RHINO
+      longname: Routine Health Information Network
+    - shortname: USAID
+      longname: United States Agency for International Development
+    - shortname: US
+      longname: United States
+    - shortname: CHRR
+      longname: centre hospitalier de référence régionale
+    - shortname: CHU
+      longname: centre hospitalier universitaire
+    - shortname: C3S
+      longname: Copernicus Climate Change Service
+    - shortname: ECMWF
+      longname: European Centre for Medium-Range Weather Forecasts
+    - shortname: km
+      longname: kilometers
+    - shortname: MFR La Réunion
+      longname: Météo-France La Réunion
+    - shortname: WMO
+      longname: World Meteorological Organisation
+    - shortname: RSMC 
+      longname: Regional Specialized Meteorological Center
+    - shortname: NB
+      longname: negative binomial
+    - shortname: IRRs
+      longname: incidence rate ratios
+    - shortname: FE
+      longname: fixed effects
+    - shortname: CDC
+      longname: Centers for Disease Control and Prevention
+    - shortname: FDA
+      longname: Food and Drug Administration
+    - shortname: EUA
+      longname: Emergency Use Authorization
+    - shortname: MIT
+      longname: Massachusetts Institute of Technology
+    - shortname: FIPS
+      longname: Federal Information Processing Standards
+    - shortname: USDA
+      longname: United States Department of Agriculture
+    - shortname: ITS
+      longname: interrupted time series
+    - shortname: CITS
+      longname: controlled interrupted time series
+    - shortname: MDD
+      longname: major depressive disorder
+    - shortname: ADHD
+      longname: attention deficit hyperactivity disorder
+    - shortname: CoC
+      longname: clouding of consciousness
+    - shortname: GAD
+      longname: generalized anxiety disorder
 ---
 
 
@@ -131,11 +227,11 @@ Mental disorders are a leading cause of morbidity and mortality, affecting over 
 
 This dissertation aims to contribute to a better understanding of the evolving burden and dynamics of global mental health. The three studies it presents take as their focus different quantitative aspects of how the global burden is measured and evaluated, how it may be changing in response to global challenges, and how novel data sources may help in characterizing these changes, particularly in the absence of robust, high-frequency epidemiological surveillance.
 
-In Chapter 1, we investigated the share of the global burden of disease attributable to mental disorders and its associated economic value. To capture premature mortality due to mental disorders, as well as disability from associated causes, we proposed a composite approach to estimation. Using the most recently available estimates from the Global Burden of Disease study, we found that the burden of mental disorders is likely much higher than previously estimated, encompassing 16% of disability-adjusted life years in 2019. The economic value of this mental health burden was estimated to exceed 4.7 trillion USD using a value of statistical life year approach, accounting for regional losses that range from 3.9% of gross domestic product in Eastern Sub-Saharan Africa to 7.9% in High-income North America.
+In Chapter 1, we investigated the share of the global burden of disease attributable to mental disorders and its associated economic value. To capture premature mortality due to mental disorders, as well as disability from associated causes, we proposed a composite approach to estimation. Using the most recently available estimates from the Global Burden of Disease study, we found that the burden of mental disorders is likely much higher than previously estimated, encompassing 16% of disability-adjusted life years in 2019. The economic value of this mental health burden was estimated to exceed 4.7 trillion United States dollars using a value of statistical life year approach, accounting for regional losses that range from 3.9% of gross domestic product in Eastern Sub-Saharan Africa to 7.9% in High-income North America.
 
 In Chapter 2, we focused on Madagascar—a low income country that is among the most vulnerable to the health consequences of climate change—and examine how health system visits for mental disorders may be shifting in response to climate change exposures such as changes in temperature, soil moisture, and the duration of tropical storms and cyclones. Drawing on meteorologic, geospatial, and health system data reported by 3,413 facilities from 2010 to 2020, we conducted an ecological analysis using negative binomial regression.  Our results indicated that warmer temperatures in the cooler central highlands were associated with a decrease in monthly reported visits for mental disorders, while higher soil moisture could lead to an increase in visits, particular in high flood-risk regions and after a three-month lag, indicating potential variation in the impact of climate change on mental health needs and system responses.
 
-In Chapter 3, I investigated how Google search data for mental health symptoms might provide insight into the state of mental health during the COVID-19 pandemic. Using an interrupted time series approach with search data from U.S. counties, states, and international trends, I found that announcements of COVID-19 vaccine safety and efficacy data in November 2020 were associated with immediate and sustained declines in search density for anxiety and depression. These declines in searches, if taken as a reasonable proxy for population mental health, underscore the importance of timely and transparent communication and illustrate the potential application of high frequency internet search data for population mental health surveillance.
+In Chapter 3, I investigated how Google search data for mental health symptoms might provide insight into the state of mental health during the COVID-19 pandemic. Using an interrupted time series approach with search data from Australia, Ireland, New Zealand, Singapore, the United Kingdom, and the United States, I found that announcements of COVID-19 vaccine safety and efficacy data in November 2020 were associated with immediate and sustained declines in search density for anxiety and depression. These declines in searches, if taken as a reasonable proxy for population mental health, underscore the importance of timely and transparent communication and illustrate the potential application of high frequency internet search data for population mental health surveillance.
 
 Taken together, these chapters highlight different facets of the global burden of mental disorder and contribute to a growing effort to generate a more comprehensive understanding of the challenges posed by this burden at local, regional, and global levels.
 
@@ -161,7 +257,18 @@ Taken together, these chapters highlight different facets of the global burden o
 
 \cleardoublepage
 
+\newpage
+
 \end{spacing}
+
+\section*{List of Acronyms}
+
+\addcontentsline{toc}{section}{List of Acronyms}
+
+\printacronyms
+
+\newpage
+
 
 ```{r frontmatter, child='frontmatter.Rmd'}
 ```
@@ -217,13 +324,10 @@ Taken together, these chapters highlight different facets of the global burden o
 
 ### TO DO / KNOWN ISSUES
 
-# Acronyms with acronym down
-# Separate bibliography for each section
+# Check that sequential articles are represented by a dash
+# Institutional authors need to be fixed in bibliography
 # Numbered figures and tables by section
 
-# Check that sequential articles are represented by a dash
-# Table of figures and tables
-# Institutional authors need to be fixed in bibliography
 
 ```
 

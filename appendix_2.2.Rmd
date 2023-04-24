@@ -278,7 +278,7 @@ These cases indicated that identifying unique facilities would require catchment
 
 Using facility name, type, and catchment area to uniquely identify facilities in our sample, we identified `r  prettyNum(n_facilities_overall, big.mark = ",", scientific = FALSE)` unique facilities. In order to classify these facilities by type, we extracted the relevant data from the "FS' variable; in doing so, we observed slight orthographic variations in the classification of facilities types (e.g., "CSB 1" vs. "CSB1") that required standardization.
 
-We standardized region, district, and commune names in our sample against reference shapefiles to address variations in translation (e.g., "Atsimo" and "Sud" being the Malagasy and French words for "South"), abbreviation (e.g., "St." as an abbreviation for "Saint"), transposition (e.g., "Bevoay Beretra" transposed as "Beretra Bevoay"), accent marks (e.g., "Tovòna" vs. "Tovona"), spacing (e.g., "AmbalapaisoII" vs. "Ambalapaiso II"), separation vs. combination of names (e.g., "Tanambaovatrakaka" vs. "Tanambao Vahatrakaka"), hyphenation (e.g, "Ankiabe Salohy" and "Ankiabe-Salohy"), and spelling (e.g., "Mizilo Gare" vs.	"Mizilo Gara"). 
+We standardized region, district, and commune names in our sample against reference shapefiles to address variations in translation (e.g., "Atsimo" and "Sud" being the Malagasy and French words for "South"), abbreviation (e.g., "St." as an abbreviation for "Saint"), transposition (e.g., "Bevoay Beretra" transposed as "Beretra Bevoay"), accent marks (e.g., "Tovòna" vs. "Tovona"), spacing (e.g., "AmbalapaisoII" vs. "Ambalapaiso II"), separation vs. combination of names (e.g., "Tanambaovatrakaka" vs. "Tanambao Vahatrakaka"), hyphenation (e.g., "Ankiabe Salohy" and "Ankiabe-Salohy"), and spelling (e.g., "Mizilo Gare" vs.	"Mizilo Gara"). 
 
 
 ```{r facility-name-standardization-function_1,  warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
@@ -2726,7 +2726,7 @@ Grouping resulted in `r format(as.numeric(n_groups), big.mark = ",")` coordinate
 
 In order to evaluate whether groups of two coordinates (which we referred to as "line groups") and groups of three or more coordinate ("polygon groups") were internally consistent (i.e., the points within a group were not geographically far apart, suggesting uncertainty in the location of a facility), we calculated the length (for line groups) and area (for polygon groups) of groups with more than one coordinate. 
 
-We applied an arbitrary restriction to line and polygon groups, such that the length or area, respectively, would not exceed a particular threshold. The threshold for length (`r format(as.numeric(length_lim), big.mark = ",")` km.) was selected to be approximately half the distance of one side of a spatial climate resolution tile (~30 km for ERA-5 data). The threshold for area (`r format(as.numeric(area_lim), big.mark = ",")` km²) was assigned to be the length threshold, squared. Groups that exceeded their respective thresholds were discarded.
+We applied an arbitrary restriction to line and polygon groups, such that the length or area, respectively, would not exceed a particular threshold. The threshold for length (`r format(as.numeric(length_lim), big.mark = ",")` \acr{km}) was selected to be approximately half the distance of one side of a spatial climate resolution tile (~30 \acr{km} for \acr{ERA5} data). The threshold for area (`r format(as.numeric(area_lim), big.mark = ",")` \acr{km}²) was assigned to be the length threshold, squared. Groups that exceeded their respective thresholds were discarded.
 
 ```{r step_3-histogram-prep, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
 
@@ -2829,7 +2829,7 @@ ggsave(filename = "gps_data_lines.jpg", plot = last_plot(),
 
 <!-- ``` -->
 
-Among polygon groups, the mean area was `r format(round(n_mean_area_polygons,2), big.mark = ",")` km², with a maximum area of `r format(round(n_max_area_polygons), big.mark = ",")` km². At the threshold of `r format(as.numeric(area_lim), big.mark = ",")` km², all polygon groups fell within the cut-off. Among line groups, the mean distance between coordinates was `r format(round(n_mean_length,2), big.mark = ",")` km, with a maximum distance of `r format(round(n_max_length), big.mark = ",")` km. At the threshold of `r format(as.numeric(length_lim), big.mark = ",")` km,  `r format(round(n_length_retained), big.mark = ",")` line groups fell within the cut-off (`r round(as.numeric(n_length_retained)/n_line * 100,0)`% of line groups).
+Among polygon groups, the mean area was `r format(round(n_mean_area_polygons,2), big.mark = ",")` \acr{km}², with a maximum area of `r format(round(n_max_area_polygons), big.mark = ",")` \acr{km}². At the threshold of `r format(as.numeric(area_lim), big.mark = ",")` \acr{km}², all polygon groups fell within the cut-off. Among line groups, the mean distance between coordinates was `r format(round(n_mean_length,2), big.mark = ",")` \acr{km}, with a maximum distance of `r format(round(n_max_length), big.mark = ",")` \acr{km}. At the threshold of `r format(as.numeric(length_lim), big.mark = ",")` \acr{km},  `r format(round(n_length_retained), big.mark = ",")` line groups fell within the cut-off (`r round(as.numeric(n_length_retained)/n_line * 100,0)`% of line groups).
 
 ```{r step_3-retaining-coordinates-within-threshold, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
 
@@ -3275,9 +3275,9 @@ label = "Centroid"
 
 ```
 
-While it would be ideal to obtain precise locations for each facility in our sample, for the purposes of our analysis, an approximate location would be sufficient, given the spatial resolution of the climate data we used. The spatial resolution of ERA-5 and ESA-CCI data is approximately 30 km., meaning that all coordinates within a spatial tile of 900 km² will have the same time series for a given variable. Furthermore, neighboring tiles are unlikely to have extraordinarily different time series, underscoring that close approximate locations would likely result in minimal impact to the analysis versus exact coordinates.
+While it would be ideal to obtain precise locations for each facility in our sample, for the purposes of our analysis, an approximate location would be sufficient, given the spatial resolution of the climate data we used. The spatial resolution of \acr{ERA5} and \acr{ESA CCI} data is approximately 30 \acr{km}, meaning that all coordinates within a spatial tile of 900 \acr{km}² will have the same time series for a given variable. Furthermore, neighboring tiles are unlikely to have extraordinarily different time series, underscoring that close approximate locations would likely result in minimal impact to the analysis versus exact coordinates.
 
-For commune-level facilities, knowing the catchment area may therefore be just as informative as knowing the facility's precise location if the catchment area was sufficiently small. Determining a cut-off was, again, arbitrary; to adopt a conservative threshold, we considered a catchment area small if its area was  no greater than `r format(as.numeric(area_lim), big.mark = ",")` km², which corresponded to approximately `r round(as.numeric(area_lim)/(30*30) * 100,0)`% of the area of a climate data spatial resolution tile (Figure \ref{figure_communes_fokontany}).
+For commune-level facilities, knowing the catchment area may therefore be just as informative as knowing the facility's precise location if the catchment area was sufficiently small. Determining a cut-off was, again, arbitrary; to adopt a conservative threshold, we considered a catchment area small if its area was  no greater than `r format(as.numeric(area_lim), big.mark = ",")` \acr{km}², which corresponded to approximately `r round(as.numeric(area_lim)/(30*30) * 100,0)`% of the area of a climate data spatial resolution tile (Figure \ref{figure_communes_fokontany}).
 
 
 ```{r figure_communes_fokontany, include = TRUE, results = TRUE, warning = FALSE, message = FALSE, echo = FALSE, fig.width = 9, fig.height = 8.5, fig.align='center', out.width = '95%',  fig.scap="Communes and fokontany in Madagascar, by area.", out.extra='',  fig.cap="\\label{figure_communes_fokontany}Communes and fokontany in Madagascar, by area. Units colored in teal are within the 225 km² threshold for use in Step 5 of the matching process."}
@@ -3364,6 +3364,13 @@ ggsave(filename = "fokontany_size_binary.jpg", plot = last_plot(),
        width = 8,
        height = 7,
        bg = "white")
+
+
+ ggsave(filename = paste0("Figure_24.jpg"),
+    plot = last_plot(),
+    width = 7,
+    height = 6,
+    bg = "white")
 
 ggarrange(map_a, map_b, ncol = 2, common.legend = TRUE, legend = "bottom")
 

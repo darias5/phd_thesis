@@ -603,7 +603,7 @@ mh_diseases_n <- format(length(list_mental_health_symptoms), big.mark = ",")
 num_models_multiverse = format(max(model_outputs_multiverse$model_number), big.mark = ",") 
 
 ```
-I applied this model for all available `r diseases_n` diseases with county-level data. As search density may rapidly change in response to new announcements, I trimmed the bandwidth of dates to fit the model to 40 days before and after November 16, 2020.
+I applied this model for all available `r diseases_n` diseases with county-level data, weighted by population size. As search density may rapidly change in response to new announcements, I trimmed the bandwidth of dates to fit the model to 40 days before and after November 16, 2020.
 
 To control for time-varying confounders which may affect symptom search trends, I applied a \acr{CITS} approach to contrast how searches for mental health symptoms varied above and beyond changes in search density for a comparable physical complaint (i.e., headaches).
 

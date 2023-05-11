@@ -239,7 +239,7 @@ The sample of health facilities in our study was obtained from health facility d
 
 * **Region**: The region of Madagascar that contained the facility's catchment area. All facilities had a value for this variable.
 * **District**: The district of Madagascar (2nd largest administrative unit) that contained the facility's catchment area. Only district- and commune-level facilities had a value for this variable.
-* **Commune**: The commune of Madagascar (3rd largest unit) that contained the facility's catchment area. Only basic health facility had a value for this variable.
+* **Commune**: The commune of Madagascar (3rd largest unit) that contained the facility's catchment area. Only basic health facilities had a value for this variable.
 * **FS**: The facility type and name. The facility type would typically be identified with an acronym (e.g., CSB2, CHD1, etc.), with the facility name following thereafter. The facility name would occasionally be the same as the commune, district, or region that corresponded with the facility's catchment area (e.g., CHRR Alaotra Mangoro). Some facilities were named for the village (*fokontany*) that they were located in. Other facilities were named for the groups that operated them (e.g., facilities named "EKAR" are operated by the *Eglizy Katôlika Apôstôlika Rômanina*, or the Roman Catholic Church).
 
 Before beginning to geolocate our sample, we began by identifying the unique facilities therein. At first pass, our sample included `r  prettyNum(n_facilities_name, big.mark = ",", scientific = FALSE)` uniquely named facilities. We observed, however, several instances where facilities in different regions shared the same facility name: for example, there is a CSB2 facility named "Ambalabe" in both the Sava and Atsimo Atsinanana regions, which are located at the northern and southern ends of Madagascar, respectively. 
@@ -1252,7 +1252,7 @@ A summary of the standardization changes is provided below.
 \addcontentsline{lot}{table}{Table S2.6: Standardization of region names.}
 
 
-``` {r table_standardization_region_1, results = TRUE, , warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
+``` {r table_standardization_region_1, results = TRUE, , warning = FALSE, message = FALSE, echo = FALSE, include = TRUE}
 
 column2 <- data_mh %>% dplyr::select(commune, district, region) %>% unique()
 column1 <- facilities_all %>% dplyr::select(region_name, district_name, commune_name) %>% unique()
@@ -1505,7 +1505,7 @@ facilities_all_gps <- facilities_all_nogps[-(1:nrow(facilities_all_nogps)),]
 facilities_all_gps <- facilities_all_gps %>% mutate(source ="") %>% mutate(geometry ="")
 ```
 
-After standardizing facility types and catchment areas, the sample consisted of `r  prettyNum(n_facilities_combined, big.mark = ",", scientific = FALSE)` unique facilities. This list of facilities was then manually inspected for any remaining duplicates. From reviewing this list, we observed that in the Diana region, the regional hospitals named "Hopitaly MANARA-PENITRA" and "Hopitaly Manara-Penitra Antsiranana" were duplicates, but appeared separately because the latter name contained the city the hospital is located in, Antsiranana. We standardized the names of those facilities, which resolved `r  prettyNum(n_dif, big.mark = ",", scientific = FALSE)` `r ifelse(n_dif > 1, "duplicates","duplicate")`).
+After standardizing facility types and catchment areas, the sample consisted of `r  prettyNum(n_facilities_combined, big.mark = ",", scientific = FALSE)` unique facilities. This list of facilities was then manually inspected for any remaining duplicates. From reviewing this list, we observed that in the Diana region, the regional hospitals named "Hopitaly MANARA-PENITRA" and "Hopitaly Manara-Penitra Antsiranana" were duplicates, but appeared separately because the latter name contained the city the hospital is located in, Antsiranana. We standardized the names of those facilities, which resolved `r  prettyNum(n_dif, big.mark = ",", scientific = FALSE)` `r ifelse(n_dif > 1, "duplicates","duplicate")`.
 
 The final sample of `r  prettyNum(n_facilities_new, big.mark = ",", scientific = FALSE)` unique facilities consisted of:  `r  prettyNum(n_CSB +n_CSB1 +n_CSB2, big.mark = ",", scientific = FALSE)` CSB facilities, including `r  prettyNum(n_CSB1, big.mark = ",", scientific = FALSE)` CSB1s, `r  prettyNum(n_CSB2, big.mark = ",", scientific = FALSE)` CSB2s, and `r  prettyNum(n_CSB, big.mark = ",", scientific = FALSE)` of unknown level; `r  prettyNum(n_FSP, big.mark = ",", scientific = FALSE)`  FSP facilities; `r  prettyNum(n_CHD + n_CHD1 + n_CHD2, big.mark = ",", scientific = FALSE)`  district hospitals, including `r  prettyNum(n_CHD1, big.mark = ",", scientific = FALSE)` CHD1 facilities, `r  prettyNum(n_CHD2, big.mark = ",", scientific = FALSE)` CHD2 facilities, and `r  prettyNum(n_CHD, big.mark = ",", scientific = FALSE)` facilities of unknown level, and `r  prettyNum(n_CHRR +n_CHU +n_CHRRCHU, big.mark = ",", scientific = FALSE)` regional hospitals, including `r  prettyNum(n_CHRR, big.mark = ",", scientific = FALSE)` CHRRs, `r  prettyNum(n_CHU, big.mark = ",", scientific = FALSE)` CHUs, and `r  prettyNum(n_CHRRCHU, big.mark = ",", scientific = FALSE)` of unknown type.
 
@@ -2195,7 +2195,7 @@ We began by gathering data from a validated spatial inventory of health faciliti
 
 <!-- ``` -->
 
-In order to systematically match facilities in our sample to facilities in the spatial inventory, we implemented an approximate string matching technique. This technique—also known as "fuzzy string searching"—is a common approach to record linkage, where information from one source (e.g., our sample) needs to be linked to data from another (e.g., the spatial inventory). As its name suggests, this techniques allows for "strings" of text to be matched approximately, rather than exactly, to corresponding patterns. In our case, this can be helpful if the facility name is spelled slightly differently in our sample versus the spatial inventory, due to typographic errors in the raw data or small orthographic variations (e.g., writing "2" as "II", inclusion or omission of a dash, etc.). A description of how this approach can be implemented in R is available at www.R-bloggers.com. @docFuzzyStringMatching2015
+In order to systematically match facilities in our sample to facilities in the spatial inventory, we implemented an approximate string matching technique. This technique—also known as "fuzzy string searching"—is a common approach to record linkage, where information from one source (i.e., our sample) needs to be linked to data from another (i.e., the spatial inventory). As its name suggests, this techniques allows for "strings" of text to be matched approximately, rather than exactly, to corresponding patterns. In our case, this can be helpful if the facility name is spelled slightly differently in our sample versus the spatial inventory, due to typographic errors in the raw data or small orthographic variations (e.g., writing "2" as "II", inclusion or omission of a dash, etc.). A description of how this approach can be implemented in R is available at www.R-bloggers.com. @docFuzzyStringMatching2015
 
 To account for similarly named facilities located in different regions, we constructed a full, standardized name for each facility that included facility name and catchment area prior to applying our matching technique. Facility type was standardized to align with the facility types in our sample. For example, the full, standardized name for the Alakamisy Tsarazaza Health Post located in the commune of Tsarazazaa in the Fandrian district of Amoron'I Mania region would be "Alakamisy Tsarazaza Tsarazazaa Fandrian Amoron'I Mania", with the facility classified as a CSB1 facility). 
 
@@ -2724,7 +2724,7 @@ n_length_retained <- facilities_gps_any %>% filter(shape_type == "line") %>%
 
 Grouping resulted in `r format(as.numeric(n_groups), big.mark = ",")` coordinate groups in our expanded inventory. Of these, `r format(as.numeric(n_poly), big.mark = ",")` consisted of three or more coordinates, `r format(as.numeric(n_line), big.mark = ",")` consisted of two coordinates, and `r format(as.numeric(n_point), big.mark = ",")` consisted of a single coordinate.
 
-In order to evaluate whether groups of two coordinates (which we referred to as "line groups") and groups of three or more coordinate ("polygon groups") were internally consistent (i.e., the points within a group were not geographically far apart, suggesting uncertainty in the location of a facility), we calculated the length (for line groups) and area (for polygon groups) of groups with more than one coordinate. 
+In order to evaluate whether groups of two coordinates (which we referred to as "line groups") and groups of three or more coordinates ("polygon groups") were internally consistent (i.e., the points within a group were not geographically far apart, suggesting uncertainty in the location of a facility), we calculated the length (for line groups) and area (for polygon groups) of groups with more than one coordinate. 
 
 We applied an arbitrary restriction to line and polygon groups, such that the length or area, respectively, would not exceed a particular threshold. The threshold for length (`r format(as.numeric(length_lim), big.mark = ",")` \acr{km}) was selected to be approximately half the distance of one side of a spatial climate resolution tile (~30 \acr{km} for \acr{ERA5} data). The threshold for area (`r format(as.numeric(area_lim), big.mark = ",")` \acr{km}²) was assigned to be the length threshold, squared. Groups that exceeded their respective thresholds were discarded.
 
@@ -3825,8 +3825,6 @@ Comparing the geolocated coordinates to validated coordinates for each facility,
 
 \begin{spacing}{1}
 
-\addcontentsline{lot}{table}{Table S2.11: Distance between geolocated and validated coordinates.}
-
 ```{r validation_table, warning = FALSE, message = FALSE, echo = FALSE, include = TRUE, results=TRUE}
       
  facilities_sample_matches %>%         
@@ -3843,6 +3841,9 @@ Comparing the geolocated coordinates to validated coordinates for each facility,
       fmt_markdown(columns = everything())
 
 ```
+
+\addcontentsline{lot}{table}{Table S2.11: Distance between geolocated and validated coordinates.}
+
 \end{spacing}
 
 \vspace{24 pt}

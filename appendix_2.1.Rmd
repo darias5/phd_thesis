@@ -216,13 +216,14 @@ A summary of \acr{GESIS} data availability is provided in Table S2.1.
 
 \begin{raggedright}
 
-\addcontentsline{lot}{table}{Table S2.1: Availability of disaggregated health system data by year and level of care.}
-
 ```{r table_s_2_1, echo = FALSE, include = TRUE, out.width = '100%'}
 
 knitr::include_graphics("table_s_2_1.png")
 
 ```
+
+\addcontentsline{lot}{table}{Table S2.1: Availability of disaggregated health system data by year and level of care.}
+
 \end{raggedright}
 
 \vspace{6 pt}
@@ -1502,7 +1503,7 @@ n_obs <- data_mh %>%  filter(cleaning_status == "count_raw") %>%
  nrow()
 ```
 
-Visual inspect of our data showed potential outliers, which may have arisen due to data entry mistakes, synchronization errors, and other sources. To address outliers, monthly observations of the outcome were arranged separately for each facility into a unique time series. The nonparametric Friedman’s super smoother regression estimator [@friedmanVariableSpanScatterplot1984] was applied to each time series to identify outlier observations and replace them through linear interpolation [@hyndmanAutomaticTimeSeries2008]. By considering outliers on a facility-by-facility basis, the data cleaning approach preserved extreme values that may habe reflected true variances in visit counts (for example, visits reported by a large, regional reference hospital) while addressing potential errors in data entry. Interpolated values were coerced to the nearest integer. 
+Visual inspect of our data showed potential outliers, which may have arisen due to data entry mistakes, synchronization errors, and other sources. To address outliers, monthly observations of the outcome were arranged separately for each facility into a unique time series. The nonparametric Friedman’s super smoother regression estimator [@friedmanVariableSpanScatterplot1984] was applied to each time series to identify outlier observations and replace them through linear interpolation [@hyndmanAutomaticTimeSeries2008]. By considering outliers on a facility-by-facility basis, the data cleaning approach preserved extreme values that may have reflected true variances in visit counts (for example, visits reported by a large, regional reference hospital) while addressing potential errors in data entry. Interpolated values were coerced to the nearest integer. 
 
 Linear interpolation ultimately only impacted `r format(as.numeric(n_changed), big.mark = ",")` of `r format(as.numeric(n_obs), big.mark = ",")` observations of our summary outcome measure, leaving approximately `r round(as.numeric(n_unchanged)/as.numeric(n_obs) * 100,0)`% of observations unadjusted. 
 

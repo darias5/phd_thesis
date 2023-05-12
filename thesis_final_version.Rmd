@@ -4,11 +4,7 @@ output:
   pdf_document:
     pandoc_args: !expr acronymsdown::add_filter()
     number_sections: TRUE
-    
-  # pdf_document:
-  #   pandoc_args: !expr acronymsdown::add_filter()
-  #   number_sections: TRUE
-    
+
 reference-section-title: Works Cited
 
 geometry: margin=1in
@@ -23,14 +19,7 @@ header-includes:
   - \newcommand{\blandscape}{\begin{landscape}}
   - \newcommand{\elandscape}{\end{landscape}}
   - \usepackage[nottoc]{tocbibind}
-  # - \usepackage{acro}
-  # - \usepackage{float}
-  # - \usepackage{chapterbib}
-  # - \usepackage{lastpage}
-  # - \usepackage{dcolumn}
-  # - \usepackage[backend=biber,style=authoryear-icomp]{biblatex}
-  # - \addbibresource{bibliography.bib}  
-  
+
 bibliography: main.bib
 csl: https://www.zotero.org/styles/the-lancet
 acronyms:
@@ -165,6 +154,8 @@ library(acronymsdown)
 
 \large
 
+\addcontentsline{toc}{section}{Title page}
+
 {\bf `r toupper("Quantitative Approaches Towards Evaluating the Global Burden of Mental Illness")`}
 
 \vspace{12pt}
@@ -192,14 +183,16 @@ Cambridge, Massachusetts
 
 \vspace{42pt}
 
-`r format(Sys.time(), '%B %Y')`
+`r format(as.Date('04-26-2023', '%m-%d-%Y'), '%B %Y')`
 
 \end{centering}
 
 \newpage
 
+\addcontentsline{toc}{section}{Copyright}
+
 \vspace*{\fill}
-© `r format(Sys.time(), '%Y')` Daniel Arias. All rights reserved.
+© `r format(Sys.time(), '%Y')` Daniel Alejandro Arias. All rights reserved.
 
 \newpage
 
@@ -209,7 +202,7 @@ Cambridge, Massachusetts
 
 \begin{centering}
 
-Dissertation Advisor: Stéphane Verguet \hfill Daniel Arias
+Dissertation Advisor: Stéphane Verguet \hfill Daniel Alejandro Arias
 
 \vspace{24 pt}
 
@@ -315,18 +308,4 @@ Taken together, these chapters highlight different facets of the global burden o
 
 ```{r appendix_all, child='appendix.Rmd'}
 ```
-
-\newpage
-
-
-<!-- ```{r todo} -->
-
-<!-- ### TO DO / KNOWN ISSUES -->
-
-<!-- # Check that sequential articles are represented by a dash -->
-<!-- # Institutional authors need to be fixed in bibliography -->
-<!-- # Numbered figures and tables by section -->
-
-
-<!-- ``` -->
 

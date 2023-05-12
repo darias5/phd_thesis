@@ -1582,12 +1582,13 @@ Examining lagged effects showed potential temporal associations between soil moi
 
 Results from our subgroup analysis showed evidence of potential effect heterogeneity by ecoregion (Table 2.3). For temperature, estimates of association were only statistically significant in the highland subhumid forests, where each one-degree Celsius increase in temperature was associated with `r function_dynamic_text_results(section = "regional", coefficient_option = "exposure_temperature", region_option = "2", value = "irr", value_include = "only")` visits reported `r function_dynamic_text_results(section = "regional", coefficient_option = "exposure_temperature", region_option = "2", value = "irr", value_include = TRUE)`. Temperature was associated with a slight increase in visits in the eastern lowland forests `r function_dynamic_text_results(section = "regional", coefficient_option = "exposure_temperature", region_option = "1", value = "irr", value_include = TRUE)` and the desert and xeric shrublands `r function_dynamic_text_results(section = "regional", coefficient_option = "exposure_temperature", region_option = "1", value = "irr", value_include = TRUE)`, but in neither case was the estimate significant at a level of 0.05. 
 
+\newpage
+
 \begin{spacing}{1.5}
 
 \addcontentsline{lot}{table}{Table 2.3: Subgroup analysis results, summarized by incidence rate ratios (IRRs) and average marginal effects (AME) from Models 1 through 4.}
 
 ```{r table_3, include = TRUE, echo=FALSE, warnings = FALSE}
-
 
 model_outputs_regional %>%
  filter(coefficient %in% c("exposure_temperature:exposure_sm", "exposure_temperature", "exposure_sm", "days_with_cyclone")) %>%

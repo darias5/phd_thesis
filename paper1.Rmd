@@ -1020,7 +1020,7 @@ discussion_sentence3 <- paste0("We estimate that in 2019, the losses would alrea
 
 \noindent\rule{8cm}{0.4pt}
 
-\vspace{1pt}
+\vspace{6pt}
 
 \begin{spacing}{1}
 
@@ -1042,7 +1042,7 @@ An earlier version of this paper was published by \emph{eClinicalMedicine} in Vo
 
 {\bf Findings and interpretation:} `r paste0(abstract_sentence1, abstract_sentence2, abstract_sentence3)` Taken together, our findings suggest that the burden of mental illness in terms of both health and economic losses may be much higher than previously assessed.
 
-\vspace{24pt}
+\vspace{18pt}
 
 \emph{Keywords: mental health, disease burden, premature mortality, economic burden.}
 
@@ -1111,7 +1111,7 @@ Consistent with previous approaches, we use \acr{GDP} per capita (\acr{USD} 2019
 
 The primary focus of this paper concerns structural uncertainty in determining the burden of mental illness, resulting in the evaluation of three different estimation approaches. To address parameter uncertainty within each approach, we apply a three-way sensitivity analysis. First, following a simple intuitive approach, we incorporate the upper and lower \acr{UIs} provided by \acr{GBD} 2019 for \acr{YLLs}, \acr{YLDs}, and \acr{DALYs} to account for parameter uncertainty. Second, we use the upper and lower values of prevalence estimates and of the 95% \acr{CIs} of the pooled relative risk of all-cause mortality from Walker and colleagues in our composite approach.[@walkerMortalityMentalDisorders2015] Third, our lower bound estimates are set to reallocate one sixth of the burden of musculoskeletal disorders proposed by Vigo and colleagues,[@vigoEstimatingTrueGlobal2016] while our upper bound estimates are set to reallocate one half of this burden.
 
-In addition to our base-case economic valuation, we further report our \acr{VSL} estimates using three times \acr{GDP} per capita as the value of a DALY. (Alternative valuations using values of $1,000 and $5,000, as well as \acr{PPP}-adjusted \acr{GDP} per capita, are reported in Tables S1.5 and S1.6 of Appendix 1.)
+In addition to our base-case economic valuation, we further report our \acr{VSL} estimates using three times \acr{GDP} per capita as the value of a DALY. 
 
 ### Statistical analysis
 
@@ -1143,7 +1143,7 @@ knitr::include_graphics("table1_2.png")
 
 Rates of \acr{DALYs} and deaths attributable to mental disorders under the different estimation approaches are presented by \acr{GBD} region (Figure \ref{figure_gbd_adjusted}). Geographically, the composite approach allocated a large portion of \acr{DALYs} (to mental disorders) in Eastern Europe, North and Latin America, and sub-Saharan Africa. This is largely driven by the inclusion of premature mortality in the composite approach. Estimates of DALYs by country income group and \acr{GBD} region are reported in Table 1.2. (Estimates of deaths are reported in Table S1.4-1.6.)
 
-Under the three approaches, we calculated the economic value of mental disorder losses (Table 1.3). `r results_sentence2`. Further adjusting for purchasing power parity, the global value of mental illness losses would exceed 7.2 trillion international dollars in 2019 (Table S1.7).
+Under the three approaches, we calculated the economic value of mental disorder losses (Table 1.3). `r results_sentence2`. Further adjusting for purchasing power parity, the global value of mental illness losses would exceed 7.2 trillion international dollars in 2019 (Table S1.7). (Alternative valuations using values of $1,000 and $5,000, as well as \acr{PPP}-adjusted \acr{GDP} per capita, are reported in Table S1.8 of Appendix 1.)
 
 \begin{raggedright}
 

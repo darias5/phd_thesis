@@ -154,7 +154,7 @@ library(acronymsdown)
 
 \large
 
-\addcontentsline{toc}{section}{Title page}
+\addcontentsline{toc}{section}{Title Page}
 
 {\bf `r toupper("Quantitative Approaches Towards Evaluating the Global Burden of Mental Illness")`}
 
@@ -304,8 +304,8 @@ Taken together, these chapters highlight different facets of the global burden o
 
 \section*{Supplementary materials}
 
-\addcontentsline{toc}{section}{Supplementary materials}
+<!-- \addcontentsline{toc}{section}{Supplementary materials} -->
 
-```{r appendix_all, child='appendix.Rmd'}
-```
+<!-- ```{r appendix_all, child='appendix.Rmd'} -->
+<!-- ``` -->
 

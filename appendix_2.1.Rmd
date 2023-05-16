@@ -230,42 +230,46 @@ knitr::include_graphics("table_s_2_1.png")
 
 After compiling the \acr{GESIS} data, we translated the case definitions from French to English. The translations are provided in Table S2.2.
 
-\vspace{24 pt}
-
-\begin{spacing}{1}
+\newpage
 
 \addcontentsline{lot}{table}{Table S2.2: Mental health disorders reported in GESIS, in French and English.}
 
-```{r  table_s_2_2, warning = FALSE, message = FALSE, echo = FALSE, include = TRUE}
+```{r table_s_2_2, echo = FALSE, include = TRUE, out.width = '97%'}
 
-mh_english_disease %>% unique() %>%
-  arrange(disease) %>%
-  relocate(disease, .before=disease_english) %>%
-    mutate(disease = gsub(" and ", " & ", disease),
-           disease =  StrTrunc(disease, maxlen = 40, ellipsis = "...", wbound = TRUE),
-           disease_english = gsub(" and ", " & ", disease_english),
-   disease_english = case_when(
-       str_detect(disease_english, "Bouffées délirantes aiguës") ~
-                   "Short-lived psychosis",
-   TRUE ~ disease_english),
-      disease_english = gsub("of diseases classified elsewhere", "(d.c.e.)", disease_english),
-      disease_english = gsub("in diseases classified elsewhere", "(d.c.e.)", disease_english),
-   disease_english = gsub(" nervous system", " N.S.", disease_english)) %>%
-  rename(English = disease_english, French = disease) %>%
-  gt() %>%
-  tab_footnote(
-    footnote = "d.c.e.: in or among diseases classified elsewhere. N.S.: nervous system",
-    locations = cells_column_labels(
-      columns = English
-    )
-  ) %>%
-  tab_style(locations = cells_column_labels(),
-            style     = list(cell_text(weight = "bold", size = 9))) %>%
-    tab_header(
-    title ="Table S2.2: Mental health disorders reported in GESIS, in French and English")
+knitr::include_graphics("table_s_2_2.png")
+
+
+# 
+# mh_english_disease %>% unique() %>%
+#   arrange(disease) %>%
+#   relocate(disease, .before=disease_english) %>%
+#     mutate(disease = gsub(" and ", " & ", disease),
+#            disease =  StrTrunc(disease, maxlen = 40, ellipsis = "...", wbound = TRUE),
+#            disease_english = gsub(" and ", " & ", disease_english),
+#    disease_english = case_when(
+#        str_detect(disease_english, "Bouffées délirantes aiguës") ~
+#                    "Short-lived psychosis",
+#    TRUE ~ disease_english),
+#       disease_english = gsub("of diseases classified elsewhere", "(d.c.e.)", disease_english),
+#       disease_english = gsub("in diseases classified elsewhere", "(d.c.e.)", disease_english),
+#    disease_english = gsub(" nervous system", " N.S.", disease_english)) %>%
+#   rename(English = disease_english, French = disease) %>%
+#   gt() %>%
+#   tab_footnote(
+#     footnote = "d.c.e.: in or among diseases classified elsewhere. N.S.: nervous system",
+#     locations = cells_column_labels(
+#       columns = English
+#     )
+#   ) %>%
+#   tab_style(locations = cells_column_labels(),
+#             style     = list(cell_text(weight = "bold", size = 9))) %>%
+#     tab_header(
+#     title ="Table S2.2: Mental health disorders reported in GESIS, in French and English")  %>%
+#    gtsave("table_s_2_2.docx")
 
 ```
 
+\newpage
 
 ```{r  function_table_s2, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
 
@@ -309,15 +313,13 @@ data %>% filter(sex == "both" & subgroup == "total") %>%
   tab_options(table.font.names = "Source Sans Pro") %>%
   fmt(
     rows = everything(),
-    fns = function(x) ifelse(is.na(x), "—", prettyNum(x, big.mark = ",")))
+    fns = function(x) ifelse(is.na(x), "—", prettyNum(x, big.mark = ",")))  
 }
 
 n_chu <- chu_data %>% dplyr::select(disease) %>% unique() %>% nrow
 
 
 ```
-
-\end{spacing}
 
 \vspace{24 pt}
 
@@ -329,24 +331,29 @@ Among district hospitals, reporting of mental disorders was consistent between 2
 
 Reporting of mental disorders was most detailed among regional referral hospitals (CHRRs) and university hospitals (CHUs), with visit counts reported for `r  prettyNum(n_chu, big.mark = ",", scientific = FALSE)` unique conditions.
 
-\newpage
-
 \begin{spacing}{1}
 
 \addcontentsline{lot}{table}{Table S2.3: Yearly cumulative visits for mental and neurological disorders reported at primary facilities.}
 
 
-```{r  reporting_tables1a, warning = FALSE, message = FALSE, echo = FALSE, include = TRUE}
+```{r  reporting_tables1a, warning = FALSE, message = FALSE, echo = FALSE, include = TRUE, out.width = '97%'}
 
-reporting_table(csb_data, "Table S2.3: Yearly cumulative visits for mental and neurological disorders reported at primary facilities")
+knitr::include_graphics("table_s_2_3.png")
+
+# 
+# reporting_table(csb_data, "Table S2.3: Yearly cumulative visits for mental and neurological disorders reported at primary facilities")  %>%
+#    gtsave("table_s_2_3.docx")
 
 ```
 
 \addcontentsline{lot}{table}{Table S2.4:  Yearly cumulative visits for mental and neurological disorders reported at district hospitals.}
 
-```{r  reporting_tables1b, warning = FALSE, message = FALSE, echo = FALSE, include = TRUE}
+```{r  reporting_tables1b, warning = FALSE, message = FALSE, echo = FALSE, include = TRUE, out.width = '97%'}
 
-reporting_table(chd_data, "Table S2.4: Yearly cumulative visits for mental and neurological disorders reported at district hospitals")
+knitr::include_graphics("table_s_2_4.png")
+
+# reporting_table(chd_data, "Table S2.4: Yearly cumulative visits for mental and neurological disorders reported at district hospitals") %>%
+#    gtsave("table_s_2_4.docx")
 
 ```
 
@@ -354,9 +361,14 @@ reporting_table(chd_data, "Table S2.4: Yearly cumulative visits for mental and n
 
 \addcontentsline{lot}{table}{Table S2.5: Yearly cumulative visits for mental and neurological disorders reported at regional hospitals.}
 
-```{r  reporting_tables2, warning = FALSE, message = FALSE, echo = FALSE, include = TRUE}
+```{r  reporting_tables2, warning = FALSE, message = FALSE, echo = FALSE, include = TRUE, out.width = '97%'}
 
-reporting_table(chu_data, "Table S2.5: Yearly cumulative visits for mental and neurological disorders reported at regional hospitals")
+knitr::include_graphics("table_s_2_5a.png")
+knitr::include_graphics("table_s_2_5b.png")
+
+
+# reporting_table(chu_data, "Table S2.5: Yearly cumulative visits for mental and neurological disorders reported at regional hospitals") %>%
+#    gtsave("table_s_2_5.docx")
 
 ```
 

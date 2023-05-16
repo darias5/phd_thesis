@@ -1252,63 +1252,60 @@ A summary of the standardization changes is provided below.
 
 \addcontentsline{lot}{table}{Table S2.6: Standardization of region names.}
 
-
-```{r table_s_2_6, echo = FALSE, include = TRUE, out.height = '97%'}
+```{r table_s_2_6, echo = FALSE, include = TRUE, out.width = '97%'}
 
 knitr::include_graphics("table_s_2_6.png")
 
+# column2 <- data_mh %>% dplyr::select(commune, district, region) %>% unique()
+# column1 <- facilities_all %>% dplyr::select(region_name, district_name, commune_name) %>% unique()
+# 
+# r_old <- column1 %>% dplyr::select(region_name) %>% unique()
+# r_new <- column2 %>% dplyr::select(region) %>% unique()
+# 
+# cbind(r_old, r_new) %>% mutate(test = region_name == region) %>%
+#   filter(test == FALSE) %>%
+#   relocate(region, .before = region_name) %>%
+#   rename("Name in data" = region,
+#          "Standardized name" = region_name) %>%
+#   dplyr::select(!test) %>%
+#   gt() %>%
+#   tab_header(
+#     title = md("**Table S2.6: Standardization of region names**")) %>%
+#   gtsave("table_s_2_6.docx")
+
+
 ```
 
-<!-- ``` {r table_standardization_region_1, results = TRUE, , warning = FALSE, message = FALSE, echo = FALSE, include = TRUE} -->
 
-<!-- column2 <- data_mh %>% dplyr::select(commune, district, region) %>% unique() -->
-<!-- column1 <- facilities_all %>% dplyr::select(region_name, district_name, commune_name) %>% unique() -->
-
-<!-- r_old <- column1 %>% dplyr::select(region_name) %>% unique() -->
-<!-- r_new <- column2 %>% dplyr::select(region) %>% unique() -->
-
-<!-- cbind(r_old, r_new) %>% mutate(test = region_name == region) %>% -->
-<!--   filter(test == FALSE) %>% -->
-<!--   relocate(region, .before = region_name) %>% -->
-<!--   rename("Name in data" = region, -->
-<!--          "Standardized name" = region_name) %>% -->
-<!--   dplyr::select(!test) %>% -->
-<!--   gt() %>% -->
-<!--   tab_header( -->
-<!--     title = md("**Table S2.6: Standardization of region names**")) %>% -->
-<!--   gtsave("table_s_2_6.docx") -->
-
-<!-- ``` -->
 
 \addcontentsline{lot}{table}{Table S2.7: Standardization of district names.}
 
-```{r table_s_2_7, echo = FALSE, include = TRUE, out.height = '97%'}
+```{r table_s_2_7, echo = FALSE, include = TRUE, out.width = '97%'}
 
 knitr::include_graphics("table_s_2_7.png")
 
+ 
+# district_old <- c("Anosibe An'Ala", "Antananarivo Atsimon", "Antananarivo Avaradr", "Antananarivo Renivoh", "Fenoarivo Atsinanana", "Mananara Avaratra", "Nosy Boraha", "Ambovombe Androy", "Tsiombe", "Amboasary Atsimo", "Ankazoabo Atsimo", "Toliara I", "Toliara II", "Toliara-I", "Toliara-II", "Midongy Atsimo", "Antanambao Manampont", "Antanambao Manampotsy", "Vohibinany", "Ambatoboeny", "FenoarivoBe", "Nosy Be", "Fianarantsoa II", "lalangina", "Belo Tsiribihina", "Vohimarina", "Befandriana Avaratra", "Boriziny", "Nosy Varika")
+# 
+# district_new <- c("Anosibe-An'ala", "Antananarivo Atsimondrano", "Antananarivo Avaradrano", "Antananarivo Renivohitra", "Fenerive Est", "Mananara-Avaratra", "Sainte Marie", "Ambovombe-Androy", "Tsihombe", "Amboasary-Atsimo", "Ankazoabo", "Toliary-I", "Toliary-II", "Toliary-I", "Toliary-II", "Midongy-Atsimo", "Antanambao Manampontsy", "Antanambao Manampontsy", "Brickaville", "Ambato Boeni", "Fenoarivobe", "Nosy-Be", "Fianarantsoa I", "Lalangina", "Belo Sur Tsiribihina", "Vohemar", "Befandriana Nord", "Port-Berge (Boriziny-Vaovao)", "Nosy-Varika")
+# 
+# as.data.frame(cbind(district_old, district_new)) %>%
+#   arrange(district_old) %>%
+#   rename("Name in data" = district_old,
+#          "Standardized name" = district_new) %>%
+#   gt() %>%
+#   tab_header(
+#     title = md("**Table S2.7: Standardization of district names**")) %>%
+#   tab_options(table.font.names = "Source Sans Pro",  page.header.use_tbl_headings	= TRUE) %>%
+#   tab_style(
+#     locations = cells_column_labels(),
+#     style     = list(
+#       cell_text(weight = "bold"))
+#   ) %>%
+#   gtsave("table_s_2_7.docx")
+
 ```
 
-<!-- ``` {r table_standardization_district_1, results = TRUE, , warning = FALSE, message = FALSE, echo = FALSE, include = TRUE} -->
-
-<!-- district_old <- c("Anosibe An'Ala", "Antananarivo Atsimon", "Antananarivo Avaradr", "Antananarivo Renivoh", "Fenoarivo Atsinanana", "Mananara Avaratra", "Nosy Boraha", "Ambovombe Androy", "Tsiombe", "Amboasary Atsimo", "Ankazoabo Atsimo", "Toliara I", "Toliara II", "Toliara-I", "Toliara-II", "Midongy Atsimo", "Antanambao Manampont", "Antanambao Manampotsy", "Vohibinany", "Ambatoboeny", "FenoarivoBe", "Nosy Be", "Fianarantsoa II", "lalangina", "Belo Tsiribihina", "Vohimarina", "Befandriana Avaratra", "Boriziny", "Nosy Varika") -->
-
-<!-- district_new <- c("Anosibe-An'ala", "Antananarivo Atsimondrano", "Antananarivo Avaradrano", "Antananarivo Renivohitra", "Fenerive Est", "Mananara-Avaratra", "Sainte Marie", "Ambovombe-Androy", "Tsihombe", "Amboasary-Atsimo", "Ankazoabo", "Toliary-I", "Toliary-II", "Toliary-I", "Toliary-II", "Midongy-Atsimo", "Antanambao Manampontsy", "Antanambao Manampontsy", "Brickaville", "Ambato Boeni", "Fenoarivobe", "Nosy-Be", "Fianarantsoa I", "Lalangina", "Belo Sur Tsiribihina", "Vohemar", "Befandriana Nord", "Port-Berge (Boriziny-Vaovao)", "Nosy-Varika") -->
-
-<!-- as.data.frame(cbind(district_old, district_new)) %>% -->
-<!--   arrange(district_old) %>% -->
-<!--   rename("Name in data" = district_old, -->
-<!--          "Standardized name" = district_new) %>% -->
-<!--   gt() %>% -->
-<!--   tab_header( -->
-<!--     title = md("**Table S2.7: Standardization of district names**")) %>% -->
-<!--   tab_options(table.font.names = "Source Sans Pro",  page.header.use_tbl_headings	= TRUE) %>% -->
-<!--   tab_style( -->
-<!--     locations = cells_column_labels(), -->
-<!--     style     = list( -->
-<!--       cell_text(weight = "bold")) -->
-<!--   ) %>% -->
-<!--   gtsave("table_s_2_7.docx") -->
-<!-- ``` -->
 
 \addcontentsline{lot}{table}{Table S2.8: Standardization of district names, based on commune name.}
 
@@ -1316,136 +1313,137 @@ knitr::include_graphics("table_s_2_7.png")
 
 knitr::include_graphics("table_s_2_8.png")
 
+# 
+# 
+# district_tobechanged <- c("Antsirabe II", "Port-Berge (Boriziny-Vaovao)", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Betafo", "Vohemar", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I")
+# 
+# 
+# district_communes_affected <- c("Antanamalaza", "Andribavontsona", "Ambalamidera", "Andoharanomaintso", "Anjoma-tsara", "Ankarinarivo", "Fanjakana", "Iavinomby", "Isorana", "Nasandratrony", "Soatanana", "Alakamisy Ambohimahy", "Ambalakely", "Ambalamahasoa", "Andianjanto Est", "Andrainjanto Centre", "Androy", "Fandravandava", "Ialananidro", "Ivoamba", "Mahatsinjo", "Mahatsinjony", "Sahambavy", "Taindambo", "Antanambao Ambary", "Antsahavaribe", "Ambohimahavelona", "Ambolofoty", "Anakao", "Analamisampy", "Andranohinaly", "Andranovory", "Ankililoaka", "Ankilimalinika", "Beheloka", "Behompy", "Belalanda", "Betsinjaka", "Manombo", "Manorofify", "MarofotyMarofoty", "Maromiandra", "Miary", "Milenaka", "Mitsinjo", "Soalara", "St Augustin", "Tsianisiha", "Alakamisy Itenina", "Andranomiditra", "Andranovorivato", "Ankaromalaza Mifanas", "Ihazoara", "Mahaditra", "Mahasoabe", "Maneva", "Soaindrana", "Talata Ampano", "Vohibato Ouest", "Vohimarina", "Vohitrafeno")
+# 
+# 
+# district_changed <- c("Ambatolampy", "Analalava", "Isandra", "Isandra", "Isandra", "Isandra", "Isandra", "Isandra", "Isandra", "Isandra", "Isandra", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Mandoto", "Sambava", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato")
+# 
+# 
+# as.data.frame(cbind(district_tobechanged, district_changed, district_communes_affected)) %>%
+#   arrange(district_tobechanged) %>%
+#   relocate(district_communes_affected, .before = district_tobechanged) %>%
+#   rename("District name in data" = district_tobechanged,
+#          "Communes" = district_communes_affected,
+#          "District name, updated" = district_changed) %>%
+#   gt() %>%
+#   tab_header(
+#     title = md("**Table S2.8: Standardization of district names, based on commune name**")) %>%
+#   tab_options(table.font.names = "Source Sans Pro",  page.header.use_tbl_headings	= TRUE) %>%
+#   tab_style(
+#     locations = cells_column_labels(),
+#     style     = list(
+#       cell_text(weight = "bold"))
+#   )%>%
+#   gtsave("table_s_2_8.docx")
+
+
+
 ```
 
-<!-- ``` {r table_standardization_district_commune_1, results = TRUE, , warning = FALSE, message = FALSE, echo = FALSE, include = TRUE} -->
-
-<!-- district_tobechanged <- c("Antsirabe II", "Port-Berge (Boriziny-Vaovao)", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Betafo", "Vohemar", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Toliara-I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I", "Fianarantsoa I") -->
-
-
-<!-- district_communes_affected <- c("Antanamalaza", "Andribavontsona", "Ambalamidera", "Andoharanomaintso", "Anjoma-tsara", "Ankarinarivo", "Fanjakana", "Iavinomby", "Isorana", "Nasandratrony", "Soatanana", "Alakamisy Ambohimahy", "Ambalakely", "Ambalamahasoa", "Andianjanto Est", "Andrainjanto Centre", "Androy", "Fandravandava", "Ialananidro", "Ivoamba", "Mahatsinjo", "Mahatsinjony", "Sahambavy", "Taindambo", "Antanambao Ambary", "Antsahavaribe", "Ambohimahavelona", "Ambolofoty", "Anakao", "Analamisampy", "Andranohinaly", "Andranovory", "Ankililoaka", "Ankilimalinika", "Beheloka", "Behompy", "Belalanda", "Betsinjaka", "Manombo", "Manorofify", "MarofotyMarofoty", "Maromiandra", "Miary", "Milenaka", "Mitsinjo", "Soalara", "St Augustin", "Tsianisiha", "Alakamisy Itenina", "Andranomiditra", "Andranovorivato", "Ankaromalaza Mifanas", "Ihazoara", "Mahaditra", "Mahasoabe", "Maneva", "Soaindrana", "Talata Ampano", "Vohibato Ouest", "Vohimarina", "Vohitrafeno") -->
-
-
-<!-- district_changed <- c("Ambatolampy", "Analalava", "Isandra", "Isandra", "Isandra", "Isandra", "Isandra", "Isandra", "Isandra", "Isandra", "Isandra", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Lalangina", "Mandoto", "Sambava", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Toliary-II", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato", "Vohibato") -->
-
-
-<!-- as.data.frame(cbind(district_tobechanged, district_changed, district_communes_affected)) %>% -->
-<!--   arrange(district_tobechanged) %>% -->
-<!--   relocate(district_communes_affected, .before = district_tobechanged) %>% -->
-<!--   rename("District name in data" = district_tobechanged, -->
-<!--          "Communes" = district_communes_affected, -->
-<!--          "District name, updated" = district_changed) %>% -->
-<!--   gt() %>%  -->
-<!--   tab_header( -->
-<!--     title = md("**Table S2.8: Standardization of district names, based on commune name**")) %>% -->
-<!--   tab_options(table.font.names = "Source Sans Pro",  page.header.use_tbl_headings	= TRUE) %>% -->
-<!--   tab_style( -->
-<!--     locations = cells_column_labels(), -->
-<!--     style     = list( -->
-<!--       cell_text(weight = "bold")) -->
-<!--   )%>% -->
-<!--   gtsave("table_s_2_8.docx") -->
-
-<!-- ``` -->
 
 \addcontentsline{lot}{table}{Table S2.9: Standardization of commune names.}
 
-```{r table_s_2_9, echo = FALSE, include = TRUE, out.height = '97%'}
+```{r table_s_2_9a, echo = FALSE, include = TRUE, out.width = '97%'}
 
 knitr::include_graphics("table_s_2_9a.png")
-knitr::include_graphics("table_s_2_9b.png")
 
 ```
 
 
-<!-- ``` {r table_standardization_commune_1, results = TRUE, , warning = FALSE, message = FALSE, echo = FALSE, include = TRUE} -->
+```{r table_s_2_9b, echo = FALSE, include = TRUE, out.width = '97%'}
+
+knitr::include_graphics("table_s_2_9b.png")
+
+# commune_old <- c("Alakamisy Ambohimahy", "Alakamisy Itenina", "Ambadrika", "Ambalakely", "Ambalamahasoa", "Ambalamanasy   II", "Ambalamidera", "AmbalapaisoII", "Ambararatabe /Nord",
+#                  "Ambarijeby Atsimo", "Ambatoben'anja", "AmbatofisakaII", "AmbatoharananaI", "Ambatolampy Tsimahaf", "Ambatolampy Tsimahafotsy", "Ambatoriha/Est", "Ambatotsipihana",
+#                  "Ambatovala", "Ambatry", "Ambinanin'Andravory", "Ambinaninandro", "Ambinaniroa-Andonaka", "Ambodiadabo Maitsokely", "Ambodiadabo", "Ambodiampana Lokoho",
+#                  "Ambodiampanana", "Ambodifarihy", "Ambodihazambo", "Ambodimanga  I", "Ambodimanga II-B", "Ambodimotso Atsimo", "AmbodinonokaAntaratr", "Ambodirian'Isahafary",
+#                  "Amboditandroho", "Ambohibao Atsimo", "Ambohibary", "Ambohijato Mandritsara", "Ambohimahavelona", "Ambohimalaza", "Ambohimàna", "Ambohimanga Sud",
+#                  "Ambohimanjaka", "AmbohimiarinaII", "Ambohitralalana", "Ambohitrandriamanitr", "AmbohitsaraEst", "Ambolidibe Atsinanana", "Ambolofoty", "Amboropotsy",
+#                  "Ampasimadinika", "Ampasimborajka", "Ampasimpotsy", "Ampasipotsy Gare", "Ampasipotsy Madialaz", "Ampataka Manampaneva", "Ampataka Maroreny", "Anakao",
+#                  "Analalaiva", "Analamisampy", "Analamitsivala", "Anbatomainty", "Andanandava", "Andianjanto Est", "Andimaka", "Andoharanomaintso", "Andoharanomaintso",
+#                  "Andrainjanto Centre", "Andranohinaly", "Andranomiditra", "Andranomiely", "Andranovorivato", "Andranovory", "Andravola", "Andrebakely", "Andribavontsona",
+#                  "Androndrona", "Androy", "Anjapaly", "Anjeke Ankilira", "Anjeva Gare", "Anjiabe", "Anjiaija", "Anjoman'Ankona", "Anjoma-tsara", "Ankadinondry", "Ankafina",
+#                  "Ankarinarivo", "Ankaromalaza Mifanas", "Ankasakasa", "Ankazoabo", "Ankazotokana I", "Ankiabe Salohy", "Ankiakabe-Nord", "Ankililoaka", "Ankilimalinika",
+#                  "Ankirondro", "Anontsibe", "Anosiarivo", "Anosy Tsararafara", "Antalaha", "Antanamalaza", "Antanambao Ambary", "Antanambao I", "Antanambao Manampotsy",
+#                  "Antanambaon'Amberina", "Antananarivo I", "Antananarivo II", "Antananarivo III", "Antananarivo IV", "Antananarivo V", "Antananarivo VI", "Antanandava Nord",
+#                  "Antananivo /Haut", "Antanetibe Mahazaza", "Antanimora- Sud", "Antenina I", "Antoby", "Antohaboto", "Antongo", "Antokoboritelo", "Antranonkarany", "Antsahavaribe",
+#                  "Antsakomanondro", "Antsapanimahazo", "Antsirabe I", "Antsiranana I", "Antsoantany", "Bealampoana", "Bealanana I", "Beampombo  I", "Beandrarezona I",
+#                  "Befandriana Avaratra", "Befandriana-Sud", "Befetra", "Befotaka Avaratra", "Befotaka", "Beheloka", "Behera", "Behompy", "Belafika Haut", "Belalanda",
+#                  "Belambo", "Belaoko Marovato", "Belo sur Mer", "Belo Tsiribihina", "Belotsiribihina", "Bemaneviky H", "BenatoToby", "Beraketa", "Berevo Ranobe",
+#                  "Beroy Sud", "Betioky Sud", "Betsakotsako Andrano", "Betsimiositra", "Betsinjaka", "Bevoay Beretra", "Bevonotro", "Efatsy Anandroza", "Enakara Haut",
+#                  "Enaniiliha", "Ereda", "Etrotroka", "Fandravandava", "Fanjakana", "Faux-Cap", "Fenoevo", "Fieferana", "Foulpointe", "Ialananidro", "Iavinomby", "Ibity",
+#                  "Ihaborano Namohora", "Ihazoara", "Iloto", "Imady", "Imeritsiatosika", "Isaka Ivondro", "Isaraha", "Isorana", "Ivatana", "Ivato Aéroport", "Ivoamba",
+#                  "Ivony", "Kalalao", "Kianjandrandrakefina", "labohazo", "Lavaraty Ivondro", "Mahaditra", "Mahafasa", "Mahajanga I", "Mahasoabe", "Mahatsara Lefaka",
+#                  "Mahatsinjo Atsinanana", "Mahatsinjo", "Mahatsinjony", "Mahazina", "Manajary Urbain", "Manakambahiny Est", "Manakambahiny Ouest", "Manakara(com)",
+#                  "Manambotra Sud", "Manapatrana", "Mandromodromotra", "Maneva", "Mangarivot", "Manombo", "Manorofify", "Marintampona", "Marivorahona", "Maroarivo",
+#                  "MarofotyMarofoty", "Maromiandra", "Maromokotra-Loky", "Marosavoa Bas", "Marovitsika", "Merimandroso", "Miary", "Milenaka", "Mitsinjo", "Mizilo Gare",
+#                  "Moramanga Urbain", "Morarano Gare", "Morombe", "Nagnarena", "Nasandratrony", "Niarovana", "Nosibe Masianaka", "Onilhy", "Port Bergé I", "Port Bergé II",
+#                  "Rantabe Est", "Rantabe Sud", "Razanaka", "Sahamadio", "Sahambavy", "Sahambo", "Sahanivotry Atsimo", "Sakamahily-Ouest", "Sakay", "Sakona", "Sambava Urbain",
+#                  "Sarobaratra", "Soaindrana", "Soalara", "Soatanana", "St Augustin", "Taindambo", "Talata Ampano", "Talatan'Angavo", "Taolognaro", "Tanakamba", "Tanambao  Daoud",
+#                  "Tanambaovatrakaka", "Tanandava-Sud", "Tanandrano", "Toamasina Suburbain", "Tovòna", "Tsarahonenana", "Tsarajomoko", "Tsaratanana", "Tsiafajavona Ankarat",
+#                  "Tsianisiha", "Tsianofàna", "Tsinjoarivo", "Tsiombe", "Tsiroanomadidy Ville", "Tsiroanomandidy Ville", "Vatolatsaky", "Vilihazo", "Vinaninony Avaratra",
+#                  "Vineta Andamasiny", "Vohibato Ouest", "Vohimarina", "Vohitrafeno", "Zomabealoka")
+# 
+# commune_new <- c("Alakamisy Ambohimaha", "Alakamisy Itenina", "Ambandrika", "Ambalakely", "Ambalamahasoa", "Ambalamanasy II", "Ambalamidera II", "Ambalapaiso II", "Ambararatabe Nord",
+#                  "Ambarijeby Sud", "Ambatoben'anjavy", "Ambatofisaka II", "Ambatoharanana", "Ambatolampy", "Ambatolampy", "Ambatoriha Est", "Ambatotsipihina", "Ambatolava",
+#                  "Ambatry Mitsinjo", "Ambinanin'andravory", "Ambinanindrano", "Ambinaniroa", "Ambodiadabo", "Ambodiadabo M", "Ambodiampana", "Ambodiampana", "Ambodifarihy Fenomanana",
+#                  "Ambodihazoambo", "Ambodimanga I","Ambodimanga II", "Ambodimotso Sud", "Ambodinonoka", "Ambodirian'i Sahafary", "Amboditandroroho", "Ambohibao Sud",
+#                  "Ambohibary Vohilena", "Mandritsara", " Ambohimahavelona", "Ambohimalaza Miray", "Ambohimana", "Ambohimanga Du Sud", "Sahatsiho Ambohimanjaka",
+#                  "Ambohimiarina II", "Ambohitralanana", "Ambohitrandriamanitra", "Ambohitsara Est", "Ambolidibe Est", "Ambolofoty", "Amborompotsy", "Ampasimadinika Manambolo",
+#                  "Ampasimboraka", "Ampasimpotsy Sud", "Ampasimpotsy Gara", "Ampasipotsy Mandialaza", "Manampaneva", "Ampatakamaroreny", "Anakao", "Analaiva", "Analamisampy",
+#                  "Analamitsivalana", "Ambatomainty", "Antanandava", "Andrainjato Est", "Andimaky Manambolo", "Andoharanomaitso", "Andoharanomaitso", "Andrainjato Centre",
+#                  "Andranohinaly", "Andranomiditra", "Rambolamasoandro Andranomiely", "Andranovorivato", "Andranovory", "Andravola Vohipeno", "Andrebakely Nord", "Andribavontsona",
+#                  "Androndrono", "Androy", "Anjampaly", "Anjeky Ankilikira", "Anjeva Gara", "Anjiabe Ambony", "Anjiajia", "Anjoman'ankona", "Anjoma Itsara", "Ankadinondry Sakay",
+#                  "Ankafina Tsarafidy", "Ankarinarivo Manirisoa", "Ankaromalaza Mifanasoa", "Ankasakasa Tsibiray", "Ankazoabo Sud", "Ankazotokana", "Ankiabe-Salohy", " Ankiakabe Nord",
+#                  "Ankililoaka", "Ankilimalinike", "Bemarivo Ankirondro", "Anontsibe Centre", "Anosiarivo I", "Anosy Tsararafa", " Antalaha Ambonivohitra", "Antanamalaza", "Antanambao Ambary",
+#                  "Antanambao", "Antanambao Manampontsy", "Antanambaon'amberina", "1er Arrondissement", "2e Arrondissement", "3e Arrondissement", "4e Arrondissement", "5e Arrondissement",
+#                  "6e Arrondissement", "Antanandava", "Antananivo Haut", "Antanetibe", "Antanimora Atsimo", "Antenina", "Antoby Est", "Antohabato", "Antongo Vaovao", "Marovitsika Sud", "Antranokarany",
+#                  "Antsahavaribe", "Antsakoamanondro", "Antsampanimahazo", "Antsirabe Afovoany Atsinanana", "Diego Suarez", "Antsoatany", "Bealampona", "Bealanana", "Beampombo I",
+#                  "Beandrarezona", "Befandriana Nord", "Befandriana Sud", "Befeta", "Befotaka Nord", "Befotaka Sud", "Beheloka", "Behara", "Behompy", "Belafike Haut", "Belalanda",
+#                  "Belambo Firaisana", "Belaoka Marovato", "Belo Sur Mer", "Belo Sur Tsiribihina", "Belo Sur Tsiribihina", "Bemaneviky Haut Sambirano", "Benato Toby", "Bereketa",
+#                  "Berevo/ranobe", "Beroy Atsimo", "Betioky Atsimo", "Betsakotsako Andranotsara", "Betsimisotra", "Betsinjaka", " Beretra Bevoay", "Bevonotra", "Efatsy", "Enakara-Haut",
+#                  "Enaniliha", "Erada", "Etrotroka Atsimo", "Fandrandava", "Fanjakana", "Betanty (Faux Cap)", "Fenoevo-Efita", "Fiaferana", "Mahavelona (Foulpointe)", "Ialananindro",
+#                  "Iavonomby Vohibola", "Alatsinainy Ibity", "Namohora Iaborano", "Ihazoara", "Menamaty Iloto", "Imerina Imady", "Imerintsiatosika", "Isaka-Ivondro", "Isahara",
+#                  "Isorana", "Vatana", "Ivato Aeroport", "Ivoamba", "Ivony Miaramiasa", "Ikalalao", "Kianjandrakefina", "Iabohazo", "Ivondro", "Mahaditra", "Mahafasa Centre",
+#                  "Mahajanga", "Mahasoabe", "Mahatsara Iefaka", "Mahatsinjo Est", "Mahatsinjony", "Mahatsinjony", "Mahazina Ambohipierenana", "Mananjary", "Manakambahiny Antsinanana",
+#                  "Manakambahiny Andrefana", "Manakara", "Manambotra Atsimo", "Manampatrana", "Mandromondromotra", "Maneva", "Mangarivotra", "Manombo Sud", "Manorofify", "Maritampona",
+#                  "Tanambao Marivorahona", "Maroarivo Ankazomanga", "Marofoty", "Maromiandra", "Maromokotra Loky", "Marosavoa", "Marovitsika Sud", "Imerimandroso", "Miary Ambohibola",
+#                  "Milenaka", "Mitsinjo Betanimena", "Mizilo Gara", "Moramanga", "Morarano Gara", "Cu Morombe", "Nanarena Besakoa", "Nasandratrony", "Niarovana Marosampanana",
+#                  "Masianaka", "Onilahy", "Port Berge", "Port Berge II", "Rantabe", "Rantabe", "Vohipeno Razanaka", "Sahamadio Fisakana", "Sahambavy", "Sahambano", "Sahanivotry Manandona",
+#                  "Sakamahily", "Tanamarina Sakay", "Sakoana", "Sambava Cu", "Sarobaratra Ifanja", "Soaindrana", "Soalara Sud", "Soatanana", "Saint Augustin", "Taindambo", "Tatala Ampano",
+#                  "Talata Angavo", "Fort-Dauphin", "Tanakambana", "Tanambao Daoud", "Tanambao Vahatrakaka", "Tanandava Sud", "Tandrano", "Toamasina Suburbaine", "Tovona", "Tsarahonenana Sahanivotry",
+#                  "Tsarajomoka", "Tsaratanana I", "Tsiafajavona Ankaratra", "Tsianisiha", "Tsianofana", "Tsinjoarivo Imanga", "Tsihombe", "Tsiroanomandidy Fihaonana",
+#                  "Tsiroanomandidy Fihaonana", "Vatolatsaka", "Viliahazo", "Vinaninony Atsimo", "Andamasiny Vineta", "Vohibato Ouest", "Vohimarina", "Vohitrafeno", "Zoma Bealoka")
+# 
+# as.data.frame(cbind(commune_old, commune_new)) %>%
+#   arrange(commune_old) %>%
+#   mutate(test = commune_new == commune_old) %>%
+#   filter(test == FALSE) %>%
+#   dplyr::select(!test) %>%
+#   rename("Name in data" = commune_old,
+#          "Standardized name" = commune_new) %>%
+#   gt() %>%
+#   tab_header(
+#     title = md("**Table S2.9: Standardization of commune names**")) %>%
+#   tab_options(table.font.names = "Source Sans Pro",
+#               page.header.use_tbl_headings	= TRUE) %>%
+#   tab_style(
+#     locations = cells_column_labels(),
+#     style     = list(
+#       cell_text(weight = "bold"))
+#   ) %>%
+#   gtsave("table_s_2_9.docx")
 
 
-<!-- commune_old <- c("Alakamisy Ambohimahy", "Alakamisy Itenina", "Ambadrika", "Ambalakely", "Ambalamahasoa", "Ambalamanasy   II", "Ambalamidera", "AmbalapaisoII", "Ambararatabe /Nord", -->
-<!--                  "Ambarijeby Atsimo", "Ambatoben'anja", "AmbatofisakaII", "AmbatoharananaI", "Ambatolampy Tsimahaf", "Ambatolampy Tsimahafotsy", "Ambatoriha/Est", "Ambatotsipihana",  -->
-<!--                  "Ambatovala", "Ambatry", "Ambinanin'Andravory", "Ambinaninandro", "Ambinaniroa-Andonaka", "Ambodiadabo Maitsokely", "Ambodiadabo", "Ambodiampana Lokoho", -->
-<!--                  "Ambodiampanana", "Ambodifarihy", "Ambodihazambo", "Ambodimanga  I", "Ambodimanga II-B", "Ambodimotso Atsimo", "AmbodinonokaAntaratr", "Ambodirian'Isahafary", -->
-<!--                  "Amboditandroho", "Ambohibao Atsimo", "Ambohibary", "Ambohijato Mandritsara", "Ambohimahavelona", "Ambohimalaza", "Ambohimàna", "Ambohimanga Sud", -->
-<!--                  "Ambohimanjaka", "AmbohimiarinaII", "Ambohitralalana", "Ambohitrandriamanitr", "AmbohitsaraEst", "Ambolidibe Atsinanana", "Ambolofoty", "Amboropotsy", -->
-<!--                  "Ampasimadinika", "Ampasimborajka", "Ampasimpotsy", "Ampasipotsy Gare", "Ampasipotsy Madialaz", "Ampataka Manampaneva", "Ampataka Maroreny", "Anakao", -->
-<!--                  "Analalaiva", "Analamisampy", "Analamitsivala", "Anbatomainty", "Andanandava", "Andianjanto Est", "Andimaka", "Andoharanomaintso", "Andoharanomaintso", -->
-<!--                  "Andrainjanto Centre", "Andranohinaly", "Andranomiditra", "Andranomiely", "Andranovorivato", "Andranovory", "Andravola", "Andrebakely", "Andribavontsona", -->
-<!--                  "Androndrona", "Androy", "Anjapaly", "Anjeke Ankilira", "Anjeva Gare", "Anjiabe", "Anjiaija", "Anjoman'Ankona", "Anjoma-tsara", "Ankadinondry", "Ankafina", -->
-<!--                  "Ankarinarivo", "Ankaromalaza Mifanas", "Ankasakasa", "Ankazoabo", "Ankazotokana I", "Ankiabe Salohy", "Ankiakabe-Nord", "Ankililoaka", "Ankilimalinika", -->
-<!--                  "Ankirondro", "Anontsibe", "Anosiarivo", "Anosy Tsararafara", "Antalaha", "Antanamalaza", "Antanambao Ambary", "Antanambao I", "Antanambao Manampotsy", -->
-<!--                  "Antanambaon'Amberina", "Antananarivo I", "Antananarivo II", "Antananarivo III", "Antananarivo IV", "Antananarivo V", "Antananarivo VI", "Antanandava Nord", -->
-<!--                  "Antananivo /Haut", "Antanetibe Mahazaza", "Antanimora- Sud", "Antenina I", "Antoby", "Antohaboto", "Antongo", "Antokoboritelo", "Antranonkarany", "Antsahavaribe", -->
-<!--                  "Antsakomanondro", "Antsapanimahazo", "Antsirabe I", "Antsiranana I", "Antsoantany", "Bealampoana", "Bealanana I", "Beampombo  I", "Beandrarezona I", -->
-<!--                  "Befandriana Avaratra", "Befandriana-Sud", "Befetra", "Befotaka Avaratra", "Befotaka", "Beheloka", "Behera", "Behompy", "Belafika Haut", "Belalanda", -->
-<!--                  "Belambo", "Belaoko Marovato", "Belo sur Mer", "Belo Tsiribihina", "Belotsiribihina", "Bemaneviky H", "BenatoToby", "Beraketa", "Berevo Ranobe", -->
-<!--                  "Beroy Sud", "Betioky Sud", "Betsakotsako Andrano", "Betsimiositra", "Betsinjaka", "Bevoay Beretra", "Bevonotro", "Efatsy Anandroza", "Enakara Haut", -->
-<!--                  "Enaniiliha", "Ereda", "Etrotroka", "Fandravandava", "Fanjakana", "Faux-Cap", "Fenoevo", "Fieferana", "Foulpointe", "Ialananidro", "Iavinomby", "Ibity", -->
-<!--                  "Ihaborano Namohora", "Ihazoara", "Iloto", "Imady", "Imeritsiatosika", "Isaka Ivondro", "Isaraha", "Isorana", "Ivatana", "Ivato Aéroport", "Ivoamba", -->
-<!--                  "Ivony", "Kalalao", "Kianjandrandrakefina", "labohazo", "Lavaraty Ivondro", "Mahaditra", "Mahafasa", "Mahajanga I", "Mahasoabe", "Mahatsara Lefaka", -->
-<!--                  "Mahatsinjo Atsinanana", "Mahatsinjo", "Mahatsinjony", "Mahazina", "Manajary Urbain", "Manakambahiny Est", "Manakambahiny Ouest", "Manakara(com)", -->
-<!--                  "Manambotra Sud", "Manapatrana", "Mandromodromotra", "Maneva", "Mangarivot", "Manombo", "Manorofify", "Marintampona", "Marivorahona", "Maroarivo",  -->
-<!--                  "MarofotyMarofoty", "Maromiandra", "Maromokotra-Loky", "Marosavoa Bas", "Marovitsika", "Merimandroso", "Miary", "Milenaka", "Mitsinjo", "Mizilo Gare",  -->
-<!--                  "Moramanga Urbain", "Morarano Gare", "Morombe", "Nagnarena", "Nasandratrony", "Niarovana", "Nosibe Masianaka", "Onilhy", "Port Bergé I", "Port Bergé II", -->
-<!--                  "Rantabe Est", "Rantabe Sud", "Razanaka", "Sahamadio", "Sahambavy", "Sahambo", "Sahanivotry Atsimo", "Sakamahily-Ouest", "Sakay", "Sakona", "Sambava Urbain", -->
-<!--                  "Sarobaratra", "Soaindrana", "Soalara", "Soatanana", "St Augustin", "Taindambo", "Talata Ampano", "Talatan'Angavo", "Taolognaro", "Tanakamba", "Tanambao  Daoud", -->
-<!--                  "Tanambaovatrakaka", "Tanandava-Sud", "Tanandrano", "Toamasina Suburbain", "Tovòna", "Tsarahonenana", "Tsarajomoko", "Tsaratanana", "Tsiafajavona Ankarat", -->
-<!--                  "Tsianisiha", "Tsianofàna", "Tsinjoarivo", "Tsiombe", "Tsiroanomadidy Ville", "Tsiroanomandidy Ville", "Vatolatsaky", "Vilihazo", "Vinaninony Avaratra", -->
-<!--                  "Vineta Andamasiny", "Vohibato Ouest", "Vohimarina", "Vohitrafeno", "Zomabealoka") -->
 
-<!-- commune_new <- c("Alakamisy Ambohimaha", "Alakamisy Itenina", "Ambandrika", "Ambalakely", "Ambalamahasoa", "Ambalamanasy II", "Ambalamidera II", "Ambalapaiso II", "Ambararatabe Nord", -->
-<!--                  "Ambarijeby Sud", "Ambatoben'anjavy", "Ambatofisaka II", "Ambatoharanana", "Ambatolampy", "Ambatolampy", "Ambatoriha Est", "Ambatotsipihina", "Ambatolava",  -->
-<!--                  "Ambatry Mitsinjo", "Ambinanin'andravory", "Ambinanindrano", "Ambinaniroa", "Ambodiadabo", "Ambodiadabo M", "Ambodiampana", "Ambodiampana", "Ambodifarihy Fenomanana", -->
-<!--                  "Ambodihazoambo", "Ambodimanga I","Ambodimanga II", "Ambodimotso Sud", "Ambodinonoka", "Ambodirian'i Sahafary", "Amboditandroroho", "Ambohibao Sud", -->
-<!--                  "Ambohibary Vohilena", "Mandritsara", " Ambohimahavelona", "Ambohimalaza Miray", "Ambohimana", "Ambohimanga Du Sud", "Sahatsiho Ambohimanjaka", -->
-<!--                  "Ambohimiarina II", "Ambohitralanana", "Ambohitrandriamanitra", "Ambohitsara Est", "Ambolidibe Est", "Ambolofoty", "Amborompotsy", "Ampasimadinika Manambolo", -->
-<!--                  "Ampasimboraka", "Ampasimpotsy Sud", "Ampasimpotsy Gara", "Ampasipotsy Mandialaza", "Manampaneva", "Ampatakamaroreny", "Anakao", "Analaiva", "Analamisampy", -->
-<!--                  "Analamitsivalana", "Ambatomainty", "Antanandava", "Andrainjato Est", "Andimaky Manambolo", "Andoharanomaitso", "Andoharanomaitso", "Andrainjato Centre", -->
-<!--                  "Andranohinaly", "Andranomiditra", "Rambolamasoandro Andranomiely", "Andranovorivato", "Andranovory", "Andravola Vohipeno", "Andrebakely Nord", "Andribavontsona", -->
-<!--                  "Androndrono", "Androy", "Anjampaly", "Anjeky Ankilikira", "Anjeva Gara", "Anjiabe Ambony", "Anjiajia", "Anjoman'ankona", "Anjoma Itsara", "Ankadinondry Sakay", -->
-<!--                  "Ankafina Tsarafidy", "Ankarinarivo Manirisoa", "Ankaromalaza Mifanasoa", "Ankasakasa Tsibiray", "Ankazoabo Sud", "Ankazotokana", "Ankiabe-Salohy", " Ankiakabe Nord", -->
-<!--                  "Ankililoaka", "Ankilimalinike", "Bemarivo Ankirondro", "Anontsibe Centre", "Anosiarivo I", "Anosy Tsararafa", " Antalaha Ambonivohitra", "Antanamalaza", "Antanambao Ambary", -->
-<!--                  "Antanambao", "Antanambao Manampontsy", "Antanambaon'amberina", "1er Arrondissement", "2e Arrondissement", "3e Arrondissement", "4e Arrondissement", "5e Arrondissement", -->
-<!--                  "6e Arrondissement", "Antanandava", "Antananivo Haut", "Antanetibe", "Antanimora Atsimo", "Antenina", "Antoby Est", "Antohabato", "Antongo Vaovao", "Marovitsika Sud", "Antranokarany", -->
-<!--                  "Antsahavaribe", "Antsakoamanondro", "Antsampanimahazo", "Antsirabe Afovoany Atsinanana", "Diego Suarez", "Antsoatany", "Bealampona", "Bealanana", "Beampombo I", -->
-<!--                  "Beandrarezona", "Befandriana Nord", "Befandriana Sud", "Befeta", "Befotaka Nord", "Befotaka Sud", "Beheloka", "Behara", "Behompy", "Belafike Haut", "Belalanda", -->
-<!--                  "Belambo Firaisana", "Belaoka Marovato", "Belo Sur Mer", "Belo Sur Tsiribihina", "Belo Sur Tsiribihina", "Bemaneviky Haut Sambirano", "Benato Toby", "Bereketa",  -->
-<!--                  "Berevo/ranobe", "Beroy Atsimo", "Betioky Atsimo", "Betsakotsako Andranotsara", "Betsimisotra", "Betsinjaka", " Beretra Bevoay", "Bevonotra", "Efatsy", "Enakara-Haut", -->
-<!--                  "Enaniliha", "Erada", "Etrotroka Atsimo", "Fandrandava", "Fanjakana", "Betanty (Faux Cap)", "Fenoevo-Efita", "Fiaferana", "Mahavelona (Foulpointe)", "Ialananindro",  -->
-<!--                  "Iavonomby Vohibola", "Alatsinainy Ibity", "Namohora Iaborano", "Ihazoara", "Menamaty Iloto", "Imerina Imady", "Imerintsiatosika", "Isaka-Ivondro", "Isahara", -->
-<!--                  "Isorana", "Vatana", "Ivato Aeroport", "Ivoamba", "Ivony Miaramiasa", "Ikalalao", "Kianjandrakefina", "Iabohazo", "Ivondro", "Mahaditra", "Mahafasa Centre",  -->
-<!--                  "Mahajanga", "Mahasoabe", "Mahatsara Iefaka", "Mahatsinjo Est", "Mahatsinjony", "Mahatsinjony", "Mahazina Ambohipierenana", "Mananjary", "Manakambahiny Antsinanana", -->
-<!--                  "Manakambahiny Andrefana", "Manakara", "Manambotra Atsimo", "Manampatrana", "Mandromondromotra", "Maneva", "Mangarivotra", "Manombo Sud", "Manorofify", "Maritampona",  -->
-<!--                  "Tanambao Marivorahona", "Maroarivo Ankazomanga", "Marofoty", "Maromiandra", "Maromokotra Loky", "Marosavoa", "Marovitsika Sud", "Imerimandroso", "Miary Ambohibola",  -->
-<!--                  "Milenaka", "Mitsinjo Betanimena", "Mizilo Gara", "Moramanga", "Morarano Gara", "Cu Morombe", "Nanarena Besakoa", "Nasandratrony", "Niarovana Marosampanana",  -->
-<!--                  "Masianaka", "Onilahy", "Port Berge", "Port Berge II", "Rantabe", "Rantabe", "Vohipeno Razanaka", "Sahamadio Fisakana", "Sahambavy", "Sahambano", "Sahanivotry Manandona", -->
-<!--                  "Sakamahily", "Tanamarina Sakay", "Sakoana", "Sambava Cu", "Sarobaratra Ifanja", "Soaindrana", "Soalara Sud", "Soatanana", "Saint Augustin", "Taindambo", "Tatala Ampano",  -->
-<!--                  "Talata Angavo", "Fort-Dauphin", "Tanakambana", "Tanambao Daoud", "Tanambao Vahatrakaka", "Tanandava Sud", "Tandrano", "Toamasina Suburbaine", "Tovona", "Tsarahonenana Sahanivotry", -->
-<!--                  "Tsarajomoka", "Tsaratanana I", "Tsiafajavona Ankaratra", "Tsianisiha", "Tsianofana", "Tsinjoarivo Imanga", "Tsihombe", "Tsiroanomandidy Fihaonana",  -->
-<!--                  "Tsiroanomandidy Fihaonana", "Vatolatsaka", "Viliahazo", "Vinaninony Atsimo", "Andamasiny Vineta", "Vohibato Ouest", "Vohimarina", "Vohitrafeno", "Zoma Bealoka") -->
+```
 
-<!-- as.data.frame(cbind(commune_old, commune_new)) %>% -->
-<!--   arrange(commune_old) %>% -->
-<!--   mutate(test = commune_new == commune_old) %>% -->
-<!--   filter(test == FALSE) %>% -->
-<!--   dplyr::select(!test) %>% -->
-<!--   rename("Name in data" = commune_old, -->
-<!--          "Standardized name" = commune_new) %>% -->
-<!--   gt() %>% -->
-<!--   tab_header( -->
-<!--     title = md("**Table S2.9: Standardization of commune names**")) %>% -->
-<!--   tab_options(table.font.names = "Source Sans Pro", -->
-<!--               page.header.use_tbl_headings	= TRUE) %>% -->
-<!--   tab_style( -->
-<!--     locations = cells_column_labels(), -->
-<!--     style     = list( -->
-<!--       cell_text(weight = "bold")) -->
-<!--   ) %>% -->
-<!--   gtsave("table_s_2_9.docx") -->
-
-
-
-
-<!-- ``` -->
 
 ```{r housekeeping_1a, warning = FALSE, message = FALSE, echo = FALSE, include = FALSE}
 
@@ -2230,7 +2228,7 @@ In order to systematically match facilities in our sample to facilities in the s
 
 To account for similarly named facilities located in different regions, we constructed a full, standardized name for each facility that included facility name and catchment area prior to applying our matching technique. Facility type was standardized to align with the facility types in our sample. For example, the full, standardized name for the Alakamisy Tsarazaza Health Post located in the commune of Tsarazazaa in the Fandrian district of Amoron'I Mania region would be "Alakamisy Tsarazaza Tsarazazaa Fandrian Amoron'I Mania", with the facility classified as a CSB1 facility). 
 
-The similarity between two strings of text can be measured numerically using the Levenshtein (or edit) distance. @konstantinidisComputingEditDistance2007 The Levenshtein distance between two identical strings will be zero, while strings involving a single character edit (insertions, deletions or substitutions) will involve a distance of 1.
+The similarity between two strings of text can be measured numerically using the Levenshtein (or edit) distance. @konstantinidisComputingEditDistance2007 The Levenshtein distance between two identical strings will be zero, while strings involving a single character edit (insertions, deletions, or substitutions) will involve a distance of 1.
 
 To identify the closest matches between the full, standardized facility names in our sample and the spatial inventory, we calculated a matrix identifying the pair-wise Levenshtein distance between all possible combinations. For each member of our sample, we then selected the facility in the spatial inventory with the lowest Levenshtein distance (i.e., the nearest pair). 
 

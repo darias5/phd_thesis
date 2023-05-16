@@ -611,8 +611,8 @@ After reviewing the list of symptoms for which search density data were availabl
 
 For each of these symptoms, $d$, I ran the following model:
 
-\begin{spacing}{1}
 
+\begin{spacing}{1}
 $$Y_{d,it} = \lambda_0 + \lambda_1 time_t + \lambda_2 Post_t + \lambda_3 time_t*Post_t + \alpha_d mhealth_{di} + 
 \ \ \ \ \ $$
 $$\beta_d time_t*mhealth_{di} + \delta_{d} Post_i*mhealth_{di} + \gamma_d time_t*Post_i*mhealth_{di} + \theta_g + T^{'}_t\chi + \epsilon_{it}\ \ \ ,\ \ \ \ \ \ \ \ \ \ (3.2)$$
@@ -622,7 +622,7 @@ $$\beta_d time_t*mhealth_{di} + \delta_{d} Post_i*mhealth_{di} + \gamma_d time_t
 
 where $mhealth_{di}$ equals 1 if the observation is for a mental health symptom $d$ (0 for headaches). The estimates of interest are given by $\delta$, which reflects the additional level shift among symptom searches (compared to searches for headaches) after vaccine announcement, and $\gamma$, the additional relative change in search density over time (i.e., slope change).
 
-Given the high number of observations in the sample, I evaluated significance against an alpha of 0.01, and I constructed 99% confidence intervals ( \acr{CIs}) using heteroskedasticity-robust standard errors.
+Given the high number of observations in the sample, I evaluated significance against an alpha of 0.01, and I constructed 99% confidence intervals (\acr{CIs}) using heteroskedasticity-robust standard errors.
 
 ##### Sensitivity analysis 
 
@@ -1263,8 +1263,6 @@ Instead, I observed the opposite: among the counties that most heavily voted for
 These findings should be interpreted with some limitations in mind. First, the aggregated and anonymized nature of the data imposes a constraint to the interpretations, as it was not possible to identify whether individual political ideologies were correlated with changes in search trends. Instead, I relied on population aggregates that reflect political orientation (i.e., vote share by county and state) as a proxy, focusing on the 20% most Democrat and Republican-voting areas to strengthen the plausibility of this proxy. In addition, the use of Google search density as a proxy for population mental health could not be directly validated in the study, as the search data was anonymized and aggregated. 
 
 While this is an important limitation, prior work has found a strong correlation between searches for anxiety and depression and \acr{US} population survey responses for receiving therapy, receiving medication for mental health disorders, and having unmet mental health needs.[@agrawalImpactCOVID19Vaccine2021] Given the paucity of high-frequency population mental health data, Google search density data offered a unique opportunity to investigate the immediate and sustained impacts of vaccine safety and efficacy announcements with an aggregated measures that may be linked with subjective well-being and care seeking.
-
-\newpage
 
 Despite these limitations, the findings suggest that the announcement of COVID-19 vaccine safety and efficacy led to a robust and sustained reduction in Google search density for anxiety and depression, relative to search density prior to the announcements and to searches for other symptoms. If symptom search density echoes population health, the results would indicate that these announcements led to an improvement in mental health, an improvement observed across countries and predominant political party inclination. These findings underscore the importance of timely and transparent public health communication and highlight the potential application of high-frequency internet search data for population mental health surveillance. 
 
